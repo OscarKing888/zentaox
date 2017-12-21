@@ -11,68 +11,67 @@
  */
 ?>
 <?php include '../../common/view/header.html.php'; ?>
-<?php include '../../common/view/kindeditor.html.php';?>
-<?php include 'debug.html.php';?>
+<?php include '../../common/view/kindeditor.html.php'; ?>
+<?php include 'debug.html.php'; ?>
 
-<div class='container'>
-    <div class='panel'>
-        <div class='panel-heading'>
-            <strong> <?php echo $lang->blog->index; ?></strong>
-            <div class='pull-right'> <?php echo html::a(inlink('create'), $lang->blog->add, "class='btn btn-primary btn-xs'"); ?></div>
+<div class='row-table'>
+    <div class='col-main'>
+        <div class='btn btn-primary' align="right" id='createActionMenu'>
+            <?php
+            echo html::a(inlink('create'), "<i class='icon icon-plus'></i>" . $lang->blog->add);
+            ?>
         </div>
-        <table class='table table-list table-hover'>
-            <thead>
-            <tr>
-                <td class='text-center' width='150'><?php echo $lang->blog->date; ?></td>
-                <td width='50'><?php echo $lang->project->manageProducts; ?></td>
-                <td><?php echo $lang->blog->content; ?></td>
-                <td class='text-center' width='120'><?php echo $lang->blog->action; ?></td>
-            </tr>
-            </thead>
-            <tbody>
+
+        <div class='main'>
             <?php foreach ($articles as $article): ?>
-                <tr>
-                    <td><?php echo formatTime("YYYY-MM-DD",$article->date); ?></td>
-                    <td class='text-center'><?php echo $products[$article->product]; ?></td>
-                    <td>
-                        <fieldset>
-                            <div class='content'>
-                                <?php
-                                $steps = $article->content;
-                                //$steps = str_replace('<p></p>', '', $article->content);
-                                echo "<font color=blue><b>raw:</b></font><dd>"; echo ($steps);
-                                echo "<br><br>";
-                                echo "<font color=blue><b>htmlspecialchars:</b></font><dd>"; echo htmlspecialchars($steps);
-                                echo "<br><br>";
-                                echo "<font color=blue><b>html_entity_decode:</b></font><dd>"; echo html_entity_decode($steps);
-                                echo "<br><br>";
-                                echo "<font color=blue><b>htmlentities:</b></font><dd>"; echo htmlentities($steps);
-                                echo "<br><br>";
-                                echo "<font color=blue><b>htmlspecialchars_decode:</b></font><dd>"; echo htmlspecialchars_decode($steps);
-                                ?>
-                            </div>
-                        </fieldset>
-                    </td>
-                    <td>
+
+                <fieldset>
+                    <legend><?php echo formatTime("YYYY-MM-DD", $article->date) . "&nbsp;&nbsp;" . $products[$article->product]; ?></legend>
+
+                    <div class='content'>
+                        <?php
+                        echo $article->content;
+                        echo "<br>";
+                        echo $article->contentimages;
+                        //$steps = $article->contentimages;
+                        //$steps = str_replace('<p></p>', '', $article->content);
+                        //$test = $this->loadModel('file')->replaceImgURL($steps, 'contentimages');
+                        //echo $test;
+                        //echo "<br><br>";
+
+                        /*
+                        echo "<font color=blue><b>raw:</b></font><dd>"; echo ($steps);
+                        echo "<br><br>";
+                        echo "<font color=blue><b>htmlspecialchars:</b></font><dd>"; echo htmlspecialchars($steps);
+                        echo "<br><br>";
+                        echo "<font color=blue><b>html_entity_decode:</b></font><dd>"; echo html_entity_decode($steps);
+                        echo "<br><br>";
+                        echo "<font color=blue><b>htmlentities:</b></font><dd>"; echo htmlentities($steps);
+                        echo "<br><br>";
+                        echo "<font color=blue><b>htmlspecialchars_decode:</b></font><dd>"; echo htmlspecialchars_decode($steps);
+                        //*/
+                        ?>
+                    </div>
+
+                    <div align="right" class='content'>
+                        <br>
                         <?php
                         //echo html::a($this->createLink('blog', 'view', "id=$article->id"), $lang->blog->view);
                         echo html::a($this->createLink('blog', 'edit', "id=$article->id"), $lang->blog->edit);
                         echo html::a($this->createLink('blog', 'delete', "id=$article->id"), $lang->blog->delete);
                         ?>
-                    </td>
-                </tr>
+                    </div>
+                </fieldset>
+
+
             <?php endforeach; ?>
-            </tbody>
-            <tfoot>
-            <tr>
-                <td colspan='4'>
-                    <?php
-                    $pager->show('right', 'short');
-                    ?>
-                </td>
-            </tr>
-            </tfoot>
-        </table>
+
+            <div align="right" class='content'>
+                <?php
+                $pager->show('right', 'short');
+                ?>
+            </div>
+        </div>
     </div>
 </div>
 <?php include '../../common/view/footer.html.php'; ?>

@@ -24,6 +24,7 @@ $lang->blog->id      = '编号';
 $lang->blog->title   = '标题';
 $lang->blog->date    = '日期';
 $lang->blog->content = '内容';
+$lang->blog->pic = '图片';
 $lang->blog->action  = '操作';
 
 $lang->project->manageProducts = '产品';

@@ -39,17 +39,9 @@
                         <fieldset>
                             <div class='content'>
                                 <?php
-                                $steps = $article->content;
-                                //$steps = str_replace('<p></p>', '', $article->content);
-                                echo "<font color=blue><b>raw:</b></font><dd>"; echo ($steps);
-                                echo "<br><br>";
-                                echo "<font color=blue><b>htmlspecialchars:</b></font><dd>"; echo htmlspecialchars($steps);
-                                echo "<br><br>";
-                                echo "<font color=blue><b>html_entity_decode:</b></font><dd>"; echo html_entity_decode($steps);
-                                echo "<br><br>";
-                                echo "<font color=blue><b>htmlentities:</b></font><dd>"; echo htmlentities($steps);
-                                echo "<br><br>";
-                                echo "<font color=blue><b>htmlspecialchars_decode:</b></font><dd>"; echo htmlspecialchars_decode($steps);
+                                echo $article->content;
+                                echo "<br>";
+                                echo  $article->contentimages;
                                 ?>
                             </div>
                         </fieldset>

@@ -24,5 +24,6 @@ $lang->blog->id      = 'Id';
 $lang->blog->title   = 'Title';
 $lang->blog->date    = 'Date';
 $lang->blog->content = 'Content';
+$lang->blog->pic = 'Images';
 $lang->blog->action  = 'Action';
 $lang->project->manageProducts = 'Product';

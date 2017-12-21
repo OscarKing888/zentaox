@@ -11,12 +11,15 @@
  */
 ?>
 
-<?php if($this->config->debug):?>
+<?php if($this->config->blog->debug):?>
 ===========
+<?php echo $this->post->uid; ?>
+<br>
 <br>
 <?php echo $this->moduleName; ?>
 <br>
 <?php echo $this->app->user->account; ?>
 <br>
+
 ===========
 <?php endif;?>
