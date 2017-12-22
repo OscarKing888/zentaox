@@ -21,6 +21,10 @@ class blog extends control
     {
         parent::__construct();
         $this->app->loadLang('index');
+
+        $this->loadModel('dept');
+        $this->loadModel('file');
+        $this->loadModel('product');
     }
 
     /**
@@ -36,9 +40,9 @@ class blog extends control
         $this->app->loadClass('pager');
         $pager = new pager($recTotal, $recPerPage, $pageID);
 
-        $products = $this->loadModel('product')->getPairs();
+        $products = $this->product->getPairs();
         $this->view->products = $products;
-        $this->view->allProducts   = array(0 => '') + $this->loadModel('product')->getPairs('noclosed|nocode');
+        $this->view->allProducts   = array(0 => '') + $this->product->getPairs('noclosed|nocode');
         $this->view->title    = $this->lang->blog->index;
         $this->view->articles = $this->blog->getList($pager);
         $this->view->pager    = $pager;
@@ -72,9 +76,9 @@ class blog extends control
             die(js::locate(inlink('index')));
         }
 
-        $products = $this->loadModel('product')->getPairs();
+        $products = $this->product->getPairs();
         $this->view->products = $products;
-        $this->view->allProducts   = array(0 => '') + $this->loadModel('product')->getPairs('noclosed|nocode');
+        $this->view->allProducts   = array(0 => '') + $this->product->getPairs('noclosed|nocode');
         $this->view->title = $this->lang->blog->add;
         $this->display();
     }
@@ -95,9 +99,9 @@ class blog extends control
         }
         else
         {
-            $products = $this->loadModel('product')->getPairs();
+            $products = $this->product->getPairs();
             $this->view->products = $products;
-            $this->view->allProducts   = array(0 => '') + $this->loadModel('product')->getPairs('noclosed|nocode');
+            $this->view->allProducts   = array(0 => '') + $this->product->getPairs('noclosed|nocode');
             $this->view->title   = $this->lang->blog->edit;
             $this->view->article = $this->blog->getByID($id);
             $this->display();
@@ -136,9 +140,9 @@ class blog extends control
         $this->app->loadClass('pager');
         $pager = new pager($recTotal, $recPerPage, $pageID);
 
-        $products = $this->loadModel('product')->getPairs();
+        $products = $this->product->getPairs();
         $this->view->products = $products;
-        $this->view->allProducts   = array(0 => '') + $this->loadModel('product')->getPairs('noclosed|nocode');
+        $this->view->allProducts   = array(0 => '') + $this->product->getPairs('noclosed|nocode');
         $this->view->title    = $this->lang->blog->index;
         $this->view->articles = $this->blog->getDeletedList($pager);
         $this->view->pager    = $pager;
@@ -151,12 +155,20 @@ class blog extends control
         $this->locate(inlink('restore'));
     }
 
-    public function reportmyteam($recTotal = 0, $recPerPage = 20, $pageID = 0)
+    public function reportmyteam()
     {
+        $articles = $this->blog->getGroupReport();
+        $products = $this->product->getPairs();
+        $this->view->products = $products;
+        $this->view->allProducts   = array(0 => '') + $this->product->getPairs('noclosed|nocode');
+        $this->view->title    = $this->lang->blog->reportmyteam;
+        $this->view->articles = $articles;
+        $this->view->dept = $this->dept->getById($this->app->user->dept)->name;
+
         $this->display();
     }
 
-    public function reportproject($recTotal = 0, $recPerPage = 20, $pageID = 0)
+    public function reportproject()
     {
         $this->display();
     }

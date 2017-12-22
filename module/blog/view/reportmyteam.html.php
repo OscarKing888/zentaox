@@ -4,30 +4,64 @@
  *
  * The author disclaims copyright to this source code.  In place of
  * a legal notice, here is a blessing:
- * 
+ *
  *  May you do good and not evil.
  *  May you find forgiveness for yourself and forgive others.
  *  May you share freely, never taking more than you give.
  */
 ?>
-<?php include '../../common/view/header.html.php';?>
+<?php include '../../common/view/header.html.php'; ?>
 
-<?php include 'debug.html.php';?>
+<?php include 'debug.html.php'; ?>
 
-<div class='container'>
-  <div class='article'>
-    <h1><?php echo $article->date;?></h1>
-    <p><?php echo nl2br(strip_tags($article->content));?></p>
-      <fieldset>
-          <div class='content'>
-              <?php
-              $steps = str_replace('<p></p>', '', $article->content);
-              echo $steps + " www";
-              ?>
-          </div>
-      </fieldset>
+<
+<div class='row-table'>
+    <div class='col-main'>
+        <div class='main'>
 
-  </div>
-  <?php echo html::backButton();?>
+            ================
+            <?php
+            foreach ($articles as $a)
+            {
+                echo $a;
+            }
+            ?>
+            ================
+            <?php
+            $i = 0;
+            foreach ($articles as $article): ?>
+                <?php if ($i == 0) : ?>
+                    <legend>
+                        <?php echo $products[$article->product]
+                            . "&nbsp;&nbsp;"
+                            . $dept
+                            . "&nbsp;&nbsp;"
+                            . formatTime("YYYY-MM-DD", $article->date)
+                            ;
+                        $i++; ?>
+                    </legend>
+                <?php endif; ?>
+
+
+                <?php
+                echo $article->content;
+                echo "<br>";
+                ?>
+            <?php endforeach; ?>
+
+            <?php foreach ($articles as $article): ?>
+
+                <?php
+                $imgs = str_replace("<img", "<br><img", $article->contentimages);
+                //$imgs = $imgs . "<br>";
+                //$imgs = str_replace("<br>\n<br>", "<br>", $imgs);
+                echo $imgs;
+                //echo $article->contentimages;
+                //echo "<br>";
+                ?>
+            <?php endforeach; ?>
+
+        </div>
+    </div>
 </div>
-<?php include '../../common/view/footer.html.php';?>
+<?php include '../../common/view/footer.html.php'; ?>

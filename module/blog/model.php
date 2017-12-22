@@ -18,6 +18,9 @@ class blogModel extends model
     public function __construct()
     {
         parent::__construct();
+
+        $this->loadModel('dept');
+        $this->loadModel('file');
     }
 
     /**
@@ -40,12 +43,11 @@ class blogModel extends model
 
     function convertImageURL($arr)
     {
-        $fileModule = $this->loadModel('file');
         $artr = array();
         $i = 0;
         foreach ($arr as $art) {
             //$art = html_entity_decode($art);
-            $art = $fileModule->replaceImgURL($art, $this->config->blog->imageContentFieldName);
+            $art = $this->file->replaceImgURL($art, $this->config->blog->imageContentFieldName);
             $art->contentimages = htmlspecialchars_decode($art->contentimages);
             $artr[$i] = $art;
             $i++;
@@ -89,10 +91,9 @@ class blogModel extends model
     public function getById($id)
     {
         $content = $this->dao->findById($id)->from($this->config->blog->dbname)->fetch();
-        $fileModule = $this->loadModel('file');
 
         $art = ($content);
-        $art = $fileModule->replaceImgURL($art, $this->config->blog->imageContentFieldName);
+        $art = $this->file->replaceImgURL($art, $this->config->blog->imageContentFieldName);
         $art->contentimages = htmlspecialchars_decode($art->contentimages);
 
         return $art;
@@ -100,7 +101,7 @@ class blogModel extends model
 
     public function logBlog($log)
     {
-        if(!$this->config->blog->debug)
+        if (!$this->config->blog->debug)
             return false;
 
         if (!is_writable($this->app->getLogRoot()))
@@ -130,8 +131,7 @@ class blogModel extends model
 
         $article2 = htmlspecialchars_decode($article);
 
-        $articleProced = $this->loadModel('file')
-            ->processImgURL($article, $this->config->blog->editor->create['id'], $this->post->uid);
+        $articleProced = $this->file->processImgURL($article, $this->config->blog->editor->create['id'], $this->post->uid);
 
 
         $this->logBlog("\n====id:" . $this->post->uid . "\nraw:" . $article->contentimages . "\nbefore:" . $article2->contentimages . " \n after:"
@@ -180,5 +180,50 @@ class blogModel extends model
     {
         $this->dao->update($this->config->blog->dbname)
             ->set('deleted')->eq(0)->where('id')->eq($id)->exec();
+    }
+
+    public function getGroupReport()
+    {
+        //return array('www', 'qqq');
+
+        //$sql = "SELECT * FROM gameblog WHERE owner IN (SELECT zt_user.account FROM zt_user WHERE zt_user.dept =". $this->app->user->dept .") AND gameblog.deleted <> '1'";
+        $sql = "SELECT * FROM gameblog WHERE owner IN (SELECT zt_user.account FROM zt_user WHERE zt_user.dept ='". $this->app->user->dept ."')";
+        //$sql = "SELECT * FROM gameblog";
+        $deptUsers = $this->dao->exec($sql);
+
+        //*
+        $deptUsers = $this->dao->select('account')->from(TABLE_USER)
+            ->where('dept')->eq((int)$this->app->user->dept)
+            ->fetchAll();
+
+        $deptUsers = $this->dao->select("t1.id")
+            ->from($this->config->blog->dbname)->alias("t1")
+            ->fetchAll();
+
+        $articles = $this->dao->select('*')
+            ->from($this->config->blog->dbname)
+            ->where('owner')->in(array_keys($deptUsers))
+            ->orderBy('date desc')
+            ->fetchAll();
+        //*/
+
+        /*
+        $articles = $this->dao->select('t1.*')
+            ->from($this->config->blog->dbname)->alias('t1')
+            ->where('t1.deleted')->eq(0)
+            ->orderBy('date desc')
+            ->fetchAll();
+        //*/
+        //return $articles;
+
+        return $deptUsers;
+        //if (!$articles) return array('error from model.getGroupReport', array_keys($deptUsers));
+        if (!$articles) return array($this->app->user->dept);
+
+
+        foreach ($articles as $art) {
+            $art->contentimages = $this->file->setImgSize($art->contentimages, 512);
+        }
+        return $this->convertImageURL($articles);
     }
 }

@@ -28,7 +28,7 @@ include '../../common/view/datepicker.html.php';
                         <div class='row'>
                             <div class='col-sm-3'>
                                 <div class='input-group'>
-                                    <?php echo html::select("product", $allProducts, 1, "class='form-control chosen' onchange='loadBranches(this)'"); ?>
+                                    <?php echo html::select("product", $allProducts, 1, "class='form-control chosen' onchange=''"); ?>
                                     <span class='input-group-addon fix-border' style='padding:0px'></span>
                                 </div>
                             </div>

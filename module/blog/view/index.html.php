@@ -14,14 +14,20 @@
 <?php include '../../common/view/kindeditor.html.php'; ?>
 <?php include 'debug.html.php'; ?>
 
+
+<nav id="modulemenu">
+    <ul class="nav">
+        <li class="right" data-id="create">
+            <?php
+            $lnk = html::a(inlink('create'), "<i class='icon icon-plus'></i>" . $lang->blog->add);
+            echo $lnk;
+            ?>
+        </li>
+    </ul>
+</nav>
+<br>
 <div class='row-table'>
     <div class='col-main'>
-        <div class='btn btn-primary' align="right" id='createActionMenu'>
-            <?php
-            echo html::a(inlink('create'), "<i class='icon icon-plus'></i>" . $lang->blog->add);
-            ?>
-        </div>
-
         <div class='main'>
             <?php foreach ($articles as $article): ?>
 
