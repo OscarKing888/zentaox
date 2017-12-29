@@ -10,56 +10,65 @@
  *  May you share freely, never taking more than you give.
  */
 ?>
-<?php include '../../common/view/header.html.php'; ?>
+<?php
+include '../../common/view/header.html.php';
+include '../../common/view/form.html.php';
+include '../../common/view/kindeditor.html.php';
+include '../../common/view/datepicker.html.php';
+?>
 
 <?php include 'debug.html.php'; ?>
 
-<
 <div class='row-table'>
     <div class='col-main'>
         <div class='main'>
 
-            ================
+            <form method='post'>
+                <table class='table table-borderless table-form' align='center'>
+                    <tr>
+                        <th><?php echo $lang->blog->date; ?></th>
+                        <td>
+                            <?php echo html::input('day', $day, "class='form-control form-date' placeholder=''"); ?>
+                            <?php echo html::submitButton('查询'); ?>
+                        </td>
+                    </tr>
+                </table>
+            </form>
+
             <?php
-            foreach ($articles as $a)
-            {
-                echo $a;
-            }
-            ?>
-            ================
-            <?php
+            //echo $day;
+
             $i = 0;
-            foreach ($articles as $article): ?>
-                <?php if ($i == 0) : ?>
-                    <legend>
-                        <?php echo $products[$article->product]
-                            . "&nbsp;&nbsp;"
-                            . $dept
-                            . "&nbsp;&nbsp;"
-                            . formatTime("YYYY-MM-DD", $article->date)
-                            ;
-                        $i++; ?>
-                    </legend>
-                <?php endif; ?>
+            foreach ($articles as $article) {
+                if ($i == 0 && ($article != null)) {
+                    echo "<legend>";
 
+                    echo $products[$article->product]
+                        . "&nbsp;&nbsp;"
+                        . $dept
+                        . "&nbsp;&nbsp;"
+                        . date('Y-m-d', strtotime($article->date))
+                        ;
+                    $i++;
 
-                <?php
-                echo $article->content;
+                    echo "</legend>";
+                }
+                //echo $article->content;
+                echo str_replace("\n", "<br>", $article->content);
                 echo "<br>";
-                ?>
-            <?php endforeach; ?>
+            }
 
-            <?php foreach ($articles as $article): ?>
-
-                <?php
+            foreach ($articles as $article) {
                 $imgs = str_replace("<img", "<br><img", $article->contentimages);
                 //$imgs = $imgs . "<br>";
                 //$imgs = str_replace("<br>\n<br>", "<br>", $imgs);
-                echo $imgs;
+                echo htmlspecialchars_decode($imgs);
+                //echo ($imgs);
                 //echo $article->contentimages;
                 //echo "<br>";
-                ?>
-            <?php endforeach; ?>
+            }
+
+            ?>
 
         </div>
     </div>

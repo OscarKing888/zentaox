@@ -25,6 +25,7 @@ class blog extends control
         $this->loadModel('dept');
         $this->loadModel('file');
         $this->loadModel('product');
+        $this->loadModel('user');
     }
 
     /**
@@ -157,19 +158,58 @@ class blog extends control
 
     public function reportmyteam()
     {
-        $articles = $this->blog->getGroupReport();
+        if(!empty($_POST))
+        {
+            $day = fixer::input('post')
+                //->specialchars('day')
+                ->get()->day;
+        }
+        else
+        {
+            $day = helper::today();
+        }
+
+
+        $articles = $this->blog->getGroupReport($day);
+        //$articles = $this->dao->select("name")->from('zt_dept')->fetchAll();
+        //$articles = $this->dao->select("*")->from('gameblog')->fetchAll();
+
         $products = $this->product->getPairs();
         $this->view->products = $products;
         $this->view->allProducts   = array(0 => '') + $this->product->getPairs('noclosed|nocode');
         $this->view->title    = $this->lang->blog->reportmyteam;
         $this->view->articles = $articles;
         $this->view->dept = $this->dept->getById($this->app->user->dept)->name;
+        $this->view->day = $day;
 
         $this->display();
     }
 
     public function reportproject()
     {
+        if(!empty($_POST))
+        {
+            $day = fixer::input('post')
+                //->specialchars('day')
+                ->get()->day;
+        }
+        else
+        {
+            $day = helper::today();
+        }
+
+        $articles = $this->blog->getProjectReport($day);
+        //$articles = $this->dao->select("name")->from('zt_dept')->fetchAll();
+        //$articles = $this->dao->select("*")->from('gameblog')->fetchAll();
+
+        $products = $this->product->getPairs();
+        $this->view->products = $products;
+        $this->view->allProducts   = array(0 => '') + $this->product->getPairs('noclosed|nocode');
+        $this->view->title    = $this->lang->blog->reportproject;
+        $this->view->articles = $articles;
+        $this->view->dept = $this->dept->getById($this->app->user->dept)->name;
+        $this->view->day = $day;
+
         $this->display();
     }
 }
