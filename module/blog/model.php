@@ -36,7 +36,7 @@ class blogModel extends model
             ->from($this->config->blog->dbname)
             ->where('owner')->eq($this->app->user->account)
             ->andwhere('deleted')->eq(0)
-            ->orderBy('id desc')->page($pager)->fetchAll();
+            ->orderBy('date desc')->page($pager)->fetchAll();
 
         return $this->convertImageURL($articles);
         //return getListByUser($this->app->user->account, $pager);
@@ -183,30 +183,8 @@ class blogModel extends model
             ->set('deleted')->eq(0)->where('id')->eq($id)->exec();
     }
 
-    public function getGroupReport($day)
+    public function getGroupReport($day, $product)
     {
-        //var_dump(debug_backtrace());
-        //debug_print_backtrace();
-        //trigger_error("select * from zt_group");
-        //return array('www', 'qqq');
-
-        //$dbg = debug_backtrace();
-        //$dbg = str_replace("[\"", "<br>\r\n[\"", $dbg);
-        //$dbg = str_replace("{", "<br>\r\n{", $dbg);
-        //var_dump($dbg);
-
-        //$sql = "SELECT * FROM gameblog WHERE owner IN (SELECT zt_user.account FROM zt_user WHERE zt_user.dept =". $this->app->user->dept .") AND gameblog.deleted <> '1'";
-        //$sql = "SELECT * FROM gameblog WHERE owner IN (SELECT zt_user.account FROM zt_user WHERE zt_user.dept ='". $this->app->user->dept ."')";
-        //$sql = "SELECT * FROM gameblog";
-        //$deptUsers = $this->dao->exec($sql);
-
-        /*
-        $deptUsers = $this->dao->select("t1.id")
-            ->from($this->config->blog->dbname)->alias("t1")
-            ->fetchAll();
-        //*/
-
-        //*
         $deptUsers = $this->dao->select('account')->from(TABLE_USER)
             ->where('dept')->eq((int)$this->app->user->dept)
             //->fetchAll();
@@ -217,50 +195,15 @@ class blogModel extends model
         $dptus = array_keys($deptUsers);
         //foreach ($dptus as $depu)        {  error_log('=====depu:' . $depu);        }
 
-        error_log("=== [getGroupReport]" . $day);
+        //error_log("=== [getGroupReport]" . $day);
         $articles = $this->dao->select('*')
             ->from($this->config->blog->dbname)
             ->where('owner')->in($dptus)
-            //->andWhere('date')->between()
-            //->andWhere('date')->between(date('Y-m-d 00:00:00', strtotime('-'.$day.' day')), date('Y-m-d 23:59:59', strtotime('-'.$day.' day')))
-                ->andWhere('date')->between(date('Y-m-d 00:00:00', strtotime($day)), date('Y-m-d 23:59:59', strtotime($day)))
+            ->andwhere('deleted')->eq(0)
+            ->andWhere('date')->between(date('Y-m-d 00:00:00', strtotime($day)), date('Y-m-d 23:59:59', strtotime($day)))
+            ->andwhere('product')->eq($product)
             ->orderBy('date desc')
             ->fetchAll();
-
-        //->where('time')->between(date('Y-m-d 00:00:00', strtotime('-1 day')), date('Y-m-d 23:59:59', strtotime('-1 day')))
-        //*/
-
-        //$deptUsers = $this->dao->select('*')->from(TABLE_USER)->fetchAll();
-        //$deptUsers = $this->user->getCommiters();
-
-
-
-        /*
-        $articles = $this->dao->select('t1.*')
-            ->from($this->config->blog->dbname)->alias('t1')
-            ->where('t1.deleted')->eq(0)
-            ->orderBy('date desc')
-            ->fetchAll();
-        //*/
-        //return $articles;
-        //return array($this->app->user->dept);
-
-        //error_log("=== [getGroupReport] test:select * from zt_group");
-        //$deptUsers = $this->dao->select('name')->from('zt_dept')->fetchAll();
-        //foreach ($deptUsers as $depu)     {
-            //error_log('=====depu:' . $depu->name);        }
-        //error_log(debug_backtrace());
-        //debug_print_backtrace();
-        //return $deptUsers;
-        //if (!$articles) return array('error from model.getGroupReport', array_keys($deptUsers));
-        //if (!$articles) return array($this->app->user->dept);
-
-        /*
-        $articles = $this->dao->select('*')
-            ->from($this->config->blog->dbname)
-            ->orderBy('date desc')
-            ->fetchAll();
-        //*/
 
         $articles = $this->convertImageURL($articles);
         /*
@@ -271,12 +214,14 @@ class blogModel extends model
         return $articles;
     }
 
-    public function getProjectReport($day)
+    public function getProjectReport($day, $product)
     {
-        error_log("=== [getProjectReport]" . $day);
+        //error_log("=== [getProjectReport]" . $day);
         $articles = $this->dao->select('*')
             ->from($this->config->blog->dbname)
             ->where('date')->between(date('Y-m-d 00:00:00', strtotime($day)), date('Y-m-d 23:59:59', strtotime($day)))
+            ->andwhere('deleted')->eq(0)
+            ->andwhere('product')->eq($product)
             ->orderBy('date desc')
             ->fetchAll();
 

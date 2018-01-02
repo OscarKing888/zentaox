@@ -26,15 +26,45 @@ include '../../common/view/datepicker.html.php';
             <form method='post'>
                 <table class='table table-borderless table-form' align='center'>
                     <tr>
+                        <th><?php echo $lang->project->manageProducts; ?></th>
+                        <td>
+
+                            <?php if($this->config->blog->debug):?>
+
+                                =======<br>
+                                <?php
+                                foreach ($products as $prod)
+                                {
+                                    echo $prod;
+                                }
+                                ?>
+                                <br>=======<br>
+                                <?php
+                                echo $products[$product];
+                                ?>
+                                <br>=======<br>
+
+                            <?php endif;?>
+
+                            <?php echo html::select("product", $products, $product, "class='form-control chosen' onchange=''"); ?>
+                        </td>
+                    </tr>
+                    <tr>
                         <th><?php echo $lang->blog->date; ?></th>
                         <td>
                             <?php echo html::input('day', $day, "class='form-control form-date' placeholder=''"); ?>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th></th>
+                        <td>
                             <?php echo html::submitButton('查询'); ?>
                         </td>
                     </tr>
                 </table>
             </form>
 
+            <table class='table table-data table-fixed' border="1">
             <?php
             //echo $day;
 
@@ -54,21 +84,23 @@ include '../../common/view/datepicker.html.php';
                     echo "</legend>";
                 }
                 //echo $article->content;
-                echo str_replace("\n", "<br>", $article->content);
-                echo "<br>";
+                echo "<tr><th>$article->ownerrealname</th>";
+                $cnt = str_replace("\n", "<br>", $article->content);
+                echo"<td>$cnt</td></tr>";
             }
 
             foreach ($articles as $article) {
+            if(!empty($article->contentimages)) {
                 $imgs = str_replace("<img", "<br><img", $article->contentimages);
-                //$imgs = $imgs . "<br>";
-                //$imgs = str_replace("<br>\n<br>", "<br>", $imgs);
-                echo htmlspecialchars_decode($imgs);
-                //echo ($imgs);
-                //echo $article->contentimages;
-                //echo "<br>";
+                $imgs = htmlspecialchars_decode($imgs);
+                echo "<tr><th>$article->ownerrealname</th>";
+                echo "<td>$imgs</td></tr>";
+            }
             }
 
             ?>
+
+            </table>
 
         </div>
     </div>
