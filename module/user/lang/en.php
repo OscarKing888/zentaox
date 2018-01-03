@@ -79,17 +79,17 @@ $lang->user->todo        = 'To-Do';
 $lang->user->story       = 'Story';
 $lang->user->dynamic     = 'Dynamic';
 
-$lang->user->openedBy    = 'Opened by him';
-$lang->user->assignedTo  = 'Assigned to him';
-$lang->user->finishedBy  = 'Finished by him';
-$lang->user->resolvedBy  = 'Resolved by him';
-$lang->user->closedBy    = 'Closed by him';
-$lang->user->reviewedBy  = 'Reviewed by him';
-$lang->user->canceledBy  = 'Cancelled by him';
+$lang->user->openedBy    = 'Opened';
+$lang->user->assignedTo  = 'Assigned';
+$lang->user->finishedBy  = 'Finished';
+$lang->user->resolvedBy  = 'Resolved';
+$lang->user->closedBy    = 'Closed';
+$lang->user->reviewedBy  = 'Reviewed';
+$lang->user->canceledBy  = 'Cancelled';
 
-$lang->user->testTask2Him = 'His Build';
-$lang->user->case2Him     = 'His Case';
-$lang->user->caseByHim    = 'Case Open by Him';
+$lang->user->testTask2Him = 'Build';
+$lang->user->case2Him     = 'Case Assigned';
+$lang->user->caseByHim    = 'Case Opened';
 
 $lang->user->errorDeny    = "Sorry, your access to <b>%s</b> Module <b>%s</b> Feature has been denied. Please contact Admin to get permission. Click Back to return.";
 $lang->user->loginFailed  = "Login failed. Please check your account and password.";
@@ -145,6 +145,7 @@ $lang->user->error->realname      = "ID %s，must be real name";
 $lang->user->error->password      = "ID %s，password must be 6 characters at least.";
 $lang->user->error->mail          = "ID %s，please enter valid Email address";
 $lang->user->error->role          = "ID %s，role cannot be null.";
+$lang->user->error->reserved      = "ID %s，account is reserved.";
 
 $lang->user->error->verifyPassword   = "Wrong password. Please enter your Login Password.";
 $lang->user->error->originalPassword = "Old password is incorrect.";
@@ -156,19 +157,19 @@ $lang->user->contacts->userList = 'User List';
 
 $lang->user->contacts->manage        = 'Manage';
 $lang->user->contacts->contactsList  = 'Contacts';
-$lang->user->contacts->selectedUsers = 'Select User';
-$lang->user->contacts->selectList    = 'Select List';
+$lang->user->contacts->selectedUsers = 'User';
+$lang->user->contacts->selectList    = 'List';
 $lang->user->contacts->createList    = 'Create a List';
-$lang->user->contacts->noListYet     = 'No contacts list exist. Please create a list first.';
+$lang->user->contacts->noListYet     = 'No contact list exists. Please create a list first.';
 $lang->user->contacts->confirmDelete = 'Do you want to delete this list?';
 $lang->user->contacts->or            = ' or ';
 
 $lang->user->resetFail       = "Failed. Please check the account";
 $lang->user->resetSuccess    = "Reset! Please use your new password to login.";
-$lang->user->noticeResetFile = "<h5>If you are not Administrator, please contact Administrator to reset your password.</h5>
-    <h5>If you are, please login into your Zentao host and create a file named <span> '%s' </span>.</h5>
+$lang->user->noticeResetFile = "<h5>Contact the Administrator to reset your password.</h5>
+    <h5>If you are, please login your Zentao host and create a file named <span> '%s' </span>.</h5>
     <p>Note:</p>
     <ol>
     <li>Keep the file empty.</li>
-    <li>If the file exists, remove it and create one again.</li>
+    <li>If the file exists, remove it and create it again.</li>
     </ol>";

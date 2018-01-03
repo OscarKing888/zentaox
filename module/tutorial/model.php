@@ -19,6 +19,8 @@ class tutorialModel extends model
      */
     public function checkNovice()
     {
+        //oscar:
+        return false;
         $account = $this->app->user->account;
         if($account == 'guest') return false;
         if(!empty($this->app->user->modifyPassword)) return false;

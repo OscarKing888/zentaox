@@ -186,6 +186,7 @@ class baseHelper
      */
     static public function import($file)
     {
+        $file = realpath($file);
         if(!is_file($file)) return false;
 
         static $includedFiles = array();
@@ -715,6 +716,8 @@ function getWebRoot($full = false)
 
     $path = substr($path, 0, (strrpos($path, '/') + 1));
     $path = str_replace('\\', '/', $path);
+
+    //error_log("OSCAR:get webroot" . $path);
     return $path;
 }
 

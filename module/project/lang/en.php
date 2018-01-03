@@ -19,7 +19,7 @@ $lang->project->begin         = 'Begin';
 $lang->project->end           = 'End';
 $lang->project->dateRange     = 'Time Frame';
 $lang->project->to            = 'To';
-$lang->project->days          = 'Work Days';
+$lang->project->days          = 'Man-Day';
 $lang->project->day           = 'day';
 $lang->project->workHour      = 'Hour';
 $lang->project->status        = 'Status';
@@ -57,7 +57,7 @@ $lang->project->readjustTask  = 'Readjust task start date and deadline';
 
 $lang->project->start    = 'Start';
 $lang->project->activate = 'Activate';
-$lang->project->putoff   = 'Deplay';
+$lang->project->putoff   = 'Delay';
 $lang->project->suspend  = 'Suspend';
 $lang->project->close    = 'Close';
 $lang->project->export   = 'Export';
@@ -95,7 +95,7 @@ $lang->project->statusList['doing']     = 'Doing';
 $lang->project->statusList['suspended'] = 'Suspend';
 $lang->project->statusList['done']      = 'Done';
 
-$lang->project->aclList['open']    = "Default (With the privilege to view {$lang->projectCommon}, you will have access to {$lang->projectCommon}.)";
+$lang->project->aclList['open']    = "Default (You have access to {$lang->projectCommon}, if you can view it.)";
 $lang->project->aclList['private'] = 'Private (Only team members can access to it.)';
 $lang->project->aclList['custom']  = 'Whitelist (Team members and the whitelist members have access to it.)';
 
@@ -139,8 +139,9 @@ $lang->project->storyKanban      = 'Story Kanban';
 $lang->project->storySort        = 'Story Sort';
 
 /* 分组浏览。*/
-$lang->project->allTasks             = 'All';
-$lang->project->assignedToMe         = 'Assigned to Me';
+$lang->project->allTasks     = 'All';
+$lang->project->assignedToMe = 'Assigned to Me';
+$lang->project->myInvolved   = 'My Involved';
 
 $lang->project->statusSelects['']             = 'More';
 $lang->project->statusSelects['wait']         = 'Wait';
@@ -179,6 +180,7 @@ $lang->project->beginAndEnd     = 'Time Frame';
 $lang->project->lblStats        = 'Hour Report';
 $lang->project->stats           = '<strong>%s</strong> Hour(s) available, <strong>%s</strong> Hour(s) Estimated, <strong>%s</strong> Hour(s) Consumed, <strong>%s</strong> Hour(s) Remained.';
 $lang->project->taskSummary     = " <strong>%s</strong> Tasks on this page, <strong>%s</strong> Wait, <strong>%s</strong> Doing. <strong>%s</strong> Hour(s) Estimated, <strong>%s</strong> Hour(s) Consumed, <strong>%s</strong> Hour(s) Remained.";
+$lang->project->checkedSummary  = " <strong>%total%</strong> Checked, <strong>%wait%</strong> Wait, <strong>%doing%</strong> Doing, <strong>%estimate%</strong> Hour(s) Estimated, <strong>%consumed%</strong> Hour(s) Consumed, <strong>%left%</strong> Hour(s) Remained.";
 $lang->project->memberHours     = "%s has <strong>%s</strong> Hour(s) available ";
 $lang->project->groupSummary    = "<strong>%s</strong> Tasks in this group, Wait <strong>%s</strong>, Doing <strong>%s</strong>. <strong>%s</strong> Hour(s) Estimated , <strong>%s</strong> Hour(s) Consumed, <strong>%s</strong> Hour(s) Remained.";
 $lang->project->groupSummaryAB  = "Total Tasks <strong>%s</strong>, Wait <strong>%s</strong>, Doing <strong>%s</strong>.<br /> <strong>%s</strong> Hour(s) Estimated, <strong>%s</strong> Hour(s) Consumed，<strong>%s</strong> Hour(s) Remained.";
@@ -275,6 +277,7 @@ $lang->printKanban->typeList['increment'] = 'Increment';
 $lang->project->featureBar['task']['unclosed']     = $lang->project->unclosed;
 $lang->project->featureBar['task']['all']          = $lang->project->allTasks;
 $lang->project->featureBar['task']['assignedtome'] = $lang->project->assignedToMe;
+$lang->project->featureBar['task']['myinvolved']   = $lang->project->myInvolved;
 $lang->project->featureBar['task']['delayed']      = 'Delayed';
 $lang->project->featureBar['task']['needconfirm']  = 'Story Changed';
 $lang->project->featureBar['task']['status']       = $lang->project->statusSelects[''];

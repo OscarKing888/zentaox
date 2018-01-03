@@ -32,14 +32,14 @@ class blogModel extends model
      */
     public function getList($pager = null)
     {
-        $articles = $this->dao->select('*')
-            ->from($this->config->blog->dbname)
-            ->where('owner')->eq($this->app->user->account)
-            ->andwhere('deleted')->eq(0)
-            ->orderBy('date desc')->page($pager)->fetchAll();
+        //$articles = $this->dao->select('*')
+            //->from($this->config->blog->dbname)
+            //->where('owner')->eq($this->app->user->account)
+            //->andwhere('deleted')->eq(0)
+            //->orderBy('date desc')->page($pager)->fetchAll();
 
-        return $this->convertImageURL($articles);
-        //return getListByUser($this->app->user->account, $pager);
+        //return $this->convertImageURL($articles);
+        return $this->getListByUser($this->app->user->account, $pager);
     }
 
     function convertImageURL($arr)
@@ -77,9 +77,10 @@ class blogModel extends model
         $articles = $this->dao->select('*')
             ->from($this->config->blog->dbname)
             ->where('owner')->eq($userid)
+            ->andwhere('deleted')->eq(0)
             ->orderBy('date desc')->page($pager)->fetchAll();
 
-        return convertImageURL($articles);
+        return $this->convertImageURL($articles);
     }
 
     /**
@@ -183,10 +184,12 @@ class blogModel extends model
             ->set('deleted')->eq(0)->where('id')->eq($id)->exec();
     }
 
-    public function getGroupReport($day, $product)
+    public function getGroupReport($day, $product, $dept)
     {
+        //error_log("oscar: [getGroupReport] day:$day product:$product dept:$dept");
+
         $deptUsers = $this->dao->select('account')->from(TABLE_USER)
-            ->where('dept')->eq((int)$this->app->user->dept)
+            ->where('dept')->eq($dept)
             //->fetchAll();
             ->fetchAll('account');
 

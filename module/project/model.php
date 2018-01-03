@@ -564,7 +564,7 @@ class projectModel extends model
      * 
      * @param  int    $projectID 
      * @access public
-     * @return void
+     * @return array
      */
     public function close($projectID)
     {
@@ -789,6 +789,7 @@ class projectModel extends model
         $tasks = $this->dao->select('id, project, estimate, consumed, `left`, status, closedReason')
             ->from(TABLE_TASK)
             ->where('project')->in($projectKeys)
+            ->andWhere('parent')->eq(0)
             ->andWhere('deleted')->eq(0)
             ->fetchGroup('project', 'id');
 
@@ -1423,13 +1424,15 @@ class projectModel extends model
      * @access public
      * @return void
      */
-    public function linkStory($projectID)
+    public function linkStory($projectID, $stories = array())
     {
-        if($this->post->stories == false) return false;
+        if(empty($stories)) $stories = $this->post->stories;
+        if(empty($stories)) return false;
+
         $this->loadModel('action');
-        $versions  = $this->loadModel('story')->getVersions($this->post->stories);
+        $versions  = $this->loadModel('story')->getVersions($stories);
         $lastOrder = (int)$this->dao->select('*')->from(TABLE_PROJECTSTORY)->where('project')->eq($projectID)->orderBy('order_desc')->limit(1)->fetch('order');
-        foreach($this->post->stories as $key => $storyID)
+        foreach($stories as $key => $storyID)
         {
             $productID = (int)$this->post->products[$storyID];
             $data = new stdclass();
@@ -1636,6 +1639,7 @@ class projectModel extends model
             ->from(TABLE_TASK)
             ->where('project')->in(array_keys($projects))
             ->andWhere('deleted')->eq('0')
+            ->andWhere('parent')->eq('0')
             ->andWhere('status')->notin('cancel,closed')
             ->groupBy('project')
             ->fetchAll();
@@ -1678,7 +1682,7 @@ class projectModel extends model
      * 
      * @param  int    $projectID 
      * @access public
-     * @return void
+     * @return array
      */
     public function getBurnDataFlot($projectID = 0)
     {
@@ -1832,7 +1836,7 @@ class projectModel extends model
      */
     public function summary($tasks)
     {
-        $taskSum = $statusWait = $statusDone = $statusDoing = $statusClosed = $statusCancel = $statusPause = 0;  
+        $taskSum = $statusWait = $statusDone = $statusDoing = $statusClosed = $statusCancel = $statusPause = 0;
         $totalEstimate = $totalConsumed = $totalLeft = 0.0;
 
         foreach($tasks as $task)
@@ -1842,7 +1846,14 @@ class projectModel extends model
             $totalLeft      += (($task->status == 'cancel' or $task->closedReason == 'cancel') ? 0 : $task->left);
             $statusVar       = 'status' . ucfirst($task->status);
             $$statusVar ++;
-            if(!empty($task->children)) $taskSum += count($task->children);
+            if(!empty($task->children))
+            {
+                $taskSum += count($task->children);
+                foreach($task->children as $child)
+                {
+                    if($child->status == 'wait') $statusWait ++;
+                }
+            }
             $taskSum ++;
         }
 
@@ -1918,6 +1929,7 @@ class projectModel extends model
      * @param  string     $end 
      * @param  string     $type 
      * @param  string|int $interval 
+     * @param  string     $format
      * @access public
      * @return array
      */
@@ -2238,7 +2250,7 @@ class projectModel extends model
      */
     public function getPrevKanban($projectID)
     {
-        $prevKanbans = $this->loadModel('setting')->getItem("ower=null&module=project&section=kanban&key=project$projectID");
+        $prevKanbans = $this->loadModel('setting')->getItem("owner=null&module=project&section=kanban&key=project$projectID");
         return json_decode($prevKanbans, true);
     }
 

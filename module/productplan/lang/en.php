@@ -17,7 +17,7 @@ $lang->productplan->edit       = "Edit";
 $lang->productplan->delete     = "Delete";
 $lang->productplan->view       = "Details";
 $lang->productplan->bugSummary = "<strong>%s</strong> Bugs in total on this page.";
-$lang->productplan->info  = 'Info';
+$lang->productplan->info       = 'Info';
 $lang->productplan->batchEdit  = 'Batch Edit';
 
 $lang->productplan->batchUnlink      = "Batch Unlink";
@@ -26,6 +26,7 @@ $lang->productplan->unlinkStory      = "Unlink Story";
 $lang->productplan->batchUnlinkStory = "Batch Unlink";
 $lang->productplan->linkedStories    = 'link Story';
 $lang->productplan->unlinkedStories  = 'UnLinkEd';
+$lang->productplan->updateOrder      = 'Ranking';
 
 $lang->productplan->linkBug          = "Link Bug";
 $lang->productplan->unlinkBug        = "Unlink Bug";

@@ -60,12 +60,12 @@
         $autoWidth = $col['width'] == 'auto';
         ?>
         <div class='clearfix col<?php echo ($required ? ' require' : '') . (' fixed-' . $fixed) ?>' data-key='<?php echo $key?>' data-fixed='<?php echo $fixed?>' data-width='<?php echo $col['width']?>'>
-        <i class='icon-ok'></i> &nbsp;<span class='title'><span class='title-bar'><strong><?php echo $col['title']?></strong><i class='icon-move'></i></span></span> <?php if($required) echo "<span class='text-muted'>({$lang->datatable->required})</span>"?>
           <div class='actions pull-right'>
             <?php if(isset($col['name'])) echo html::hidden('name', $col['name'])?>
             <span><span class='text-muted'><?php echo $lang->datatable->width?></span> <input type='text' id='width' class='form-control' value='<?php echo $col['width']?>'><?php echo $autoWidth ? '&nbsp;' : 'px' ?></span>
             <button type='button' class='btn btn-link show-hide<?php echo $required ? ' disabled' : '' ?>'><span class='label-show'><?php echo $lang->datatable->show?></span><span class='text-muted'>/</span><span class='label-hide'><?php echo $lang->datatable->hide?></span></button>
           </div>
+          <i class='icon-ok'></i> &nbsp;<span class='title'><span class='title-bar'><strong><?php echo $col['title']?></strong><i class='icon-move'></i></span></span> <?php if($required) echo "<span class='text-muted'>({$lang->datatable->required})</span>"?>
         </div>
         <?php endforeach;?>
       </div>
@@ -126,7 +126,7 @@ $(function()
         var $col = $cols.filter('[data-key=' + col.id + ']');
         $col.toggleClass('disabled', !col.show);
         $col.attr('data-order', col.order);
-        if(col.width) $col.find('input').val(col.width.replace('px', ''));
+        if(col.width) $col.find('input#width').val(col.width.replace('px', ''));
     }
 
     $('.cols-list').on('click', '.col:not(.require) .show-hide, .col:not(.require) .title', function()
@@ -149,14 +149,14 @@ $(function()
 
             $list.sortable({trigger: '.title', selector: '.col'});
         }
-    }).on('keyup change', 'input', function()
+    }).on('keyup change', 'input#width', function()
     {
         renderColWidth($(this).closest('.col'));
     });
 
     function renderColWidth($col)
     {
-        var width = $col.find('input').val();
+        var width = $col.find('input#width').val();
         if(width == 'auto')
         {
             width = '500';

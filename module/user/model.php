@@ -207,6 +207,7 @@ class userModel extends model
     public function create()
     {
         if(!$this->checkPassword()) return;
+        if(strtolower($_POST['account']) == 'guest') return false;
 
         $user = fixer::input('post')
             ->setDefault('join', '0000-00-00')
@@ -267,6 +268,7 @@ class userModel extends model
         {
             if($users->account[$i] != '')
             {
+                if(strtolower($users->account[$i]) == 'guest') die(js::error(sprintf($this->lang->user->error->reserved, $i+1)));
                 $account = $this->dao->select('account')->from(TABLE_USER)->where('account')->eq($users->account[$i])->fetch();
                 if($account) die(js::error(sprintf($this->lang->user->error->accountDupl, $i+1)));
                 if(in_array($users->account[$i], $accounts)) die(js::error(sprintf($this->lang->user->error->accountDupl, $i+1)));
@@ -467,6 +469,18 @@ class userModel extends model
             $users[$id]['zipcode']  = $data->zipcode[$id];
             $users[$id]['dept']     = $data->dept[$id] == 'ditto' ? (isset($prev['dept']) ? $prev['dept'] : 0) : $data->dept[$id];
             $users[$id]['role']     = $data->role[$id] == 'ditto' ? (isset($prev['role']) ? $prev['role'] : 0) : $data->role[$id];
+
+            if(!empty($this->config->user->batchAppendFields))
+            {
+                $appendFields = explode(',', $this->config->user->batchAppendFields);
+                foreach($appendFields as $appendField)
+                {
+                    if(empty($appendField)) continue;
+                    if(!isset($data->$appendField)) continue;
+                    $fieldList = $data->$appendField;
+                    $users[$id][$appendField] = $fieldList[$id];
+                }
+            }
 
             if(isset($accountGroup[$account]) and count($accountGroup[$account]) > 1) die(js::error(sprintf($this->lang->user->error->accountDupl, $id)));
             if(in_array($account, $accounts)) die(js::error(sprintf($this->lang->user->error->accountDupl, $id)));
@@ -901,20 +915,47 @@ class userModel extends model
     /**
      * Get contact list of a user.
      * 
-     * @param  string    $account 
-     * @param  string    $params   withempty|withnote 
+     * @param string $account
+     * @param string $params  withempty|withnote
+     *
      * @access public
      * @return object
      */
     public function getContactLists($account, $params= '')
     {
-        $contacts = $this->dao->select('id, listName')->from(TABLE_USERCONTACT)->where('account')->eq($account)->fetchPairs();
-        if(!$contacts) return array();
+        $contacts  = $this->getListByAccount($account);
+        $globalIDs = isset($this->config->my->global->globalContacts) ? $this->config->my->global->globalContacts : '';
+
+        if(!empty($globalIDs))
+        {
+            $globalIDs      = explode(',', $globalIDs);
+            $globalContacts = $this->dao->select('id, listName')->from(TABLE_USERCONTACT)->where('id')->in($globalIDs)->fetchPairs();
+            foreach($globalContacts as $id => $contact)
+            {
+                if(in_array($id, array_keys($contacts))) unset($globalContacts[$id]);
+            }
+            if(!empty($globalContacts)) $contacts = $globalContacts + $contacts;
+        }
+
+        if(empty($contacts)) return array();
 
         if(strpos($params, 'withempty') !== false) $contacts = array('' => '') + $contacts;
         if(strpos($params, 'withnote')  !== false) $contacts = array('' => $this->lang->user->contacts->common) + $contacts;
 
         return $contacts;
+    }
+
+    /**
+     * Get Contact List by account.
+     *
+     * @param string $account
+     *
+     * @access public
+     * @return array
+     */
+    public function getListByAccount($account)
+    {
+        return $this->dao->select('id, listName')->from(TABLE_USERCONTACT)->where('account')->eq($account)->fetchPairs();
     }
 
     /**
@@ -995,6 +1036,31 @@ class userModel extends model
             ->where('id')->eq($listID)
             ->exec();
         if(dao::isError()) die(js::error(dao::getError()));
+    }
+
+    /**
+     * Update global contact.
+     *
+     * @param      $listID
+     * @param bool $isPush
+     *
+     * @access public
+     * @return void
+     */
+    public function setGlobalContacts($listID, $isPush = true)
+    {
+        $contacts    = $this->loadModel('setting')->getItem("owner=system&module=my&section=global&key=globalContacts");
+        $contactsIDs = empty($contacts) ? array() : explode(',', $contacts);
+        if($isPush)
+        {
+            if(!in_array($listID, $contactsIDs)) array_push($contactsIDs, $listID);
+        }
+        else
+        {
+            $key = array_search($listID, $contactsIDs);
+            if($key !== false) array_splice($contactsIDs, $key, 1);
+        }
+        $this->loadModel('setting')->setItem('system.my.global.globalContacts', join(',', $contactsIDs));
     }
 
     /**
@@ -1121,5 +1187,31 @@ class userModel extends model
         $strength = floor($strength / 10);
 
         return $strength;
+    }
+
+    /**
+     * Check Tmp dir.
+     *
+     * @access public
+     * @return void
+     */
+    public function checkTmp()
+    {
+        if(!is_dir($this->app->tmpRoot))   mkdir($this->app->tmpRoot,   0755, true);
+        if(!is_dir($this->app->cacheRoot)) mkdir($this->app->cacheRoot, 0755, true);
+        if(!is_dir($this->app->logRoot))   mkdir($this->app->logRoot,   0755, true);
+        if(!is_dir($this->app->logRoot))   return false;
+
+        $file = $this->app->logRoot . DS . 'demo.txt';
+        if($fp = @fopen($file, 'a+'))
+        {
+            @fclose($fp);
+            @unlink($file);
+        }
+        else
+        {
+            return false;
+        }
+        return true;
     }
 }

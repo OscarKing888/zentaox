@@ -13,7 +13,7 @@
 <?php include '../../common/view/header.html.php';?>
 <?php js::set('viewType', $viewType);?>
 <?php $hasBranch = (strpos('story|bug|case', $viewType) !== false and (!empty($root->type) && $root->type != 'normal')) ? true : false;?>
-<?php $name = $viewType == 'line' ? $lang->tree->line : $lang->tree->name;?>
+<?php $name = $viewType == 'line' ? $lang->tree->line : ($viewType == 'doc' ? $lang->tree->cate : $lang->tree->name);?>
 <div id='featurebar'>
   <div class='heading'><?php echo $viewType == 'line' ? $lang->tree->manageLine : $lang->tree->common;?></div>
 </div>
@@ -182,7 +182,7 @@ $(function()
             {
                 linkTemplate: '<?php echo helper::createLink('tree', 'browse', "rootID=$rootID&viewType=$viewType&moduleID={0}&branch={1}"); ?>',
                 title: '<?php echo $viewType == 'line' ? '': $lang->tree->child ?>',
-                template: '<a href="javascript:;"><?php echo $viewType == 'line' ? '': $lang->tree->child?></a>'
+                template: '<a href="javascript:;"><?php echo $viewType == 'line' ? '': (strpos($viewType, 'doc') !== false ? $lang->doc->childType : $lang->tree->child)?></a>'
             }
         },
         action: function(event)

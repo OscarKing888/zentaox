@@ -28,6 +28,7 @@ class tree extends control
         if(strpos('story|bug|case|line', $viewType) !== false)
         {
             $product = $this->loadModel('product')->getById($rootID);
+            if(empty($product)) $this->locate($this->createLink('product', 'create'));
             if(!empty($product->type) && $product->type != 'normal')
             {
                 $branches = $this->loadModel('branch')->getPairs($product->id);
@@ -325,9 +326,11 @@ class tree extends control
      * AJAX: Get the option menu of modules.
      * 
      * @param  int    $rootID 
-     * @param  string $viewType 
-     * @param  int    $rootModuleID 
+     * @param  string $viewType
+     * @param  int    $branch
+     * @param  int    $rootModuleID
      * @param  string $returnType
+     * @param  string $fieldID
      * @param  bool   $needManage
      * @access public
      * @return string the html select string.

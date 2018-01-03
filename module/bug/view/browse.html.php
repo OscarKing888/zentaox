@@ -19,6 +19,7 @@ js::set('bugBrowseType', ($browseType == 'bymodule' and $this->session->bugBrows
 js::set('flow', $this->config->global->flow);
 js::set('productID', $productID);
 js::set('branch', $branch);
+$currentBrowseType = isset($lang->bug->mySelects[$browseType]) && in_array($browseType, array_keys($lang->bug->mySelects)) ? $browseType : '';
 ?>
 <?php if($this->config->global->flow == 'onlyTest'):?>
 <div id='featurebar'>
@@ -86,11 +87,22 @@ js::set('branch', $branch);
     <?php foreach(customModel::getFeatureMenu($this->moduleName, $this->methodName) as $menuItem):?>
     <?php if(isset($menuItem->hidden)) continue;?>
     <?php if($this->config->global->flow == 'onlyTest' and $menuItem->name == 'needconfirm') continue;?>
-    <?php if(strpos($menuItem->name, 'QUERY') === 0):?>
-    <?php $queryID = (int)substr($menuItem->name, 5);?>
-    <li id='<?php echo $menuItem->name?>Tab'><?php echo html::a($this->createLink('bug', 'browse', "productid=$productID&branch=$branch&browseType=bySearch&param=$queryID"), $menuItem->text)?></li>
+    <?php $browseType = strpos($menuItem->name, 'QUERY' === 0) ? 'bySearch' : $menuItem->name;?>
+    <?php $param = strpos($menuItem->name, 'QUERY' === 0) ? (int)substr($menuItem->name, 5) : 0;?>
+    <?php if($menuItem->name == 'my'):?>
+    <?php
+    echo "<li id='statusTab' class='dropdown " . (!empty($currentBrowseType) ? 'active' : '') . "'>";
+    echo html::a('javascript:;', $menuItem->text . " <span class='caret'></span>", '', "data-toggle='dropdown'");
+    echo "<ul class='dropdown-menu'>";
+    foreach ($lang->bug->mySelects as $key => $value)
+    {
+        echo '<li' . ($key == $currentBrowseType ? " class='active'" : '') . '>';
+        echo html::a($this->createLink('bug', 'browse', "productid=$productID&branch=$branch&browseType=$key&param=$param"), $value);
+    }
+    echo '</ul></li>';
+    ?>
     <?php else:?>
-    <li id='<?php echo $menuItem->name?>Tab'><?php echo html::a($this->createLink('bug', 'browse', "productid=$productID&branch=$branch&browseType={$menuItem->name}&param=0"), $menuItem->text)?></li>
+    <li id='<?php echo $menuItem->name?>Tab'><?php echo html::a($this->createLink('bug', 'browse', "productid=$productID&branch=$branch&browseType=$browseType&param=$param"), $menuItem->text)?></li>
     <?php endif;?>
     <?php endforeach;?>
     <li id='bysearchTab'><a href='#'><i class='icon-search icon'></i>&nbsp;<?php echo $lang->bug->byQuery;?></a></li>
@@ -125,7 +137,7 @@ js::set('branch', $branch);
         else
         {
             $misc = common::hasPriv('bug', 'create') ? "class='btn btn-primary'" : "class='btn btn-primary disabled'";
-            $link = common::hasPriv('bug', 'create') ?  $this->createLink('bug', 'create', "productID=$productID&branch=$branch&extra=moduleID=$moduleID") : '#';
+            $link = common::hasPriv('bug', 'create') ? $this->createLink('bug', 'create', "productID=$productID&branch=$branch&extra=moduleID=$moduleID") : '#';
             echo html::a($link, "<i class='icon icon-plus'></i>" . $lang->bug->create, '', $misc);
         }
 
@@ -225,6 +237,23 @@ js::set('branch', $branch);
                   $misc = common::hasPriv('bug', 'batchActivate') ? "onclick=\"setFormAction('$actionLink')\"" : $class;
                   if($misc) echo "<li>" . html::a('javascript:;', $lang->bug->activate, '', $misc) . "</li>";
 
+                  if(common::hasPriv('bug', 'batchChangeBranch') and $this->session->currentProductType != 'normal')
+                  {
+                      $withSearch = count($branches) > 8;
+                      echo "<li class='dropdown-submenu'>";
+                      echo html::a('javascript:;', $lang->product->branchName[$this->session->currentProductType], '', "id='branchItem'");
+                      echo "<div class='dropdown-menu" . ($withSearch ? ' with-search':'') . "'>";
+                      echo "<ul class='dropdown-list'>";
+                      foreach($branches as $branchID => $branchName)
+                      {
+                          $actionLink = $this->createLink('bug', 'batchChangeBranch', "branchID=$branchID");
+                          echo "<li class='option' data-key='$branchID'>" . html::a('#', $branchName, '', "onclick=\"setFormAction('$actionLink', 'hiddenwin')\"") . "</li>";
+                      }
+                      echo '</ul>';
+                      if($withSearch) echo "<div class='menu-search'><div class='input-group input-group-sm'><input type='text' class='form-control' placeholder=''><span class='input-group-addon'><i class='icon-search'></i></span></div></div>";
+                      echo '</div></li>';
+                  }
+
                   if(common::hasPriv('bug', 'batchChangeModule'))
                   {
                       $withSearch = count($modules) > 8;
@@ -301,7 +330,7 @@ js::set('branch', $branch);
                       foreach ($memberPairs as $key => $value)
                       {
                           if(empty($key)) continue;
-                          echo "<li class='option' data-key='$key'>" . html::a("javascript:$(\".table-actions #assignedTo\").val(\"$key\");setFormAction(\"$actionLink\")", $value, '', '') . '</li>';
+                          echo "<li class='option' data-key='$key'>" . html::a("javascript:$(\"#assignedTo\").val(\"$key\");setFormAction(\"$actionLink\",\"hiddenwin\")", $value, '', '') . '</li>';
                       }
                       echo "</ul>";
                       if($withSearch) echo "<div class='menu-search'><div class='input-group input-group-sm'><input type='text' class='form-control' placeholder=''><span class='input-group-addon'><i class='icon-search'></i></span></div></div>";

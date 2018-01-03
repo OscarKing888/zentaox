@@ -1119,8 +1119,11 @@ class baseRouter
         if($full and $this->config->requestType == 'PATH_INFO')
         {
             if($this->URI) return $this->config->webRoot . $this->URI . '.' . $this->viewType;
+            //error_log("OSCAR:get URI" . $this->config->webRoot);
             return $this->config->webRoot;
         }
+
+        //error_log("OSCAR:get URI" . $this->URI);
         return $this->URI;
     }
 

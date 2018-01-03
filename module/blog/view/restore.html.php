@@ -25,7 +25,7 @@
             <thead>
             <tr>
                 <td class='text-center' width='150'><?php echo $lang->blog->date; ?></td>
-                <td width='50'><?php echo $lang->project->manageProducts; ?></td>
+                <td width='50'><?php echo $lang->product->name; ?></td>
                 <td><?php echo $lang->blog->content; ?></td>
                 <td class='text-center' width='120'><?php echo $lang->blog->action; ?></td>
             </tr>

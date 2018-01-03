@@ -251,14 +251,29 @@ class project extends control
 
         /* Get tasks and group them. */
         if(empty($groupBy))$groupBy = 'story';
-        $tasks       = $this->loadModel('task')->getProjectTasks($projectID, $productID = 0, $status = 'all', $modules = 0, $groupBy);
+        $sort        = $this->loadModel('common')->appendOrder($groupBy);
+        $tasks       = $this->loadModel('task')->getProjectTasks($projectID, $productID = 0, $status = 'all', $modules = 0, $sort);
         $groupBy     = str_replace('`', '', $groupBy);
         $taskLang    = $this->lang->task;
         $groupByList = array();
         $groupTasks  = array();
 
+        $groupTasks = array();
+        foreach($tasks as $task)
+        {
+            $groupTasks[] = $task;
+            if(isset($task->children))
+            {
+                foreach($task->children as $child) $groupTasks[] = $child;
+                $task->children = true;
+                unset($task->children);
+            }
+        }
+
         /* Get users. */
         $users = $this->loadModel('user')->getPairs('noletter');
+        $tasks = $groupTasks;
+        $groupTasks = array();
         foreach($tasks as $task)
         {
             if($groupBy == 'story')
@@ -298,7 +313,6 @@ class project extends control
             unset($groupTasks['Closed']);
             $groupTasks['closed'] = $closedTasks;
         }
-
 
         /* Assign. */
         $this->app->loadLang('tree');
@@ -857,6 +871,9 @@ class project extends control
     /**
      * Create a project.
      *
+     * @param string $projectID
+     * @param string $copyProjectID
+     *
      * @access public
      * @return void
      */
@@ -1305,8 +1322,8 @@ class project extends control
     public function tree($projectID, $type = '')
     {
         $this->project->setMenu($this->projects, $projectID);
-        $project  = $this->loadModel('project')->getById($projectID);
-        $tree     = $this->project->getProjectTree($projectID);
+        $project = $this->loadModel('project')->getById($projectID);
+        $tree    = $this->project->getProjectTree($projectID);
 
         /* Save to session. */
         $uri = $this->app->getURI(true);
@@ -1946,6 +1963,7 @@ class project extends control
      */
     public function tips($projectID)
     {
+        $this->view->project   = $this->project->getById($projectID);
         $this->view->projectID = $projectID;
         $this->display('project', 'tips');
     }

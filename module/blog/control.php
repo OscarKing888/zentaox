@@ -77,8 +77,8 @@ class blog extends control
             die(js::locate(inlink('index')));
         }
 
-        $products = $this->product->getPairs();
-        $this->view->products = $products;
+        //$products = $this->product->getPairs();
+        //$this->view->products = $products;
         $this->view->allProducts   = array(0 => '') + $this->product->getPairs('noclosed|nocode');
         $this->view->title = $this->lang->blog->add;
         $this->display();
@@ -100,26 +100,45 @@ class blog extends control
         }
         else
         {
-            $products = $this->product->getPairs();
-            $this->view->products = $products;
+            //$products = $this->product->getPairs();
             $this->view->allProducts   = array(0 => '') + $this->product->getPairs('noclosed|nocode');
             $this->view->title   = $this->lang->blog->edit;
-            $this->view->article = $this->blog->getByID($id);
+            $article = $this->blog->getByID($id);
+            $this->view->article = $article;
+            $this->view->product = $article->product;
             $this->display();
         }
     }
 
     /**
      * View an article.
-     * 
-     * @param  int    $id 
+     *
      * @access public
      * @return void
      */
-    public function view($id)
+    public function view()
     {
+        //$pager = new pager($recTotal, $recPerPage, $pageID);
+        $user = $this->app->user->account;
+
+        if(!empty($_POST))
+        {
+            $user = fixer::input('post')
+                ->get()->user;
+        }
+
+
+        $articles = $this->blog->getListByUser($user);
+        $newarticles = $this->processArticles($articles);
+        $this->view->articles = $newarticles;
+
+        $this->view->allProducts   = array(0 => '') + $this->product->getPairs('noclosed|nocode');
         $this->view->title   = $this->lang->blog->view;
-        $this->view->article = $this->blog->getByID($id);
+        $allUsers = $this->user->getpairs('nodeleted|noclosed');
+        $this->view->allUsers = $allUsers;
+        $this->view->user = $user;
+        //$this->view->pager    = $pager;
+
         $this->display();
     }
 
@@ -158,6 +177,9 @@ class blog extends control
 
     public function reportmyteam()
     {
+        $day = helper::today();
+        $product = 1;
+
         if(!empty($_POST))
         {
             $day = fixer::input('post')
@@ -167,40 +189,31 @@ class blog extends control
             $product = fixer::input('post')
                 ->get()->product;
         }
-        else
-        {
-            $day = helper::today();
-            $product = 1;
-        }
 
-
-        $articles = $this->blog->getGroupReport($day, $product);
+        $articles = $this->blog->getGroupReport($day, $product, (int)$this->app->user->dept);
         //$articles = $this->dao->select("name")->from('zt_dept')->fetchAll();
         //$articles = $this->dao->select("*")->from('gameblog')->fetchAll();
 
-        $products = $this->product->getPairs();
-        $this->view->products = $products;
+        //$products = $this->product->getPairs();
+        //$this->view->products = $products;
         $this->view->allProducts   = array(0 => '') + $this->product->getPairs('noclosed|nocode');
         $this->view->title    = $this->lang->blog->reportmyteam;
 
-        $newarticles = array();
-        foreach ($articles as $tart) {
-            error_log("oscar: owner" . $tart->owner);
-            $tart->ownerrealname = $this->user->getById($tart->owner)->realname;
-            $newarticles[$tart->id]=($tart);
-            }
-
+        $newarticles = $this->processArticles($articles);
         $this->view->articles = $newarticles;
 
         $this->view->dept = $this->dept->getById($this->app->user->dept)->name;
         $this->view->day = $day;
-        $this->view->$product = $product;
+        $this->view->product = $product;
 
         $this->display();
     }
 
     public function reportproject()
     {
+        $day = helper::today();
+        $product = 1;
+
         if(!empty($_POST))
         {
             $day = fixer::input('post')
@@ -210,34 +223,78 @@ class blog extends control
             $product = fixer::input('post')
                 ->get()->product;
         }
-        else
-        {
-            $day = helper::today();
-            $product = 1;
-        }
 
         $articles = $this->blog->getProjectReport($day, $product);
         //$articles = $this->dao->select("name")->from('zt_dept')->fetchAll();
         //$articles = $this->dao->select("*")->from('gameblog')->fetchAll();
 
-        $products = $this->product->getPairs();
-        $this->view->products = $products;
+        //$products = $this->product->getPairs();
+        //$this->view->products = $products;
         $this->view->allProducts   = array(0 => '') + $this->product->getPairs('noclosed|nocode');
         $this->view->title    = $this->lang->blog->reportproject;
 
-        $newarticles = array();
-        foreach ($articles as $tart) {
-            error_log("oscar: owner" . $tart->owner);
-            $tart->ownerrealname = $this->user->getById($tart->owner)->realname;
-            $newarticles[$tart->id]=($tart);
-        }
-
+        $newarticles = $this->processArticles($articles);
         $this->view->articles = $newarticles;
 
         $this->view->dept = $this->dept->getById($this->app->user->dept)->name;
         $this->view->day = $day;
-        $this->view->$product = $product;
+        $this->view->product = $product;
+        $depts = $this->dao->select('id,name')->from(TABLE_DEPT)->fetchPairs();
+        $this->view->depts = $depts;
 
         $this->display();
     }
+
+    public function searchbydepartment()
+    {
+        $dept = 0;
+        $day = helper::today();
+        $product = 1;
+
+        if(!empty($_POST))
+        {
+            $dept = fixer::input('post')
+                //->specialchars('day')
+                ->get()->dept;
+
+            $day = fixer::input('post')
+                //->specialchars('day')
+                ->get()->day;
+
+            $product = fixer::input('post')
+                ->get()->product;
+        }
+
+        $articles = $this->blog->getGroupReport($day, $product, $dept);
+
+        $this->view->allProducts   = array(0 => '') + $this->product->getPairs('noclosed|nocode');
+        $this->view->title    = $this->lang->blog->reportproject;
+
+        $newarticles = $this->processArticles($articles);
+        $this->view->articles = $newarticles;
+
+        $this->view->deptName = $this->dept->getById($this->app->user->dept)->name;
+        $this->view->day = $day;
+        $this->view->product = $product;
+        $this->view->dept = $dept;
+        $this->view->depts = $this->dept->getOptionMenu();
+
+        $this->display();
+    }
+
+    function processArticles($articles)
+    {
+        $newarticles = array();
+        foreach ($articles as $tart) {
+            //error_log("oscar: owner " . $tart->owner);
+            $tart->user = $this->user->getById($tart->owner);
+            $tart->ownerrealname = $tart->user->realname;
+            $tart->dept = $tart->user->dept;
+
+            $newarticles[$tart->id]=($tart);
+        }
+
+        return $newarticles;
+    }
 }
+

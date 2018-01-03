@@ -23,12 +23,12 @@ include '../../common/view/datepicker.html.php';
         <form method='post'>
             <table class='table table-borderless table-form' align='center'>
                 <tr>
-                    <th><?php echo $lang->project->manageProducts; ?></th>
+                    <th><?php echo $lang->product->name; ?></th>
                     <td class='text-left' id='productsBox' colspan="2">
                         <div class='row'>
                             <div class='col-sm-3'>
                                 <div class='input-group'>
-                                    <?php echo html::select("product", $allProducts, 1, "class='form-control chosen' onchange=''"); ?>
+                                    <?php echo html::select("product", $allProducts, $product, "class='form-control chosen' onchange=''"); ?>
                                     <span class='input-group-addon fix-border' style='padding:0px'></span>
                                 </div>
                             </div>

@@ -393,6 +393,10 @@ class user extends control
 
         if(!empty($_POST))
         {
+            if(strtolower($_POST['account']) == 'guest')
+            {
+                die(js::error(str_replace('ID ', '', sprintf($this->lang->user->error->reserved, $_POST['account']))));
+            }
             $this->user->create();
             if(dao::isError()) die(js::error(dao::getError()));
             die(js::locate($this->createLink('company', 'browse'), 'parent'));
@@ -622,31 +626,6 @@ class user extends control
         }
     }
 
-    /**
-     * Check Tmp dir.
-     *
-     * @access public
-     * @return void
-     */
-    public function checkTmp()
-    {
-        if(!is_dir($this->app->tmpRoot))   mkdir($this->app->tmpRoot,   0755, true);
-        if(!is_dir($this->app->cacheRoot)) mkdir($this->app->cacheRoot, 0755, true);
-        if(!is_dir($this->app->logRoot))   mkdir($this->app->logRoot,   0755, true);
-        if(!is_dir($this->app->logRoot))   return false;
-
-        $file = $this->app->logRoot . DS . 'demo.txt';
-        if($fp = @fopen($file, 'a+'))
-        {
-            @fclose($fp);
-            @unlink($file);
-        }
-        else
-        {
-            return false;
-        }
-        return true;
-    }
 
     /**
      * User login, identify him and authorize him.
@@ -659,7 +638,9 @@ class user extends control
      */
     public function login($referer = '', $from = '')
     {
-        if($this->checkTmp() === false)
+       //error_log("OSCAR:login:" . $referer . " from:" . $from);
+
+        if($this->user->checkTmp() === false)
         {
             echo "<html><head><meta charset='utf-8'></head>";
             echo "<body><table align='center' style='width:700px; margin-top:100px; border:1px solid gray; font-size:14px;'><tr><td style='padding:8px'>";
@@ -671,6 +652,8 @@ class user extends control
 
         $loginLink = $this->createLink('user', 'login');
         $denyLink  = $this->createLink('user', 'deny');
+
+        //error_log("OSCAR:login link:" . $loginLink . " referer:" . $referer);
 
         /* Reload lang by lang of get when viewType is json. */
         if($this->app->getViewType() == 'json' and $this->get->lang and $this->get->lang != $this->app->getClientLang())
@@ -717,6 +700,7 @@ class user extends control
                 die(js::error($failReason));
             }
 
+            //error_log("OSCAR:login identify:" . $account . $password);
             $user = $this->user->identify($account, $password);
 
             if($user)
@@ -735,6 +719,7 @@ class user extends control
                 /* Check password. */
                 if(isset($this->config->safe->mode) and $this->user->computePasswordStrength($password) < $this->config->safe->mode) echo js::alert($this->lang->user->weakPassword);
 
+                //error_log("OSCAR:post login:" . $this->post->referer);
                 /* Go to the referer. */
                 if($this->post->referer and strpos($this->post->referer, $loginLink) === false and strpos($this->post->referer, $denyLink) === false)
                 {
@@ -803,7 +788,9 @@ class user extends control
         {
             if(!empty($this->config->global->showDemoUsers))
             {
-                $demoUsers = $this->user->getPairs('noletter|noempty|noclosed|nodeleted');
+                $demoUsers = 'productManager,projectManager,dev1,dev2,dev3,tester1,tester2,tester3,testManager';
+                if($this->app->getClientLang() == 'en') $demoUsers = 'thePO,pm1,pm2,pg1,pg2,pg3,thePM,qa1,theQS';
+                $demoUsers = $this->dao->select('account,password,realname')->from(TABLE_USER)->where('account')->in($demoUsers)->fetchAll('account');
                 $this->view->demoUsers = $demoUsers;
             }
 

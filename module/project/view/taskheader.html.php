@@ -28,6 +28,7 @@
 
     foreach(customModel::getFeatureMenu('project', 'task') as $menuItem)
     {
+        if($project->type == 'ops' && $menuItem->name == 'needconfirm') continue;
         if(isset($menuItem->hidden)) continue;
         $menuType = $menuItem->name;
         if(strpos($menuType, 'QUERY') === 0)
@@ -73,6 +74,7 @@
     foreach ($lang->project->groups as $key => $value)
     {
         if($key == '') continue;
+        if($project->type == 'ops' && $key == 'story') continue;
         echo '<li' . ($key == $groupBy ? " class='active'" : '') . '>';
         common::printLink('project', 'groupTask', "project=$projectID&groupBy=$key", $value);
     }
@@ -96,7 +98,7 @@
         <ul class='dropdown-menu' id='exportActionMenu'>
         <?php 
         $misc = common::hasPriv('task', 'export') ? "class='export iframe' data-width='700'" : "class=disabled";
-        $link = common::hasPriv('task', 'export') ?  $this->createLink('task', 'export', "project=$projectID&orderBy=$orderBy") : '#';
+        $link = common::hasPriv('task', 'export') ? $this->createLink('task', 'export', "project=$projectID&orderBy=$orderBy&type=$browseType") : '#';
         echo "<li>" . html::a($link, $lang->task->export, '', $misc) . "</li>";
         ?>
         </ul>

@@ -22,4 +22,11 @@
 <br>
 
 ===========
+
+    <thead>
+    <?php foreach ($depts as $dept): ?>
+        <th><?php echo $dept ?></th>
+    <?php endforeach; ?>
+    </thead>
+
 <?php endif;?>

@@ -23,7 +23,7 @@ include '../../common/view/datepicker.html.php';
         <form method='post'>
             <table class='table table-borderless table-form' align='center'>
                 <tr>
-                    <th><?php echo $lang->project->manageProducts; ?></th>
+                    <th><?php echo $lang->product->name; ?></th>
                     <td class='text-left' id='productsBox' colspan="2">
                         <div class='row'>
                             <div class='col-sm-3'>

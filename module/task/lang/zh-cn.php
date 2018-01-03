@@ -11,7 +11,7 @@
  */
 $lang->task->index              = "任务一览";
 $lang->task->create             = "建任务";
-$lang->task->batchCreate        = "批量添加";
+$lang->task->batchCreate        = "批量建任务";
 $lang->task->batchEdit          = "批量编辑";
 $lang->task->batchChangeModule  = "批量修改模块";
 $lang->task->batchClose         = "批量关闭";
@@ -45,6 +45,7 @@ $lang->task->project          = '所属' . $lang->projectCommon;
 $lang->task->module           = '所属模块';
 $lang->task->moduleAB         = '模块';
 $lang->task->story            = '相关需求';
+$lang->task->storyAB          = '需求';
 $lang->task->storySpec        = '需求描述';
 $lang->task->storyVerify      = '验收标准';
 $lang->task->name             = '任务名称';
@@ -103,6 +104,7 @@ $lang->task->transferTo       = '转交给';
 $lang->task->children         = '子任务';
 $lang->task->childrenAB       = '子';
 $lang->task->parent           = '父任务';
+$lang->task->parentAB         = '父';
 $lang->task->lblPri           = 'P';
 $lang->task->lblHour          = '(h)';
 $lang->task->deniedNotice     = '此任务只允许由团队第一人开始。';

@@ -26,27 +26,30 @@ include '../../common/view/datepicker.html.php';
             <form method='post'>
                 <table class='table table-borderless table-form' align='center'>
                     <tr>
-                        <th><?php echo $lang->project->manageProducts; ?></th>
+                        <th><?php echo $lang->product->name; ?></th>
                         <td>
 
-                            <?php if($this->config->blog->debug):?>
+                            <?php if ($this->config->blog->debug): ?>
 
                                 =======<br>
                                 <?php
-                                foreach ($products as $prod)
-                                {
+                                foreach ($allProducts as $prod) {
                                     echo $prod;
                                 }
                                 ?>
                                 <br>=======<br>
                                 <?php
-                                echo $products[$product];
+                                echo "product:" . $product;
+                                echo "<br>allProducts:" . $allProducts[$product];
+                                foreach ($_POST as $p) {
+                                    echo $p;
+                                }
                                 ?>
                                 <br>=======<br>
 
-                            <?php endif;?>
+                            <?php endif; ?>
 
-                            <?php echo html::select("product", $products, $product, "class='form-control chosen' onchange=''"); ?>
+                            <?php echo html::select("product", $allProducts, $product, "class='form-control chosen' onchange=''"); ?>
                         </td>
                     </tr>
                     <tr>
@@ -64,49 +67,50 @@ include '../../common/view/datepicker.html.php';
                 </table>
             </form>
 
-            <table class='table table-data table-fixed' border="1">
-            <?php
-            //echo $day;
+            <table width="100%" border="1" cellspacing="8" cellpadding="8" bordercolor="#dddddd">
 
-            $i = 0;
-            foreach ($articles as $article) {
-                if ($i == 0 && ($article != null)) {
-                    echo "<legend>";
+                <thead>
+                <tr>
+                    <td colspan="2" bgcolor="#dddddd">
+                        <strong>
+                        <?php echo $allProducts[$product]
+                            . "&nbsp;&nbsp;"
+                            . $dept
+                            . "&nbsp;&nbsp;"
+                            . date('Y-m-d', strtotime($day));
+                        ?>
+                        </strong>
+                    </td>
+                </tr>
+                </thead>
 
-                    echo $products[$article->product]
-                        . "&nbsp;&nbsp;"
-                        . $dept
-                        . "&nbsp;&nbsp;"
-                        . date('Y-m-d', strtotime($article->date))
-                        ;
-                    $i++;
+                <?php
+                //echo $day;
 
-                    echo "</legend>";
+                foreach ($articles as $article) {
+                    //echo $article->content;
+                    echo "<tr><td width='20%' align='right'><strong>$article->ownerrealname</strong></td>";
+                    $cnt = str_replace("\n", "<br>", $article->content);
+                    echo "<td>$cnt</td></tr>";
+                    //echo "<br>";
                 }
-                //echo $article->content;
-                echo "<tr><th>$article->ownerrealname</th>";
-                $cnt = str_replace("\n", "<br>", $article->content);
-                echo"<td>$cnt</td></tr>";
-                //echo "<br>";
-            }
 
-            foreach ($articles as $article) {
-                if(!empty($article->contentimages))
-                {
-                    $imgs = str_replace("<img", "<br><img", $article->contentimages);
-                    $imgs = htmlspecialchars_decode($imgs);
-                    echo "<tr><th>$article->ownerrealname</th>";
-                    echo"<td>$imgs</td></tr>";
+                foreach ($articles as $article) {
+                    if (!empty($article->contentimages)) {
+                        $imgs = str_replace("<img", "<br><img", $article->contentimages);
+                        $imgs = htmlspecialchars_decode($imgs);
+                        echo "<tr><td width='20%' align='right'><strong>$article->ownerrealname</strong></td>";
+                        echo "<td>$imgs</td></tr>";
+                    }
+                    //$imgs = $imgs . "<br>";
+                    //$imgs = str_replace("<br>\n<br>", "<br>", $imgs);
+
+                    //echo ($imgs);
+                    //echo $article->contentimages;
+                    //echo "<br>";
                 }
-                //$imgs = $imgs . "<br>";
-                //$imgs = str_replace("<br>\n<br>", "<br>", $imgs);
 
-                //echo ($imgs);
-                //echo $article->contentimages;
-                //echo "<br>";
-            }
-
-            ?>
+                ?>
 
             </table>
 

@@ -19,7 +19,7 @@ $lang->null      = '空';
 $lang->ellipsis  = '…';
 
 $lang->zentaoPMS      = '禅道';
-$lang->welcome        = "%s项目管理系统";
+$lang->welcome        = "%s日报系统&nbsp;&nbsp;&nbsp;(内部信息，禁止外传！)";
 $lang->logout         = '退出';
 $lang->login          = '登录';
 $lang->help           = '帮助';
@@ -458,7 +458,7 @@ $lang->pager->noRecord     = "暂时没有记录";
 $lang->pager->digest       = "共 <strong>%s</strong> 条记录，%s <strong>%s/%s</strong> &nbsp; ";
 $lang->pager->recPerPage   = "每页 <strong>%s</strong> 条";
 $lang->pager->first        = "<i class='icon-step-backward' title='首页'></i>";
-$lang->pager->pre          = "<i class='icon-play icon-rotate-180' title='上一页'></i>";
+$lang->pager->pre          = "<i class='icon-play icon-flip-horizontal' title='上一页'></i>";
 $lang->pager->next         = "<i class='icon-play' title='下一页'></i>";
 $lang->pager->last         = "<i class='icon-step-forward' title='末页'></i>";
 $lang->pager->locate       = "GO!";

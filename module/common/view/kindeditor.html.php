@@ -19,6 +19,12 @@ js::set('kuid', $uid);
 <script language='javascript'>
 var editor = <?php echo json_encode($editor);?>;
 
+var blogTools =
+['undo', 'redo', '|', 'emoticons', 'code', 'link', '|', 'removeformat', 'fullscreen', 'source'];
+
+var blogImageTools =
+    ['undo', 'redo', '|',  'image',  '|', 'fullscreen', 'source'];
+
 var bugTools =
 [ 'formatblock', 'fontname', 'fontsize', '|', 'forecolor', 'hilitecolor', 'bold', 'italic','underline', '|', 
 'justifyleft', 'justifycenter', 'justifyright', 'insertorderedlist', 'insertunorderedlist', '|',
@@ -50,6 +56,8 @@ function initKindeditor(afterInit)
         editorTool = simpleTools;
         if(editor.tools == 'bugTools')  editorTool = bugTools;
         if(editor.tools == 'fullTools') editorTool = fullTools;
+        if(editor.tools == 'blogTools') editorTool = blogTools;
+        if(editor.tools == 'blogImageTools') editorTool = blogImageTools;
 
         var K = KindEditor, $editor = $('#' + editorID);
         var placeholderText = $editor.attr('placeholder');

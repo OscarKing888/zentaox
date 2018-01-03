@@ -917,6 +917,8 @@ EOT;
      */
     static public function locate($url, $target = "self")
     {
+        //error_log("OSCAR:locate:" . $url);
+
         /* If the url if empty, goto the home page. */
         if(!$url)
         {
