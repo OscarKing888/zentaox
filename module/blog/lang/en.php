@@ -19,4 +19,8 @@ $lang->blog->content = 'Content';
 $lang->blog->pic = 'Images';
 $lang->blog->action  = 'Action';
 
+$lang->blog->showstat  = 'Show Stastics';
+$lang->blog->showstatList['show'] = 'Show';
+$lang->blog->showstatList['hide']  = 'Hide';
+
 $lang->blog->methodOrder[5] = 'index';

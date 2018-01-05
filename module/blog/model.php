@@ -205,7 +205,7 @@ class blogModel extends model
             ->andwhere('deleted')->eq(0)
             ->andWhere('date')->between(date('Y-m-d 00:00:00', strtotime($day)), date('Y-m-d 23:59:59', strtotime($day)))
             ->andwhere('product')->eq($product)
-            ->orderBy('date desc')
+            ->orderBy('date asc')
             ->fetchAll();
 
         $articles = $this->convertImageURL($articles);
@@ -225,7 +225,7 @@ class blogModel extends model
             ->where('date')->between(date('Y-m-d 00:00:00', strtotime($day)), date('Y-m-d 23:59:59', strtotime($day)))
             ->andwhere('deleted')->eq(0)
             ->andwhere('product')->eq($product)
-            ->orderBy('date desc')
+            ->orderBy('date asc')
             ->fetchAll();
 
         $articles = $this->convertImageURL($articles);

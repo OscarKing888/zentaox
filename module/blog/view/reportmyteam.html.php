@@ -73,12 +73,15 @@ include '../../common/view/datepicker.html.php';
                 <tr>
                     <td colspan="2" bgcolor="#dddddd">
                         <strong>
-                        <?php echo $allProducts[$product]
-                            . "&nbsp;&nbsp;"
-                            . $dept
-                            . "&nbsp;&nbsp;"
-                            . date('Y-m-d', strtotime($day));
-                        ?>
+                            <?php
+                            $deptSubmittedUser = array();
+
+                            echo $allProducts[$product]
+                                . "&nbsp;&nbsp;"
+                                . $dept
+                                . "&nbsp;&nbsp;"
+                                . date('Y-m-d', strtotime($day));
+                            ?>
                         </strong>
                     </td>
                 </tr>
@@ -89,10 +92,17 @@ include '../../common/view/datepicker.html.php';
 
                 foreach ($articles as $article) {
                     //echo $article->content;
+                    $deptSubmittedUser[$article->account] = $article->account;
                     echo "<tr><td width='20%' align='right'><strong>$article->ownerrealname</strong></td>";
                     $cnt = str_replace("\n", "<br>", $article->content);
                     echo "<td>$cnt</td></tr>";
                     //echo "<br>";
+                }
+
+                foreach (array_keys($deptusers) as $dpuaccount) {
+                    if (!array_key_exists($dpuaccount, $deptSubmittedUser)) {
+                        echo " <tr><td align=\"right\" width=\"10%\"><font color='red'>$deptusers[$dpuaccount]</font></td><td></td></tr>";
+                    }
                 }
 
                 foreach ($articles as $article) {
@@ -102,14 +112,13 @@ include '../../common/view/datepicker.html.php';
                         echo "<tr><td width='20%' align='right'><strong>$article->ownerrealname</strong></td>";
                         echo "<td>$imgs</td></tr>";
                     }
-                    //$imgs = $imgs . "<br>";
-                    //$imgs = str_replace("<br>\n<br>", "<br>", $imgs);
-
-                    //echo ($imgs);
-                    //echo $article->contentimages;
-                    //echo "<br>";
                 }
+                //$imgs = $imgs . "<br>";
+                //$imgs = str_replace("<br>\n<br>", "<br>", $imgs);
 
+                //echo ($imgs);
+                //echo $article->contentimages;
+                //echo "<br>";
                 ?>
 
             </table>

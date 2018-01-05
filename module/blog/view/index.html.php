@@ -36,9 +36,12 @@
 
                     <div class='content'>
                         <?php
-                        echo $article->content;
-                        echo "<br>";
-                        echo $article->contentimages;
+                        $cnt = str_replace("\n", "<br>", $article->content);
+                        echo $cnt;
+                        //echo "<br>";
+                        $imgs = str_replace("<img", "<br><img", $article->contentimages);
+                        $imgs = htmlspecialchars_decode($imgs);
+                        echo $imgs;
                         //$steps = $article->contentimages;
                         //$steps = str_replace('<p></p>', '', $article->content);
                         //$test = $this->loadModel('file')->replaceImgURL($steps, 'contentimages');

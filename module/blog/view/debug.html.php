@@ -29,4 +29,6 @@
     <?php endforeach; ?>
     </thead>
 
+    <?php echo $showstat; echo html::radio('showstat', $lang->blog->showstatList, $showstat ? "show" : "hide");?>
+
 <?php endif;?>

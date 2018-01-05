@@ -206,13 +206,24 @@ class blog extends control
         $this->view->day = $day;
         $this->view->product = $product;
 
+        $depts = $this->dao->select('id,name')->from(TABLE_DEPT)->fetchPairs();
+
+        $this->view->deptusers = $this->dao->select('account,realname')->from(TABLE_USER)
+            ->where('deleted')->eq(0)
+            ->andWhere('dept')->eq($this->app->user->dept)
+            ->orderBy('account')
+            ->fetchPairs();
+
         $this->display();
     }
 
+
+    public $showstat;
     public function reportproject()
     {
         $day = helper::today();
         $product = 1;
+        $showstat = 1;
 
         if(!empty($_POST))
         {
@@ -222,7 +233,24 @@ class blog extends control
 
             $product = fixer::input('post')
                 ->get()->product;
+
+            //$showstat = fixer::input('post')
+                //->get()->showstat;
+
+            //var_dump($_POST['checkbox']);
+
+            if(!is_null($_POST['checkbox']))
+            {
+                $showstat = 1;
+            }
+            else
+            {
+                $showstat = 0;
+            }
+            //error_log("oscar: showstat=$showstats postempty:". empty($_POST['showstat']));
+            //error_log("oscar: checkbox:". is_null($_POST['checkbox']));
         }
+        //error_log("oscar: showstat=$showstats");
 
         $articles = $this->blog->getProjectReport($day, $product);
         //$articles = $this->dao->select("name")->from('zt_dept')->fetchAll();
@@ -241,6 +269,15 @@ class blog extends control
         $this->view->product = $product;
         $depts = $this->dao->select('id,name')->from(TABLE_DEPT)->fetchPairs();
         $this->view->depts = $depts;
+        $this->view->showstat = $showstat;
+
+        foreach (array_keys($depts) as $d) {
+            $this->view->deptusers[$d] = $this->dao->select('account,realname')->from(TABLE_USER)
+                ->where('deleted')->eq(0)
+                ->andWhere('dept')->eq($d)
+                ->orderBy('account')
+                ->fetchPairs();
+        }
 
         $this->display();
     }
@@ -289,6 +326,7 @@ class blog extends control
             //error_log("oscar: owner " . $tart->owner);
             $tart->user = $this->user->getById($tart->owner);
             $tart->ownerrealname = $tart->user->realname;
+            $tart->account = $tart->user->account;
             $tart->dept = $tart->user->dept;
 
             $newarticles[$tart->id]=($tart);
