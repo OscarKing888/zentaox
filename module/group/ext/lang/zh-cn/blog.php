@@ -14,7 +14,9 @@ $lang->resource->blog->edit       = 'edit';
 $lang->resource->blog->delete       = 'delete';
 $lang->resource->blog->restoreblog       = 'restore';
 
-
+$lang->resource->blog->setUserAbsent       = 'setUserAbsent';
+$lang->resource->blog->removeUserAbsent       = 'removeUserAbsent';
+$lang->resource->blog->createUserAbsent       = 'createUserAbsent';
 
 $lang->blog->methodOrder[0]  = 'index';
 $lang->blog->methodOrder[1]  = 'restorepage';
@@ -27,3 +29,7 @@ $lang->blog->methodOrder[15]  = 'create';
 $lang->blog->methodOrder[20]  = 'edit';
 $lang->blog->methodOrder[35]  = 'delete';
 $lang->blog->methodOrder[40]  = 'restoreblog';
+
+$lang->blog->methodOrder[45]  = 'setUserAbsent';
+$lang->blog->methodOrder[46]  = 'removeUserAbsent';
+$lang->blog->methodOrder[47]  = 'createUserAbsent';

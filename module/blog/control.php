@@ -191,6 +191,7 @@ class blog extends control
         }
 
         $articles = $this->blog->getGroupReport($day, $product, (int)$this->app->user->dept);
+        //$articles = $this->blog->getAllReport($day);
         //$articles = $this->dao->select("name")->from('zt_dept')->fetchAll();
         //$articles = $this->dao->select("*")->from('gameblog')->fetchAll();
 
@@ -202,23 +203,29 @@ class blog extends control
         $newarticles = $this->processArticles($articles);
         $this->view->articles = $newarticles;
 
-        $this->view->dept = $this->dept->getById($this->app->user->dept)->name;
+        $this->view->mydept = $this->app->user->dept;
+        $this->view->mydeptName = $this->dept->getById($this->app->user->dept)->name;
         $this->view->day = $day;
         $this->view->product = $product;
-
         $depts = $this->dao->select('id,name')->from(TABLE_DEPT)->fetchPairs();
+        $this->view->depts = $depts;
+        $this->view->showstat = 1;
+        $this->view->userAbsent = $this->blog->getUserAbsent($day);
 
-        $this->view->deptusers = $this->dao->select('account,realname')->from(TABLE_USER)
-            ->where('deleted')->eq(0)
-            ->andWhere('dept')->eq($this->app->user->dept)
-            ->orderBy('account')
-            ->fetchPairs();
+        //foreach (array_keys($depts) as $d)
+        {
+            $this->view->deptusers[$this->app->user->dept] = $this->dao->select('account,realname')->from(TABLE_USER)
+                ->where('deleted')->eq(0)
+                ->andWhere('dept')->eq($this->app->user->dept)
+                ->orderBy('account')
+                ->fetchPairs();
+        }
 
         $this->display();
     }
 
 
-    public $showstat;
+    //public $showstat;
     public function reportproject()
     {
         $day = helper::today();
@@ -252,7 +259,7 @@ class blog extends control
         }
         //error_log("oscar: showstat=$showstats");
 
-        $articles = $this->blog->getProjectReport($day, $product);
+        $articles = $this->blog->getAllReport($day);
         //$articles = $this->dao->select("name")->from('zt_dept')->fetchAll();
         //$articles = $this->dao->select("*")->from('gameblog')->fetchAll();
 
@@ -270,6 +277,7 @@ class blog extends control
         $depts = $this->dao->select('id,name')->from(TABLE_DEPT)->fetchPairs();
         $this->view->depts = $depts;
         $this->view->showstat = $showstat;
+        $this->view->userAbsent = $this->blog->getUserAbsent($day);
 
         foreach (array_keys($depts) as $d) {
             $this->view->deptusers[$d] = $this->dao->select('account,realname')->from(TABLE_USER)
@@ -333,6 +341,99 @@ class blog extends control
         }
 
         return $newarticles;
+    }
+
+    public function createUserAbsent()
+    {
+        $userid = "";
+        $day = helper::today();
+
+        $msg = "";
+        foreach (array_keys($_POST) as $p)
+        {
+            $msg .= $p . "\n";
+        }
+
+        //error_log("oscar: setUserAbsent :" . $msg);
+
+        if(!empty($_POST)) {
+            $postVals = $day = fixer::input('post')
+                ->get();
+            $userid = $postVals->userid;
+            $day = $postVals->day;
+        }
+        else
+        {
+            return false;
+        }
+
+        $this->blog->createUserAbsent($userid, $day);
+        //$this->display();
+    }
+
+    public function setUserAbsent()
+    {
+        $userid = "";
+        $day = helper::today();
+
+        $msg = "";
+        foreach (array_keys($_POST) as $p)
+        {
+            $msg .= $p . "\n";
+        }
+
+        //error_log("oscar: setUserAbsent :" . $msg);
+
+        if(!empty($_POST)) {
+            $postVals = $day = fixer::input('post')
+                ->get();
+
+            //error_log("oscar: setUserAbsent postVals:" . $postVals);
+
+            $userid = $postVals->userid;
+
+            //error_log("oscar: setUserAbsent userid:" . $userid);
+
+            $day = $postVals->day;
+
+            //error_log("oscar: setUserAbsent day:" . $day);
+        }
+        else
+        {
+            return false;
+        }
+
+        $this->blog->setUserAbsent($userid, $day);
+        //$this->display();
+    }
+
+    public function removeUserAbsent()
+    {
+        $userid = "";
+        $day = helper::today();
+        $msg = "";
+
+        if(!empty($_POST)) {
+            $postVals = $day = fixer::input('post')
+                ->get();
+
+            //error_log("oscar: setUserAbsent postVals:" . $postVals);
+
+            $userid = $postVals->userid;
+
+            //error_log("oscar: setUserAbsent userid:" . $userid);
+
+            $day = $postVals->day;
+
+            //error_log("oscar: setUserAbsent day:" . $day);
+        }
+        else
+        {
+            return false;
+        }
+
+        $this->blog->removeUserAbsent($userid, $day);
+        //$this->display();
     }
 }
 

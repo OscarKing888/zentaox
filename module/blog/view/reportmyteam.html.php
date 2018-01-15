@@ -67,59 +67,154 @@ include '../../common/view/datepicker.html.php';
                 </table>
             </form>
 
-            <table width="100%" border="1" cellspacing="8" cellpadding="8" bordercolor="#dddddd">
+            <?php echo $allProducts[$product]
+                . "&nbsp;&nbsp;"
+                //. $mydeptName . "]"
+                . date('Y-m-d', strtotime($day))
+                . "<br>";
 
-                <thead>
-                <tr>
-                    <td colspan="2" bgcolor="#dddddd">
-                        <strong>
-                            <?php
-                            $deptSubmittedUser = array();
+            $userOtherProject = array();
+            $deptArticles = array();
+            $deptSubmittedUser = array();
+            $userInfo = array();
 
-                            echo $allProducts[$product]
-                                . "&nbsp;&nbsp;"
-                                . $dept
-                                . "&nbsp;&nbsp;"
-                                . date('Y-m-d', strtotime($day));
-                            ?>
-                        </strong>
-                    </td>
-                </tr>
-                </thead>
+            //echo "mydept:$mydept<br>";
+            //echo "articles:" . count($articles) ."<br>";
+
+            foreach (array_keys($depts) as $tdept)
+            {
+              //  echo "dept:$depts[$tdept]<br>";
+                foreach ($articles as $article) {
+                    //echo "$article->dept vs $tdept<br>";
+                    if ($article->dept == $tdept) {
+                        if ($article->product == $product) {
+                            $deptArticles[$tdept][$article->id] = $article;
+                            //echo "$article->id    $depts[$tdept]   $article->owner   $article->content <br>";
+                        } else {
+                            $userOtherProject[$article->owner] = $article;
+                        }
+                    }
+                }
+            }
+
+            //echo "deptArticles:" . count($deptArticles) ."<br>";
+
+            foreach ($userAbsent as $user) {
+                $userInfo[$user->owner] = $user;
+                //echo "userAbsent:$user->owner absent:$user->absent<br>";
+            }
+            ?>
+
+            <table class="table" cellspacing="8">
+
+                <?php foreach (array_keys($deptArticles) as $deptr): ?>
 
                 <?php
-                //echo $day;
+                    echo "$deptr->id $deptr->owner   $deptr->content <br>";
+                    ?>
 
-                foreach ($articles as $article) {
-                    //echo $article->content;
-                    $deptSubmittedUser[$article->account] = $article->account;
-                    echo "<tr><td width='20%' align='right'><strong>$article->ownerrealname</strong></td>";
-                    $cnt = str_replace("\n", "<br>", $article->content);
-                    echo "<td>$cnt</td></tr>";
-                    //echo "<br>";
-                }
+                    <tr>
+                        <td bgcolor="#a9a9a9" align='left' colspan="2">
+                            <b><?php echo $depts[$mydept] ?></b>
+                            <?php
 
-                foreach (array_keys($deptusers) as $dpuaccount) {
-                    if (!array_key_exists($dpuaccount, $deptSubmittedUser)) {
-                        echo " <tr><td align=\"right\" width=\"10%\"><font color='red'>$deptusers[$dpuaccount]</font></td><td></td></tr>";
+                            $deptSubmittedUser = array();
+
+                            if ($showstat) {
+                                if (count($deptArticles[$mydept]) == count($deptusers[$mydept])) {
+                                    echo "<font color='green'>" . count($deptArticles[$mydept]) . "/" . count($deptusers[$mydept]) . "</font>";
+                                } else {
+                                    echo "<font color='red'>" . count($deptArticles[$mydept]) . "/" . count($deptusers[$mydept]) . "</font>";
+                                }
+                            }
+                            ?>
+                        </td>
+                    </tr>
+
+                    <?php foreach ($deptArticles[$deptr] as $article): ?>
+                        <?php
+                        if ($showstat) {
+                            $cnt = str_replace("\n", "<br>", $article->content);
+                        } else {
+                            $cnt = str_replace("\n", "/", $article->content);
+                        }
+                        ?>
+
+                        <tr>
+                            <td align="right" width="10%">
+                                <strong>
+                                    <?php
+                                    $deptSubmittedUser[$article->account] = $article->account;
+                                    if ($showstat) {
+                                        echo $article->ownerrealname;
+                                    }
+                                    ?>
+                                </strong>
+                            </td>
+                            <td><?php echo $cnt ?></td>
+                        </tr>
+                    <?php endforeach; ?>
+
+                    <?php
+                    if ($showstat) {
+                        foreach (array_keys($deptusers[$deptr]) as $dpuaccount) {
+                            if (!array_key_exists($dpuaccount, $deptSubmittedUser)) {
+                                $deptusernames = $deptusers[$deptr];
+
+                                //foreach (array_keys($deptusernames) as $ddt) {echo "<tr><td>$ddt</td><td>$dpuaccount</td></tr>";}
+
+                                echo " <tr><td align=\"right\" width=\"10%\"><font color='red'>$deptusernames[$dpuaccount]</font></td><td><font color='red'>";
+
+                                // if user has other project blog
+                                if (array_key_exists($dpuaccount, $userOtherProject)) {
+                                    echo "《" . $allProducts[$userOtherProject[$dpuaccount]->product] . "》" . $userOtherProject[$dpuaccount]->content;
+                                } else if (array_key_exists($dpuaccount, $userInfo)) { // if user has absent mark
+                                    if($userInfo[$dpuaccount]->absent == 1) {
+                                        echo $lang->blog->setUserAbsent;
+                                        echo html::commonButton($lang->blog->removeUserAbsent, "id='removeUserAbsent' onclick=\"on_removeUserAbsent('$dpuaccount', '$day')\"");
+                                    }
+                                    else
+                                    {
+                                        echo html::commonButton( $lang->blog->setUserAbsent, "id='setUserAbsent' onclick=\"on_setUserAbsent('$dpuaccount', '$day')\"");
+                                    }
+                                    //echo html::a($this->createLink('blog', 'removeUserAbsent', "userid=$dpuaccount&day=$day"), $lang->blog->removeUserAbsent);
+                                } else { // show set absent
+                                    echo html::commonButton( $lang->blog->setUserAbsent, "id='createUserAbsent' onclick=\"on_createUserAbsent('$dpuaccount', '$day')\"");
+                                    //echo html::a($this->createLink('blog', 'setUserAbsent', array($dpuaccount, $day)), $lang->blog->setUserAbsent);
+                                }
+
+                                echo "</font></td></tr>";
+                            }
+                        }
                     }
-                }
+                    ?>
 
-                foreach ($articles as $article) {
-                    if (!empty($article->contentimages)) {
-                        $imgs = str_replace("<img", "<br><img", $article->contentimages);
-                        $imgs = htmlspecialchars_decode($imgs);
-                        echo "<tr><td width='20%' align='right'><strong>$article->ownerrealname</strong></td>";
-                        echo "<td>$imgs</td></tr>";
-                    }
-                }
-                //$imgs = $imgs . "<br>";
-                //$imgs = str_replace("<br>\n<br>", "<br>", $imgs);
+                <?php endforeach; ?>
 
-                //echo ($imgs);
-                //echo $article->contentimages;
-                //echo "<br>";
-                ?>
+                <tr>
+                    <td bgcolor="#a9a9a9" align='left' colspan="2"><b>图片</b></td>
+                </tr>
+
+                <?php foreach (array_keys($deptArticles) as $tdeptr): ?>
+
+                    <?php foreach ($deptArticles[$tdeptr] as $article): ?>
+                        <?php if (!empty($article->contentimages)): ?>
+                            <?php
+                            $imgs = str_replace("<img", "<br><img", $article->contentimages);
+                            $imgs = htmlspecialchars_decode($imgs);
+                            ?>
+
+                            <tr>
+                                <td align="right" width="10%"><strong><?php if ($showstat) {
+                                            echo $article->ownerrealname;
+                                        } ?></strong></td>
+                                <td><?php echo $imgs ?></td>
+                            </tr>
+                        <?php endif; ?>
+
+                    <?php endforeach; ?>
+
+                <?php endforeach; ?>
 
             </table>
 

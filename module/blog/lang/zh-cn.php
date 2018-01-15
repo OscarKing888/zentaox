@@ -19,6 +19,11 @@ $lang->blog->content = '内容';
 $lang->blog->pic = '图片';
 $lang->blog->action  = '操作';
 
+$lang->blog->createUserAbsent  = '创建请假';
+$lang->blog->setUserAbsent  = '请假';
+$lang->blog->removeUserAbsent  = '取消请假';
+
+
 $lang->blog->showstat  = '显示统计信息';
 $lang->blog->showstatList['show'] = '显示';
 $lang->blog->showstatList['hide']  = '隐藏';

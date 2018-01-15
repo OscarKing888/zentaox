@@ -19,6 +19,10 @@ $lang->blog->content = 'Content';
 $lang->blog->pic = 'Images';
 $lang->blog->action  = 'Action';
 
+$lang->blog->createUserAbsent  = 'Create Absent';
+$lang->blog->setUserAbsent  = 'Set Absent';
+$lang->blog->removeUserAbsent  = 'Remove Absent';
+
 $lang->blog->showstat  = 'Show Stastics';
 $lang->blog->showstatList['show'] = 'Show';
 $lang->blog->showstatList['hide']  = 'Hide';

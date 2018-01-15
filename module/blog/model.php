@@ -33,10 +33,10 @@ class blogModel extends model
     public function getList($pager = null)
     {
         //$articles = $this->dao->select('*')
-            //->from($this->config->blog->dbname)
-            //->where('owner')->eq($this->app->user->account)
-            //->andwhere('deleted')->eq(0)
-            //->orderBy('date desc')->page($pager)->fetchAll();
+        //->from($this->config->blog->dbname)
+        //->where('owner')->eq($this->app->user->account)
+        //->andwhere('deleted')->eq(0)
+        //->orderBy('date desc')->page($pager)->fetchAll();
 
         //return $this->convertImageURL($articles);
         return $this->getListByUser($this->app->user->account, $pager);
@@ -204,7 +204,7 @@ class blogModel extends model
             ->where('owner')->in($dptus)
             ->andwhere('deleted')->eq(0)
             ->andWhere('date')->between(date('Y-m-d 00:00:00', strtotime($day)), date('Y-m-d 23:59:59', strtotime($day)))
-            ->andwhere('product')->eq($product)
+            //->andwhere('product')->eq($product)
             ->orderBy('date asc')
             ->fetchAll();
 
@@ -235,5 +235,63 @@ class blogModel extends model
         }
         //*/
         return $articles;
+    }
+
+    public function getAllReport($day)
+    {
+        $articles = $this->dao->select('*')
+            ->from($this->config->blog->dbname)
+            ->where('date')->between(date('Y-m-d 00:00:00', strtotime($day)), date('Y-m-d 23:59:59', strtotime($day)))
+            ->andwhere('deleted')->eq(0)
+            ->orderBy('date asc')
+            ->fetchAll();
+
+        $articles = $this->convertImageURL($articles);
+
+        return $articles;
+    }
+
+    public function getUserAbsent($day)
+    {
+        $userinfo = $this->dao->select('*')
+            ->from($this->config->blog->dbnameUserinfo)
+            ->where('date')->between(date('Y-m-d 00:00:00', strtotime($day)), date('Y-m-d 23:59:59', strtotime($day)))
+            ->fetchAll();
+
+        return $userinfo;
+    }
+
+    public function createUserAbsent($userid, $day)
+    {
+        //error_log("oscar: model + createUserAbsent  userid:$userid   day:$day");
+
+        $data = new stdclass();
+        $data->owner = $userid;
+        $data->date = $day;
+        $data->absent = 1;
+
+        $this->dao->insert($this->config->blog->dbnameUserinfo)->data($data)->exec();
+    }
+
+    public function setUserAbsent($userid, $day)
+    {
+        //error_log("oscar: model * setUserAbsent  userid:$userid   day:$day");
+
+        $this->dao->update($this->config->blog->dbnameUserinfo)
+            ->set('absent')->eq(1)
+            ->where('owner')->eq($userid)
+            ->andWhere('date')->between(date('Y-m-d 00:00:00', strtotime($day)), date('Y-m-d 23:59:59', strtotime($day)))
+            ->exec();
+    }
+
+    public function removeUserAbsent($userid, $day)
+    {
+        //error_log("oscar: model - removeUserAbsent  userid:$userid   day:$day");
+
+        $this->dao->update($this->config->blog->dbnameUserinfo)
+            ->set('absent')->eq(0)
+            ->where('owner')->eq($userid)
+            ->andWhere('date')->between(date('Y-m-d 00:00:00', strtotime($day)), date('Y-m-d 23:59:59', strtotime($day)))
+            ->exec();
     }
 }
