@@ -8,7 +8,7 @@ function on_createUserAbsent(userid, day) {
     //alert("setUserAbsent");
 
     url = createLink('blog', 'createUserAbsent');
-    alert("on_createUserAbsent userid:" + userid + " day:" + day + " url:" + url);
+    //alert("on_createUserAbsent userid:" + userid + " day:" + day + " url:" + url);
 
     $.ajax(
         {
@@ -38,7 +38,7 @@ function on_setUserAbsent(userid, day) {
     //alert("setUserAbsent");
 
     url = createLink('blog', 'setUserAbsent');
-    alert("on_setUserAbsent userid:" + userid + " day:" + day + " url:" + url);
+    //alert("on_setUserAbsent userid:" + userid + " day:" + day + " url:" + url);
 
     $.ajax(
         {
@@ -55,7 +55,7 @@ function on_removeUserAbsent(userid, day) {
     //alert("removeUserAbsent");
     //alert("removeUserAbsent userid:" + userid + " day:" + day);
     url = createLink('blog', 'removeUserAbsent');
-    alert("on_removeUserAbsent userid:" + userid + " day:" + day + " url:" + url);
+    //alert("on_removeUserAbsent userid:" + userid + " day:" + day + " url:" + url);
 
     $.ajax(
         {
