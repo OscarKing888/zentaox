@@ -1,9 +1,9 @@
 <?php include '../../common/view/header.html.php'; ?>
 <?php include '../../common/view/datepicker.html.php'; ?>
 <form method='post'>
-    <table class='table table-borderless table-form' align='center'>
+    <table class='table table-borderless mw-600px table-form' align='center'>
         <tr>
-            <th><?php echo $lang->gametaskinternal->version; ?></th>
+            <th align="right"><?php echo $lang->gametaskinternal->version; ?></th>
             <td>
 
                 <?php
@@ -26,12 +26,13 @@
         </tr>
     </table>
 </form>
-
-<table class='table table-form table-fixed with-border' id="buildList" role="grid">
+<br>
+<table class='table table-form table-fixed with-border mw-600px' align='center' id="buildList" role="grid">
     <thead>
     <tr class="colhead tablesorter-headerRow" role="row">
         <th class='w-30px'><?php echo $lang->idAB;?></th>
         <th class='w-100px'><?php echo $lang->gametaskinternal->version; ?></th>
+        <th class='w-80px'><?php echo $lang->gametaskinternal->deadline; ?></th>
         <th class='w-100px'><?php echo $lang->gametaskinternal->status; ?></th>
     </tr>
     </thead>
@@ -41,6 +42,21 @@
         <tr class="text-center">
             <td><?php echo $v->id; ?></td>
             <td><?php echo $v->name; ?></td>
+            <td>
+                <div>
+                <?php
+                if($v->active)
+                {
+                    echo html::input('deadline', date('Y-m-d', strtotime($v->deadline)), "class='form-control form-date' placeholder=''");
+                    echo html::commonButton($lang->gametaskinternal->update, "id='update_version_deadline' onclick=\"on_updateVersionDeadline('$v->id')\"");
+                }
+                else
+                {
+                    echo date('Y-m-d', strtotime($v->deadline));
+                }
+                ?>
+                </div>
+            </td>
             <td>
                 <?php
                 if($v->active)

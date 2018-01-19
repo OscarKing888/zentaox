@@ -1,10 +1,11 @@
 <?php
+
 /**
  * The control file of gametaskinternal module of ZenTaoPHP.
  *
  * The author disclaims copyright to this source code.  In place of
  * a legal notice, here is a blessing:
- * 
+ *
  *  May you do good and not evil.
  *  May you find forgiveness for yourself and forgive others.
  *  May you share freely, never taking more than you give.
@@ -13,7 +14,7 @@ class gametaskinternal extends control
 {
     /**
      * The construct function.
-     * 
+     *
      * @access public
      * @return void
      */
@@ -32,7 +33,7 @@ class gametaskinternal extends control
 
     /**
      * The index page of gametaskinternal module.
-     * 
+     *
      * @access public
      * @return void
      */
@@ -79,13 +80,7 @@ class gametaskinternal extends control
         $this->app->loadClass('pager');
         $pager = new pager($recTotal, $recPerPage, $pageID);
 
-        $gameTasks = $this->dao->select()->from(TABLE_GAMETASKINTERNAL)
-            ->where('deleted')->eq(0)
-            ->fetchAll();
-
-        $this->view->gameTasks = $gameTasks;
-
-        $this->view->allProducts   = array(0 => '') + $this->product->getPairs('noclosed|nocode');
+        $this->view->allProducts = array(0 => '') + $this->product->getPairs('noclosed|nocode');
         $depts = $this->dao->select('id,name')->from(TABLE_DEPT)->fetchPairs();
         $this->view->depts = $depts;
 
@@ -97,31 +92,45 @@ class gametaskinternal extends control
         $this->view->user = $this->app->user->account;
 
         $versions = $this->dao->select('id,name')->from(TABLE_GAMETASKINTERNALVERSION)
-            //->where('active')->eq(1)
+            ->where('active')->eq(1)
             ->orderBy('id desc')
             ->fetchPairs();
-        $this->view->versions = ($versions);
 
-        $this->view->pager    = $pager;
+        $this->view->versions = $versions;
+
+        //foreach (array_keys($versions) as $k) { error_log("oscar: version:k $k");  }
+
+        $gameTasks = $this->dao->select()->from(TABLE_GAMETASKINTERNAL)
+            ->where('deleted')->eq(0)
+            ->andWhere('version')->in(array_keys($versions))
+            //->groupBy('version')
+            ->orderBy('pri asc')
+            ->fetchAll();
+
+        $this->view->gameTasks = $gameTasks;
+
+        $this->view->pager = $pager;
     }
 
     public function create()
     {
-        if(!empty($_POST))
-        {
+        $this->view->msg = "";
+
+        if (!empty($_POST)) {
             $newGameTasks = fixer::input('post')->get();
-            $batchNum = count(reset($newGameTasks));
+            $batchNum = count($newGameTasks->version);
+            //error_log("oscar: batchNum $batchNum count:" . count($newGameTasks));
 
             $version = '';
             $dept = 0;
             $owner = '';
 
-            for($i = 0; $i < $batchNum; $i++)
-            {
-                if(empty($newGameTasks->title[$i]))
-                {
+            for ($i = 0; $i < $batchNum; $i++) {
+                if (empty($newGameTasks->title[$i])) {
                     continue;
                 }
+
+                $this->view->msg = "添加成功！";
 
                 $version = !isset($newGameTasks->version[$i]) || $newGameTasks->version[$i] == 'ditto' ? $version : $newGameTasks->version[$i];
                 $dept = !isset($newGameTasks->dept[$i]) || $newGameTasks->dept[$i] == 'ditto' ? $dept : $newGameTasks->dept[$i];
@@ -142,40 +151,38 @@ class gametaskinternal extends control
                 $this->dao->insert(TABLE_GAMETASKINTERNAL)->data($data[$i])
                     ->autoCheck()
                     ->batchCheck($this->config->gameTaskInternal->create->requiredFields, 'notempty')
-                    ->checkIF($data[$i]->estimate != '', 'estimate', 'float')
                     ->exec();
 
-                if(dao::isError())
-                {
+                if (dao::isError()) {
                     die(js::error(dao::getError()));
-                }
-                else
-                {
-
+                } else {
                 }
             }
 
 
             //$pipelineID = $this->pipeline->create();
             //if(dao::isError()) die(js::error(dao::getError()) . js::locate('back'));
-            //die(js::locate(inlink('index')));
+            //s$jumpLink  = $this->createLink('gametaskinternal', 'index', "");
+            //error_log("oscar: $jumpLink");
+            //die(js::reload("parent"));
+            //die(js::refresh($jumpLink));
+            //js::error(dao::getError());
         }
 
         $gameTasks = array();
 
-        if(count($gameTasks) < $this->config->gameTaskInternal->batchCreate)
-        {
+        if (count($gameTasks) < $this->config->gameTaskInternal->batchCreate) {
             $paddingCount = $this->config->pipeline->defaultStages - count($gameTasks);
             $newTask = new stdclass();
             //$step->type   = 'item';
             //$step->desc   = '';
             //$step->expect = '';
-            for($i = 1; $i <= $paddingCount; $i ++)
+            for ($i = 1; $i <= $paddingCount; $i++)
                 $gameTasks[$i] = $newTask;
         }
-        $this->view->gameTasks            = $gameTasks;
+        $this->view->gameTasks = $gameTasks;
 
-        $this->view->allProducts   = array(0 => '') + $this->product->getPairs('noclosed|nocode');
+        $this->view->allProducts = array(0 => '') + $this->product->getPairs('noclosed|nocode');
         $depts = $this->dao->select('id,name')->from(TABLE_DEPT)->fetchPairs();
         $this->view->depts = $depts;
 
@@ -201,10 +208,9 @@ class gametaskinternal extends control
         $groupID = $this->getGroupIDByName($grpName);
         $users = $this->group->getUserPairs($groupID);
 
-        foreach($users as $account => $user)
-        {
+        foreach ($users as $account => $user) {
             $firstLetter = ucfirst(substr($account, 0, 1)) . ':';
-            $users[$account] =  $firstLetter . $user;
+            $users[$account] = $firstLetter . $user;
         }
 
         return $users;
@@ -230,20 +236,20 @@ class gametaskinternal extends control
 
             $dat = array();
             $dat['name'] = $version;
+            $dat['active'] = 1;
+            $dat['deadline'] = helper::today();
 
-            $v = $this->dao->select()->from(TABLE_GAMETASKINTERNALVERSION)
+            $c = $this->dao->select()->from(TABLE_GAMETASKINTERNALVERSION)
                 ->where('name')->eq($version)
                 ->count();
 
-            if($v == 0) {
+            if ($c == 0) {
                 $this->dao->insert(TABLE_GAMETASKINTERNALVERSION)->data($dat)
                     ->autoCheck()
                     ->batchCheck('name', 'notempty')
                     ->exec();
                 $this->view->msg = "版本[$version]添加成功!";
-            }
-            else
-            {
+            } else {
                 $this->view->msg = "版本[$version]已经存在!";
             }
         }
@@ -266,7 +272,7 @@ class gametaskinternal extends control
 
     public function activeVersion()
     {
-        if(!empty($_POST)) {
+        if (!empty($_POST)) {
 
             $postVals = fixer::input('post')
                 ->get();
@@ -278,16 +284,14 @@ class gametaskinternal extends control
                 ->set('active')->eq(1)
                 ->where('id')->eq($id)
                 ->exec();
-        }
-        else
-        {
+        } else {
             return false;
         }
     }
 
     public function closeVersion()
     {
-        if(!empty($_POST)) {
+        if (!empty($_POST)) {
 
             $postVals = fixer::input('post')
                 ->get();
@@ -299,11 +303,103 @@ class gametaskinternal extends control
                 ->set('active')->eq(0)
                 ->where('id')->eq($id)
                 ->exec();
-        }
-        else
-        {
+        } else {
             return false;
         }
+    }
+
+    public function updateVersionDeadline()
+    {
+        if (!empty($_POST)) {
+
+            $postVals = fixer::input('post')
+                ->get();
+
+            $deadline = $postVals->deadline;
+            $id = $postVals->id;
+
+            error_log("oscar: updateVersionDeadline $id deadline:$deadline");
+            $this->dao->update(TABLE_GAMETASKINTERNALVERSION)
+                ->set('deadline')->eq($deadline)
+                ->where('id')->eq($id)
+                ->exec();
+        } else {
+            return false;
+        }
+    }
+
+    public function groupleaders()
+    {
+        //error_log("oscar: view groupleaders");
+
+        //$depts = $this->dao->select('id,name')->from(TABLE_DEPT)->fetchPairs();
+        $depts = $this->dept->getOptionMenu();
+        $this->view->depts = $depts;
+
+        if (!empty($_POST)) {
+
+            //error_log("oscar: view groupleaders  1");
+
+            $leader = fixer::input('post')->get();
+            $batchNum = count($depts);
+            //error_log("oscar: groupleaders batchNum $batchNum count:" . count($leader));
+
+            var_dump($leader);
+
+            for ($i = 0; $i < $batchNum; $i++) {
+                //error_log("oscar: groupleaders $i dept;$depts[$i]  username:$leader->username[$i]");
+
+                if (empty($leader->username[$i])) {
+                    continue;
+                }
+
+                $dat = new stdclass();
+                $dat->dept = $i;
+                $dat->username = $leader->username[$i];
+
+                $c = $this->dao->select()->from(TABLE_GAMEGROUPLEADERS)
+                    ->where('dept')->eq($dat->dept)
+                    ->count();
+
+                //error_log("oscar: groupleaders  select count:$c $dat->dept $dat->username" );
+
+                if ($c == 0) {
+                    //error_log("oscar: groupleaders  insert count:$c $dat->dept $dat->username");
+                    $this->dao->insert(TABLE_GAMEGROUPLEADERS)->data($dat)
+                        //->autoCheck()
+                        //->batchCheck('dept,username', 'notempty')
+                        ->exec();
+                } else {
+                    //error_log("oscar: groupleaders  update count:$c $dat->dept $dat->username");
+                    $this->dao->update(TABLE_GAMEGROUPLEADERS)->data($dat)
+                        ->where('dept')->eq($dat->dept)
+                        //->autoCheck()
+                        //->batchCheck('dept,username', 'notempty')
+                        ->exec();
+                }
+
+                if (dao::isError()) {
+                    die(js::error(dao::getError()));
+                }
+            }
+
+        }
+
+        //error_log("oscar: view groupleaders  2");
+
+
+        //error_log("oscar: view groupleaders  3");
+        $allUsers = $this->user->getPairs('nodeleted|noclosed');
+        $this->view->allUsers = $allUsers;
+
+        $leaders = $this->dao->select('dept,username')->from(TABLE_GAMEGROUPLEADERS)
+            ->orderBy('dept asc')
+            ->fetchPairs();
+
+        //error_log("oscar: view groupleaders  count:" . count($leaders));
+        $this->view->leaders = $leaders;
+
+        $this->display();
     }
 
     public function delete($id)

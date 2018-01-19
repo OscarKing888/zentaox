@@ -55,6 +55,9 @@ $lang->gametaskinternal->status              = "状态";
 $lang->gametaskinternal->close              = "关闭";
 $lang->gametaskinternal->active              = "激活";
 
+$lang->gametaskinternal->deadline     = '截止日期';
+$lang->gametaskinternal->update     = '更新';
+
 $lang->gametaskinternal->methodOrder[5] = 'index';
 
 $lang->gametaskinternal->priList[0] = '';

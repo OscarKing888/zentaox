@@ -21,5 +21,28 @@
 <?php echo $this->app->user->account; ?>
 <br>
 
+    <table class='hide' id='trTemp'>
+        <tbody>
+        <tr>
+            <td class='text-center'>%s</td>
+            <td><?php echo html::select("version[%s]", $versions, $version, 'class=form-control');?></td>
+            <td><?php echo html::select("dept[%s]", $depts, $dept, 'class=form-control');?></td>
+            <td><?php echo html::select("owner[%s]", $allOwners, $owner, 'class=form-control');?></td>
+            <td><?php echo html::input("title[%s]", '', "class='form-control text-center' autocomplete='on'");?></td>
+            <td><?php echo html::input("count[%s]", 1, "class='form-control text-center' autocomplete='on'");?></td>
+            <td><?php echo html::textarea("desc[%s]", '', "rows='1' class='form-control autosize'");?></td>
+            <td><?php echo html::textarea("srcResPath[%s]", '', "rows='1' class='form-control autosize'");?></td>
+            <td><?php echo html::textarea("gameResPath[%s]", '', "rows='1' class='form-control autosize'");?></td>
+            <td><?php echo html::select("pri[%s]", (array)$lang->gametaskinternal->priList, $pri, 'class=form-control');?></td>
+        </tr>
+        </tbody>
+    </table>
+
+
+    <tr class="text-center">
+        <td><?php echo $newID; ?></td>
+        <td><?php echo html::select("dept[$newID]", $depts, 0, "class='form-control chosen'"); ?></td>
+        <td><?php echo html::select("username[$newID]", $allUsers, 0, "class='form-control chosen'"); ?></td>
+    </tr>
 ===========
 <?php endif;?>

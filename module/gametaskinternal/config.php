@@ -15,6 +15,9 @@ $config->gametaskinternal->defaultProject = 3;
 
 define('TABLE_GAMETASKINTERNAL',                   'gametaskinternal');
 define('TABLE_GAMETASKINTERNALVERSION',           'gametaskinternalversion');
+define('TABLE_GAMEGROUPLEADERS',                   'gamegroupleaders');
+
 define('GROUPNAME_CQYH',                            '传奇永恒');
+
 
 $config->gametaskinternal->create->requiredFields      = 'version,dept,owner,title';
