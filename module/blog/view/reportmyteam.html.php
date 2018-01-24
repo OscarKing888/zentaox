@@ -134,7 +134,8 @@ include '../../common/view/datepicker.html.php';
                     <?php foreach ($deptArticles[$deptr] as $article): ?>
                         <?php
                         if ($showstat) {
-                            $cnt = str_replace("\n", "<br>", $article->content);
+                            //$cnt = str_replace("\n", "<br>", $article->content);
+                            $cnt = nl2br($article->content);
                         } else {
                             $cnt = str_replace("\n", "/", $article->content);
                         }
@@ -200,7 +201,8 @@ include '../../common/view/datepicker.html.php';
                     <?php foreach ($deptArticles[$tdeptr] as $article): ?>
                         <?php if (!empty($article->contentimages)): ?>
                             <?php
-                            $imgs = str_replace("<img", "<br><img", $article->contentimages);
+                            //$imgs = str_replace("<img", "<br><img", $article->contentimages);
+                            $imgs = nl2br($article->contentimages);
                             $imgs = htmlspecialchars_decode($imgs);
                             ?>
 

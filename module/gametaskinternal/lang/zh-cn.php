@@ -43,20 +43,28 @@ $lang->gametaskinternal->assignedToNull = "未指派";
 
 $lang->gametaskinternal->workhour = "工时(H)";
 
-$lang->gametaskinternal->completestat = "完成情况";
+$lang->gametaskinternal->completeStat = "完成情况";
 $lang->gametaskinternal->completed = "已完成";
 $lang->gametaskinternal->incomplete = "未完成";
+$lang->gametaskinternal->complete = "完成";
 
-$lang->gametaskinternal->closestat = "验收情况";
+$lang->gametaskinternal->closeStat = "验收情况";
 $lang->gametaskinternal->closed = "已验收";
 $lang->gametaskinternal->unclose = "未验收";
+$lang->gametaskinternal->close = "验收";
 
 $lang->gametaskinternal->status              = "状态";
-$lang->gametaskinternal->close              = "关闭";
+//$lang->gametaskinternal->close              = "关闭";
 $lang->gametaskinternal->active              = "激活";
 
 $lang->gametaskinternal->deadline     = '截止日期';
 $lang->gametaskinternal->update     = '更新';
+
+$lang->gametaskinternal->width     = '宽度(像素)';
+$lang->gametaskinternal->height     = '高度(像素)';
+
+
+$lang->gametaskinternal->checkedSummary  = "选中 <strong>%total%</strong> 个任务";
 
 $lang->gametaskinternal->methodOrder[5] = 'index';
 

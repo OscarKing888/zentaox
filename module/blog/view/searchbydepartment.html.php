@@ -102,7 +102,8 @@ include '../../common/view/datepicker.html.php';
 
                 //echo $article->content;
                 echo "<tr><td width='20%' align='right'><strong>$article->ownerrealname</strong></td>";
-                $cnt = str_replace("\n", "<br>", $article->content);
+                //$cnt = str_replace("\n", "<br>", $article->content);
+                $cnt = nl2br($article->content);
                 echo"<td>$cnt</td></tr>";
                 //echo "<br>";
             }
@@ -110,7 +111,8 @@ include '../../common/view/datepicker.html.php';
             foreach ($articles as $article) {
                 if(!empty($article->contentimages))
                 {
-                    $imgs = str_replace("<img", "<br><img", $article->contentimages);
+                    //$imgs = str_replace("<img", "<br><img", $article->contentimages);
+                    $imgs = nl2br($article->contentimages);
                     $imgs = htmlspecialchars_decode($imgs);
                     echo "<tr><td width='20%' align='right'><strong>$article->ownerrealname</strong></td>";
                     echo"<td>$imgs</td></tr>";

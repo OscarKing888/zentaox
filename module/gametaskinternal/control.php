@@ -29,6 +29,9 @@ class gametaskinternal extends control
         $this->loadModel('project');
         $this->loadModel('user');
         $this->loadModel('group');
+        $this->loadModel('datatable');
+        $this->loadModel('search');
+        $this->loadModel('task');
     }
 
     /**
@@ -37,60 +40,77 @@ class gametaskinternal extends control
      * @access public
      * @return void
      */
-    public function index($recTotal = 0, $recPerPage = 20, $pageID = 0)
+    public function index($orderBy='id_desc', $recTotal = 0, $recPerPage = 20, $pageID = 0)
     {
-        $this->setupViewTasks($recTotal, $recPerPage, $pageID);
+        $this->setupViewTasks($orderBy, $recTotal, $recPerPage, $pageID);
+        $this->setupCommonViewVars();
         $this->display();
     }
 
-    public function details($recTotal = 0, $recPerPage = 20, $pageID = 0)
+    public function details($orderBy='id_desc', $recTotal = 0, $recPerPage = 20, $pageID = 0)
     {
-        $this->setupViewTasks($recTotal, $recPerPage, $pageID);
+        $this->setupViewTasks($orderBy, $recTotal, $recPerPage, $pageID);
+        $this->setupCommonViewVars();
         $this->display();
     }
 
-    public function mytasks($recTotal = 0, $recPerPage = 20, $pageID = 0)
+    public function mytasks($orderBy='id_desc', $recTotal = 0, $recPerPage = 20, $pageID = 0)
     {
-        $this->setupViewTasks($recTotal, $recPerPage, $pageID);
+        $this->setupViewTasks($orderBy, $recTotal, $recPerPage, $pageID, -1, $this->app->user->account);
+        $this->setupCommonViewVars();
         $this->display();
     }
 
-    public function mydept($recTotal = 0, $recPerPage = 20, $pageID = 0)
+    public function assignedtome($orderBy='id_desc', $recTotal = 0, $recPerPage = 20, $pageID = 0)
     {
-        $this->setupViewTasks($recTotal, $recPerPage, $pageID);
+        $this->setupViewTasks($orderBy, $recTotal, $recPerPage, $pageID, -1, "", $this->app->user->account);
+        $this->setupCommonViewVars();
         $this->display();
     }
 
-    public function completedlist($recTotal = 0, $recPerPage = 20, $pageID = 0)
+
+    public function mydept($orderBy='id_desc', $recTotal = 0, $recPerPage = 20, $pageID = 1)
     {
-        $this->setupViewTasks($recTotal, $recPerPage, $pageID);
+        $this->setupViewTasks($orderBy, $recTotal, $recPerPage, $pageID, $this->app->user->dept);
+        $this->setupCommonViewVars();
+
         $this->display();
     }
 
-    public function incompletelist($recTotal = 0, $recPerPage = 20, $pageID = 0)
+    public function completedlist($orderBy='id_desc', $recTotal = 0, $recPerPage = 20, $pageID = 0)
     {
-        $this->setupViewTasks($recTotal, $recPerPage, $pageID);
+        $this->setupViewTasks($orderBy, $recTotal, $recPerPage, $pageID, -1, "", "", 0, 1);
+        $this->setupCommonViewVars();
         $this->display();
     }
 
-    public function setupViewTasks($recTotal = 0, $recPerPage = 20, $pageID = 0)
+    public function incompletelist($orderBy='id_desc', $recTotal = 0, $recPerPage = 20, $pageID = 0)
+    {
+        $this->setupViewTasks($orderBy, $recTotal, $recPerPage, $pageID, -1, "", "", 0, 0);
+        $this->setupCommonViewVars();
+        $this->display();
+    }
+
+    public function restore($orderBy='id_desc', $recTotal = 0, $recPerPage = 20, $pageID = 0)
+    {
+        $this->setupViewTasks($orderBy, $recTotal, $recPerPage, $pageID, -1, "", "", 1);
+        $this->setupCommonViewVars();
+        $this->display();
+    }
+
+    public function setupViewTasks($orderBy='id_desc', $recTotal = 0, $recPerPage = 20, $pageID = 0,
+                                   $matchDept = -1, $matchOwner ='',  $matchAssignedTo='', $matchDeleted = 0,
+                                   $matchCompleted = -1, $matchClosed = -1)
     {
         //$this->view->debugStr +=  $this->menu;
+        if(!$orderBy) $orderBy = $this->cookie->gameinternalTaskOrder ? $this->cookie->gameinternalTaskOrder : 'id_desc';
+        setcookie('gameinternalTaskOrder', $orderBy, $this->config->cookieLife, $this->config->webRoot);
+        $sort = $this->loadModel('common')->appendOrder($orderBy);
 
         $this->app->loadClass('pager');
         $pager = new pager($recTotal, $recPerPage, $pageID);
 
-        $this->view->allProducts = array(0 => '') + $this->product->getPairs('noclosed|nocode');
-        $depts = $this->dao->select('id,name')->from(TABLE_DEPT)->fetchPairs();
-        $this->view->depts = $depts;
-
-        $this->view->allOwners = $this->getUserByGroupName(GROUPNAME_CQYH);
-
-        $allUsers = $this->user->getPairs('nodeleted|noclosed');
-        $this->view->allUsers = $allUsers;
-
-        $this->view->user = $this->app->user->account;
-
+        // versions
         $versions = $this->dao->select('id,name')->from(TABLE_GAMETASKINTERNALVERSION)
             ->where('active')->eq(1)
             ->orderBy('id desc')
@@ -101,15 +121,46 @@ class gametaskinternal extends control
         //foreach (array_keys($versions) as $k) { error_log("oscar: version:k $k");  }
 
         $gameTasks = $this->dao->select()->from(TABLE_GAMETASKINTERNAL)
-            ->where('deleted')->eq(0)
+            ->where('deleted')->eq($matchDeleted)
             ->andWhere('version')->in(array_keys($versions))
+            ->beginIF($matchDept >= 0 )->andWhere('dept')->eq($matchDept)->fi()
+            ->beginIF($matchCompleted >= 0 )->andWhere('completed')->eq($matchCompleted)->fi()
+            ->beginIF($matchClosed >= 0 )->andWhere('closed')->eq($matchClosed)->fi()
+            ->beginIF($matchOwner != '')->andWhere('owner')->eq($matchOwner)->fi()
+            ->beginIF($matchAssignedTo != '')->andWhere('assignedTo')->eq($matchAssignedTo)->fi()
             //->groupBy('version')
-            ->orderBy('pri asc')
+            ->orderBy($sort)
+            ->page($pager)
             ->fetchAll();
 
         $this->view->gameTasks = $gameTasks;
 
+        $this->session->set('taskOrderBy', $sort);
+        $this->view->orderBy       = $orderBy;
         $this->view->pager = $pager;
+        $this->view->recTotal      = $pager->recTotal;
+        $this->view->recPerPage    = $pager->recPerPage;
+    }
+
+    public function setupCommonViewVars()
+    {
+        // products
+        $this->view->allProducts = array(0 => '') + $this->product->getPairs('noclosed|nocode');
+        $depts = $this->dao->select('id,name')->from(TABLE_DEPT)->fetchPairs();
+
+        // depts
+        $this->view->depts = $depts;
+        $this->view->dept = $this->app->user->dept;
+
+        // owners
+        $this->view->allOwners = $this->getUserByGroupName(GROUPNAME_CQYH);
+
+        // users
+        $allUsers = $this->user->getPairs('nodeleted|noclosed');
+        $this->view->allUsers = $allUsers;
+        $this->view->users = $this->user->getPairs('nodeleted|noclosed|noletter');;
+        $this->view->deptUsers = $this->dept->getDeptUserPairs($this->app->user->dept);
+        $this->view->user = $this->app->user->account;
     }
 
     public function create()
@@ -344,7 +395,7 @@ class gametaskinternal extends control
             $batchNum = count($depts);
             //error_log("oscar: groupleaders batchNum $batchNum count:" . count($leader));
 
-            var_dump($leader);
+            //var_dump($leader);
 
             for ($i = 0; $i < $batchNum; $i++) {
                 //error_log("oscar: groupleaders $i dept;$depts[$i]  username:$leader->username[$i]");
@@ -404,20 +455,196 @@ class gametaskinternal extends control
 
     public function delete($id)
     {
-        $this->gametaskinternal->delete($id);
+        //delete($this->config->blog->dbname, $id);
+        $this->dao->update(TABLE_GAMETASKINTERNAL)
+            ->set('deleted')->eq(1)->where('id')->eq($id)->exec();
+
+        //die(js::reload());
         $this->locate(inlink('index'));
+        //die(js::locate($this->session->taskList, 'parent'));
+        //$this->display();
     }
 
-    public function restore($recTotal = 0, $recPerPage = 20, $pageID = 0)
+    public function restoreTask($id)
     {
-        $this->setupViewTasks($recTotal, $recPerPage, $pageID);
-        $this->display();
-    }
+        $this->dao->update(TABLE_GAMETASKINTERNAL)
+            ->set('deleted')->eq(0)->where('id')->eq($id)->exec();
 
-    public function restorepipeline($id)
-    {
-        $this->gametaskinternal->restore($id);
         $this->locate(inlink('restore'));
+    }
+
+    public function batchAssignTo()
+    {
+        //$msg = "" . count($_POST). "  ";
+
+        //$msg = $this->post->assignedTo . "  ";
+
+        //echo js::alert("batchAssignTo: $msg");
+
+
+        if(!empty($_POST))
+        {
+            $assignedTo  = $this->post->assignedTo;
+            $taskIDList = $this->post->taskIDList;
+            $taskIDList = array_unique($taskIDList);
+            //unset($_POST['taskIDList']);
+            if(!is_array($taskIDList)) die(js::locate($this->createLink('gametaskinternal', 'mydept', ""), 'parent'));
+
+
+            //foreach ($taskIDList as $item) {$msg .= $item . "  ";}
+
+            //echo js::alert("batchAssignTo: $msg");
+
+
+            foreach($taskIDList as $taskID)
+            {
+                $this->dao->update(TABLE_GAMETASKINTERNAL)
+                    ->set('assignedTo')->eq($assignedTo)
+                    ->where('id')->eq($taskID)->exec();
+
+                //$this->loadModel('action');
+                //$changes = $this->task->assign($taskID);
+                if(dao::isError()) die(js::error(dao::getError()));
+                //$actionID = $this->action->create('task', $taskID, 'Assigned', $this->post->comment, $this->post->assignedTo);
+                //$this->action->logHistory($actionID, $changes);
+                //$this->task->sendmail($taskID, $actionID);
+            }
+            //if(!dao::isError()) $this->loadModel('score')->create('ajax', 'batchOther');
+            die(js::reload('parent'));
+            //echo js::alert("assignTo: $assignedTo");
+        }
+    }
+
+    public function batchClose()
+    {
+        //echo js::alert("batchClose");
+
+
+        if(!empty($_POST))
+        {
+            $taskIDList = $this->post->taskIDList;
+            $taskIDList = array_unique($taskIDList);
+            //unset($_POST['taskIDList']);
+            if(!is_array($taskIDList)) die(js::locate($this->createLink('gametaskinternal', 'mydept', ""), 'parent'));
+
+
+            foreach($taskIDList as $taskID)
+            {
+                $this->dao->update(TABLE_GAMETASKINTERNAL)
+                    ->set('closed')->eq(1)
+                    ->where('id')->eq($taskID)
+                    ->andWhere('completed')->eq(1)
+                    ->exec();
+
+                //$this->loadModel('action');
+                //$changes = $this->task->assign($taskID);
+                if(dao::isError()) die(js::error(dao::getError()));
+                //$actionID = $this->action->create('task', $taskID, 'Assigned', $this->post->comment, $this->post->assignedTo);
+                //$this->action->logHistory($actionID, $changes);
+                //$this->task->sendmail($taskID, $actionID);
+            }
+            //if(!dao::isError()) $this->loadModel('score')->create('ajax', 'batchOther');
+            die(js::reload('parent'));
+            //echo js::alert("assignTo: $assignedTo");
+        }
+    }
+
+    public function batchComplete()
+    {
+        //echo js::alert("batchComplete");
+
+
+        if(!empty($_POST))
+        {
+            $taskIDList = $this->post->taskIDList;
+            $taskIDList = array_unique($taskIDList);
+            //unset($_POST['taskIDList']);
+            if(!is_array($taskIDList)) die(js::locate($this->createLink('gametaskinternal', 'mydept', ""), 'parent'));
+
+
+            foreach($taskIDList as $taskID)
+            {
+                $this->dao->update(TABLE_GAMETASKINTERNAL)
+                    ->set('completed')->eq(1)
+                    ->where('id')->eq($taskID)
+                    ->exec();
+
+                //$this->loadModel('action');
+                //$changes = $this->task->assign($taskID);
+                if(dao::isError()) die(js::error(dao::getError()));
+                //$actionID = $this->action->create('task', $taskID, 'Assigned', $this->post->comment, $this->post->assignedTo);
+                //$this->action->logHistory($actionID, $changes);
+                //$this->task->sendmail($taskID, $actionID);
+            }
+            //if(!dao::isError()) $this->loadModel('score')->create('ajax', 'batchOther');
+            die(js::reload('parent'));
+            //echo js::alert("assignTo: $assignedTo");
+        }
+    }
+
+    public function batchActive()
+    {
+        //echo js::alert("batchActive");
+
+
+        if(!empty($_POST))
+        {
+            $taskIDList = $this->post->taskIDList;
+            $taskIDList = array_unique($taskIDList);
+            //unset($_POST['taskIDList']);
+            if(!is_array($taskIDList)) die(js::locate($this->createLink('gametaskinternal', 'mydept', ""), 'parent'));
+
+
+            foreach($taskIDList as $taskID)
+            {
+                $this->dao->update(TABLE_GAMETASKINTERNAL)
+                    ->set('closed')->eq(0)
+                    ->set('completed')->eq(0)
+                    ->where('id')->eq($taskID)->exec();
+
+                //$this->loadModel('action');
+                //$changes = $this->task->assign($taskID);
+                if(dao::isError()) die(js::error(dao::getError()));
+                //$actionID = $this->action->create('task', $taskID, 'Assigned', $this->post->comment, $this->post->assignedTo);
+                //$this->action->logHistory($actionID, $changes);
+                //$this->task->sendmail($taskID, $actionID);
+            }
+            //if(!dao::isError()) $this->loadModel('score')->create('ajax', 'batchOther');
+            die(js::reload('parent'));
+            //echo js::alert("assignTo: $assignedTo");
+        }
+    }
+
+    public function batchDelete()
+    {
+        //echo js::alert("batchDelete");
+
+
+        if(!empty($_POST))
+        {
+            $taskIDList = $this->post->taskIDList;
+            $taskIDList = array_unique($taskIDList);
+            //unset($_POST['taskIDList']);
+            if(!is_array($taskIDList)) die(js::locate($this->createLink('gametaskinternal', 'mydept', ""), 'parent'));
+
+
+            foreach($taskIDList as $taskID)
+            {
+                $this->dao->update(TABLE_GAMETASKINTERNAL)
+                    ->set('deleted')->eq(1)
+                    ->where('id')->eq($taskID)->exec();
+
+                //$this->loadModel('action');
+                //$changes = $this->task->assign($taskID);
+                if(dao::isError()) die(js::error(dao::getError()));
+                //$actionID = $this->action->create('task', $taskID, 'Assigned', $this->post->comment, $this->post->assignedTo);
+                //$this->action->logHistory($actionID, $changes);
+                //$this->task->sendmail($taskID, $actionID);
+            }
+            //if(!dao::isError()) $this->loadModel('score')->create('ajax', 'batchOther');
+            die(js::reload('parent'));
+            //echo js::alert("assignTo: $assignedTo");
+        }
     }
 
 }

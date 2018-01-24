@@ -48,10 +48,12 @@
         <tr class='text-center'>
             <th class='w-30px'><?php echo $lang->idAB; ?></th>
             <th class='w-100px'><?php echo $lang->gametaskinternal->version; ?><span class='required'></span></th>
-            <th class='w-80px'><?php echo $lang->gametaskinternal->dept; ?><span class='required'></span></th>
+            <th class='w-120px'><?php echo $lang->gametaskinternal->dept; ?><span class='required'></span></th>
             <th class='w-150px'><?php echo $lang->gametaskinternal->owner; ?><span class='required'></span></th>
             <th class='w-p20'><?php echo $lang->gametaskinternal->title; ?><span class='required'></span></th>
             <th class='w-50px'><?php echo $lang->gametaskinternal->count; ?></th>
+            <th class='w-80px'><?php echo $lang->gametaskinternal->width; ?></th>
+            <th class='w-80px'><?php echo $lang->gametaskinternal->height; ?></th>
             <th class='w-p20'><?php echo $lang->gametaskinternal->desc; ?></th>
             <th class='w-100px'><?php echo $lang->gametaskinternal->srcResPath; ?></th>
             <th class='w-100px'><?php echo $lang->gametaskinternal->gameResPath; ?></th>
@@ -92,10 +94,13 @@
 
                 <td><?php echo html::input("title[$i]", '', "class='form-control text-center' autocomplete='on'"); ?></td>
                 <td><?php echo html::input("count[$i]", 1, "class='form-control text-center' autocomplete='on'"); ?></td>
+                <td><?php echo html::input("sizeWidth[$i]", 0, "class='form-control text-center' autocomplete='on'"); ?></td>
+                <td><?php echo html::input("sizeHeight[$i]", 0, "class='form-control text-center' autocomplete='on'"); ?></td>
+
                 <td><?php echo html::textarea("desc[$i]", '', "rows='1' class='form-control autosize'"); ?></td>
                 <td><?php echo html::textarea("srcResPath[$i]", '', "rows='1' class='form-control autosize'"); ?></td>
                 <td><?php echo html::textarea("gameResPath[$i]", '', "rows='1' class='form-control autosize'"); ?></td>
-                <td><?php echo html::select("pri[$i]", (array)$lang->gametaskinternal->priList, $pri, 'class=form-control chosen'); ?></td>
+                <td><?php echo html::select("pri[$i]", (array)$config->gametaskinternal->priList, $pri, 'class=form-control chosen'); ?></td>
             </tr>
         <?php endfor; ?>
         <tr>

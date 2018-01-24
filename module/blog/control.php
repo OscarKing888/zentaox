@@ -357,7 +357,7 @@ class blog extends control
         //error_log("oscar: setUserAbsent :" . $msg);
 
         if(!empty($_POST)) {
-            $postVals = $day = fixer::input('post')
+            $postVals = fixer::input('post')
                 ->get();
             $userid = $postVals->userid;
             $day = $postVals->day;
@@ -385,7 +385,7 @@ class blog extends control
         //error_log("oscar: setUserAbsent :" . $msg);
 
         if(!empty($_POST)) {
-            $postVals = $day = fixer::input('post')
+            $postVals = fixer::input('post')
                 ->get();
 
             //error_log("oscar: setUserAbsent postVals:" . $postVals);
@@ -414,7 +414,7 @@ class blog extends control
         $msg = "";
 
         if(!empty($_POST)) {
-            $postVals = $day = fixer::input('post')
+            $postVals = fixer::input('post')
                 ->get();
 
             //error_log("oscar: setUserAbsent postVals:" . $postVals);
