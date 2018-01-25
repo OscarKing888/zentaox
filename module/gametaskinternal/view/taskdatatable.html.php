@@ -227,6 +227,29 @@ $taskLink = helper::createLink('gametaskinternal', 'view', "taskID=$task->id");
                             echo "</ul>";
                             echo "</div>";
 
+
+
+                            $actionLink = $this->createLink('gametaskinternal', 'batchSetWorkhour', "");
+
+                            echo "<div class='btn-group dropup'>";
+                            echo "<button id='taskbatchSetWorkhour' type='button' class='btn dropdown-toggle' data-toggle='dropdown'>" . $lang->gametaskinternal->changeWorkHour . "<span class='caret'></span></button>";
+                            echo "<ul class='dropdown-menu' id='taskbatchSetWorkhourMenu'>";
+
+                            $workhourPairs = array(1=>'1 H', 2=>'2 H', 4=>'4 H', 8=>'1 Day', 12=>'1.5 Day', 16=>'2 Day',24=>'3 Day',32=>'4 Day',40=>'5 Day');
+
+                            echo html::select('workHour', $workhourPairs, '', 'class="hidden"');
+
+                            echo '<ul class="dropdown-list">';
+                            foreach ($workhourPairs as $key => $value) {
+                                if (empty($key)) continue;
+                                echo "<li class='option' data-key='$key'>" . html::a("javascript:$(\"#workHour\").val(\"$key\");setFormAction(\"$actionLink\", \"hiddenwin\", \"#moreAction\")", $value, '', '') . '</li>';
+                            }
+                            echo "</ul>";
+                            echo "</div></li>";
+                            echo "</ul>";
+                            echo "</div>";
+
+
                             //echo "<button id='test_dpt' onclick='on_test_dpt()'>Test Dpt</button>";
                             //echo "<button id='test_dpt' onclick='on_test_setdpt()'>Test Set Dpt</button>";
 

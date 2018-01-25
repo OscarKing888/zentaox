@@ -41,6 +41,7 @@ $lang->gametaskinternal->owner = "负责人";
 $lang->gametaskinternal->assignedTo = "指派给";
 $lang->gametaskinternal->assignedToDept = "转部门";
 $lang->gametaskinternal->changeVersion = "转版本";
+$lang->gametaskinternal->changeWorkHour = "设置工时";
 $lang->gametaskinternal->assignedToNull = "未指派";
 
 $lang->gametaskinternal->workhour = "工时(H)";

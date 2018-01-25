@@ -55,14 +55,14 @@ class gametaskinternal extends control
         $this->display();
     }
 
-    public function mytasks($orderBy='id_desc', $recTotal = 0, $recPerPage = 20, $pageID = 0)
+    public function mytasks($orderBy='pri_asc', $recTotal = 0, $recPerPage = 20, $pageID = 0)
     {
         $this->setupViewTasks($orderBy, $recTotal, $recPerPage, $pageID, -1, $this->app->user->account);
         $this->setupCommonViewVars();
         $this->display();
     }
 
-    public function assignedtome($orderBy='id_desc', $recTotal = 0, $recPerPage = 20, $pageID = 0)
+    public function assignedtome($orderBy='pri_asc', $recTotal = 0, $recPerPage = 20, $pageID = 0)
     {
         $this->setupViewTasks($orderBy, $recTotal, $recPerPage, $pageID, -1, "", $this->app->user->account);
         $this->setupCommonViewVars();
@@ -70,7 +70,7 @@ class gametaskinternal extends control
     }
 
 
-    public function mydept($orderBy='id_desc', $recTotal = 0, $recPerPage = 20, $pageID = 1)
+    public function mydept($orderBy='pri_asc', $recTotal = 0, $recPerPage = 20, $pageID = 1)
     {
         $this->setupViewTasks($orderBy, $recTotal, $recPerPage, $pageID, $this->app->user->dept);
         $this->setupCommonViewVars();
@@ -591,13 +591,69 @@ class gametaskinternal extends control
 
             //foreach ($taskIDList as $item) {$msg .= $item . "  ";}
 
-            //echo js::alert("batchAssignToDept: $msg");
+            //echo js::alert("batchChangeVersion: $msg");
             //echo $msg;
 
             foreach($taskIDList as $taskID)
             {
                 $this->dao->update(TABLE_GAMETASKINTERNAL)
                     ->set('version')->eq($assignedTo)
+                    ->where('id')->eq($taskID)->exec();
+
+                //$this->loadModel('action');
+                //$changes = $this->task->assign($taskID);
+                if(dao::isError()) die(js::error(dao::getError()));
+                //$actionID = $this->action->create('task', $taskID, 'Assigned', $this->post->comment, $this->post->assignedTo);
+                //$this->action->logHistory($actionID, $changes);
+                //$this->task->sendmail($taskID, $actionID);
+            }
+            //if(!dao::isError()) $this->loadModel('score')->create('ajax', 'batchOther');
+            die(js::reload('parent'));
+            //$this->locate(inlink('details'));
+            //$this->display();
+            //echo js::alert("assignTo: $assignedTo");
+        }
+    }
+
+    public function batchSetWorkhour()
+    {
+        //*
+        $msg = " count:" . count($_POST). "  ";
+        $msg .= " workHour:" . $this->post->workHour . "  ";
+
+        foreach ($_POST as $p)
+        {
+            if(is_array($p))
+            {
+                foreach ($p as $pp)
+                {$msg .= "<br> _P:" . $pp;}
+            }
+            else
+            {
+                $msg .= "<br>   _PP:" . $p;
+            }
+        }
+        //*/
+
+        if(!empty($_POST))
+        {
+            //error_log( var_export($_POST));
+
+            $assignedTo  = $this->post->workHour;
+            $taskIDList = $this->post->taskIDList;
+            $taskIDList = array_unique($taskIDList);
+            //unset($_POST['taskIDList']);
+            if(!is_array($taskIDList)) die(js::locate($this->createLink('gametaskinternal', 'mydept', ""), 'parent'));
+
+            //foreach ($taskIDList as $item) {$msg .= $item . "  ";}
+
+            echo js::alert("batchSetWorkhour: $msg");
+            //echo $msg;
+
+            foreach($taskIDList as $taskID)
+            {
+                $this->dao->update(TABLE_GAMETASKINTERNAL)
+                    ->set('workhour')->eq($assignedTo)
                     ->where('id')->eq($taskID)->exec();
 
                 //$this->loadModel('action');
