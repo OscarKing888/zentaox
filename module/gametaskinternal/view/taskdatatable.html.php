@@ -114,6 +114,18 @@ $taskLink = helper::createLink('gametaskinternal', 'view', "taskID=$task->id");
                             //echo $member;
                         }
 
+                        $deptPairs = array();
+                        foreach ($depts as $key => $val) {
+                            $deptPairs[$key] = $val;
+                            //echo "dept $key -> $val <br>";
+                        }
+
+                        $versionPairs = array();
+                        foreach ($versions as $key => $val) {
+                            $versionPairs[$key] = $val;
+                            //echo "dept $key -> $val <br>";
+                        }
+
                         $memberPairs = $deptUsers;
                         $canBatchEdit = true;//common::hasPriv('task', 'batchEdit', !empty($task) ? $task : null);
                         $canBatchClose = true;//(common::hasPriv('task', 'batchClose', !empty($task) ? $task : null) && strtolower($browseType) != 'closedBy');
@@ -168,20 +180,64 @@ $taskLink = helper::createLink('gametaskinternal', 'view', "taskID=$task->id");
                             echo '<ul class="dropdown-list">';
                             foreach ($memberPairs as $key => $value) {
                                 if (empty($key)) continue;
-                                echo "<li class='option' data-key='$key'>" . html::a("javascript:$(\".table-actions #assignedTo\").val(\"$key\");setFormAction(\"$actionLink\", \"hiddenwin\", \"#moreAction\")", $value, '', '') . '</li>';
+                                //echo "<li class='option' data-key='$key'>" . html::a("javascript:$(\".table-actions #assignedTo\").val(\"$key\");setFormAction(\"$actionLink\", \"hiddenwin\", \"#moreAction\")", $value, '', '') . '</li>';
+                                echo "<li class='option' data-key='$key'>" . html::a("javascript:$(\"#assignedTo\").val(\"$key\");setFormAction(\"$actionLink\", \"hiddenwin\", \"#moreAction\")", $value, '', '') . '</li>';
                             }
                             echo "</ul>";
                             if ($withSearch) echo "<div class='menu-search'><div class='input-group input-group-sm'><input type='text' class='form-control' placeholder=''><span class='input-group-addon'><i class='icon-search'></i></span></div></div>";
                             echo "</div></li>";
-
                             echo "</ul>";
-
-
                             echo "</div>";
+
+
+
+                            $actionLink = $this->createLink('gametaskinternal', 'batchAssignToDept', "");
+
+                            echo "<div class='btn-group dropup'>";
+                            echo "<button id='taskbatchAssignToDept' type='button' class='btn dropdown-toggle' data-toggle='dropdown'>" . $lang->gametaskinternal->assignedToDept . "<span class='caret'></span></button>";
+                            echo "<ul class='dropdown-menu' id='taskbatchAssignToDeptMenu'>";
+                            echo html::select('assignedToDept', $deptPairs, '', 'class="hidden"');
+
+                            echo '<ul class="dropdown-list">';
+                            foreach ($deptPairs as $key => $value) {
+                                if (empty($key)) continue;
+                                echo "<li class='option' data-key='$key'>" . html::a("javascript:$(\"#assignedToDept\").val(\"$key\");setFormAction(\"$actionLink\", \"hiddenwin\", \"#moreAction\")", $value, '', '') . '</li>';
+                            }
+                            echo "</ul>";
+                            echo "</div></li>";
+                            echo "</ul>";
+                            echo "</div>";
+
+
+
+                            $actionLink = $this->createLink('gametaskinternal', 'batchChangeVersion', "");
+
+                            echo "<div class='btn-group dropup'>";
+                            echo "<button id='taskbatchChangeVersion' type='button' class='btn dropdown-toggle' data-toggle='dropdown'>" . $lang->gametaskinternal->changeVersion . "<span class='caret'></span></button>";
+                            echo "<ul class='dropdown-menu' id='taskbatchChangeVersionMenu'>";
+                            echo html::select('changeVersion', $versionPairs, '', 'class="hidden"');
+
+                            echo '<ul class="dropdown-list">';
+                            foreach ($versionPairs as $key => $value) {
+                                if (empty($key)) continue;
+                                echo "<li class='option' data-key='$key'>" . html::a("javascript:$(\"#changeVersion\").val(\"$key\");setFormAction(\"$actionLink\", \"hiddenwin\", \"#moreAction\")", $value, '', '') . '</li>';
+                            }
+                            echo "</ul>";
+                            echo "</div></li>";
+                            echo "</ul>";
+                            echo "</div>";
+
+                            //echo "<button id='test_dpt' onclick='on_test_dpt()'>Test Dpt</button>";
+                            //echo "<button id='test_dpt' onclick='on_test_setdpt()'>Test Set Dpt</button>";
+
 
                             $actionLink = $this->createLink('gametaskinternal', 'batchDelete');
                             $misc = "onclick=\"setFormAction('$actionLink', 'hiddenwin', '#moreAction')\"";
                             echo html::linkButton($lang->gametaskinternal->delete, '#', 'self', $misc);
+
+                            $actionLink = $this->createLink('gametaskinternal', 'batchRestore');
+                            $misc = "onclick=\"setFormAction('$actionLink', 'hiddenwin', '#moreAction')\"";
+                            echo html::linkButton($lang->gametaskinternal->restore, '#', 'self', $misc);
                         }
                         echo "<div class='text'>Summary:" . $summary . "</div>";
                         ?>

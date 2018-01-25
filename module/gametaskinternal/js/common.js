@@ -20,3 +20,16 @@ $(function()
         e.preventDefault();
     });
 })
+
+
+
+
+function on_test_dpt()
+{
+    alert("act:" + $(".table-actions #assignedToDept").val() + " dept:" + $("#assignedToDept").val());
+}
+
+function on_test_setdpt()
+{
+    $("#assignedToDept").val(2);
+}

@@ -39,6 +39,8 @@ $lang->gametaskinternal->pri = "优先级";
 
 $lang->gametaskinternal->owner = "负责人";
 $lang->gametaskinternal->assignedTo = "指派给";
+$lang->gametaskinternal->assignedToDept = "转部门";
+$lang->gametaskinternal->changeVersion = "转版本";
 $lang->gametaskinternal->assignedToNull = "未指派";
 
 $lang->gametaskinternal->workhour = "工时(H)";
