@@ -36,6 +36,17 @@ $config->gametaskinternal->priList[4] = '4';
 $config->gametaskinternal->datatable = new stdclass();
 
 $config->gametaskinternal->datatable->defaultField = array('id', 'version', 'dept', 'owner', 'assignedTo', 'workhour', 'completed', 'closed', 'title', 'count', 'width', 'height', 'desc', 'srcResPath', 'gameResPath', 'pri', 'actions');
+$config->gametaskinternal->datatable->indexField = array('id', 'version', 'dept', 'owner', 'assignedTo',  'completed', 'closed', 'title', 'count', 'desc', 'pri', 'actions');
+
+$config->gametaskinternal->toolsIndex = array('batchActive'=>true, 'batchClose'=>true, 'batchComplete'=>false, 'batchAssignTo'=>false, 'batchAssignToDept'=>true, 'batchChangeVersion'=>true, 'batchSetWorkhour'=>false, 'batchDelete'=>true, 'batchRestore'=>false);
+$config->gametaskinternal->toolsDetails = array('batchActive'=>true, 'batchClose'=>true, 'batchComplete'=>false, 'batchAssignTo'=>false, 'batchAssignToDept'=>true, 'batchChangeVersion'=>true, 'batchSetWorkhour'=>false, 'batchDelete'=>true, 'batchRestore'=>false);
+$config->gametaskinternal->toolsMyTask = array('batchActive'=>true, 'batchClose'=>true, 'batchComplete'=>false, 'batchAssignTo'=>false, 'batchAssignToDept'=>true, 'batchChangeVersion'=>true, 'batchSetWorkhour'=>false, 'batchDelete'=>true, 'batchRestore'=>false);
+$config->gametaskinternal->toolsAssignedToMe = array('batchActive'=>false, 'batchClose'=>false, 'batchComplete'=>true, 'batchAssignTo'=>true, 'batchAssignToDept'=>false, 'batchChangeVersion'=>false, 'batchSetWorkhour'=>true, 'batchDelete'=>false, 'batchRestore'=>false);
+$config->gametaskinternal->toolsMyDept = array('batchActive'=>false, 'batchClose'=>false, 'batchComplete'=>true, 'batchAssignTo'=>true, 'batchAssignToDept'=>true, 'batchChangeVersion'=>false, 'batchSetWorkhour'=>true, 'batchDelete'=>false, 'batchRestore'=>false);
+$config->gametaskinternal->toolsCompletedlist = array('batchActive'=>true, 'batchClose'=>true, 'batchComplete'=>false, 'batchAssignTo'=>false, 'batchAssignToDept'=>true, 'batchChangeVersion'=>true, 'batchSetWorkhour'=>false, 'batchDelete'=>true, 'batchRestore'=>false);
+$config->gametaskinternal->toolsIncompletedlist = array('batchActive'=>false, 'batchClose'=>false, 'batchComplete'=>false, 'batchAssignTo'=>false, 'batchAssignToDept'=>true, 'batchChangeVersion'=>true, 'batchSetWorkhour'=>false, 'batchDelete'=>true, 'batchRestore'=>false);
+$config->gametaskinternal->toolsRestore = array('batchActive'=>false, 'batchClose'=>false, 'batchComplete'=>false, 'batchAssignTo'=>false, 'batchAssignToDept'=>true, 'batchChangeVersion'=>true, 'batchSetWorkhour'=>false, 'batchDelete'=>false, 'batchRestore'=>true);
+
 
 $config->gametaskinternal->datatable->fieldList['id']['title']    = 'idAB';
 $config->gametaskinternal->datatable->fieldList['id']['fixed']    = 'left';

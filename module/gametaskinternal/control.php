@@ -42,6 +42,8 @@ class gametaskinternal extends control
      */
     public function index($orderBy='id_desc', $recTotal = 0, $recPerPage = 20, $pageID = 0)
     {
+        $this->view->tools = $this->config->gametaskinternal->toolsIndex;
+        $this->view->customFieldsName = "indexField";
         $this->setupViewTasks($orderBy, $recTotal, $recPerPage, $pageID);
         $this->setupCommonViewVars();
         $this->display();
@@ -49,6 +51,8 @@ class gametaskinternal extends control
 
     public function details($orderBy='id_desc', $recTotal = 0, $recPerPage = 20, $pageID = 0)
     {
+        $this->view->tools = $this->config->gametaskinternal->toolsDetails;
+        $this->view->customFieldsName = "defaultField";
         $this->setupViewTasks($orderBy, $recTotal, $recPerPage, $pageID);
         $this->setupCommonViewVars();
 
@@ -57,6 +61,8 @@ class gametaskinternal extends control
 
     public function mytasks($orderBy='pri_asc', $recTotal = 0, $recPerPage = 20, $pageID = 0)
     {
+        $this->view->tools = $this->config->gametaskinternal->toolsMyTask;
+        $this->view->customFieldsName = "defaultField";
         $this->setupViewTasks($orderBy, $recTotal, $recPerPage, $pageID, -1, $this->app->user->account);
         $this->setupCommonViewVars();
         $this->display();
@@ -64,6 +70,8 @@ class gametaskinternal extends control
 
     public function assignedtome($orderBy='pri_asc', $recTotal = 0, $recPerPage = 20, $pageID = 0)
     {
+        $this->view->tools = $this->config->gametaskinternal->toolsAssignedToMe;
+        $this->view->customFieldsName = "defaultField";
         $this->setupViewTasks($orderBy, $recTotal, $recPerPage, $pageID, -1, "", $this->app->user->account);
         $this->setupCommonViewVars();
         $this->display();
@@ -72,6 +80,8 @@ class gametaskinternal extends control
 
     public function mydept($orderBy='pri_asc', $recTotal = 0, $recPerPage = 20, $pageID = 1)
     {
+        $this->view->tools = $this->config->gametaskinternal->toolsMyDept;
+        $this->view->customFieldsName = "defaultField";
         $this->setupViewTasks($orderBy, $recTotal, $recPerPage, $pageID, $this->app->user->dept);
         $this->setupCommonViewVars();
 
@@ -80,6 +90,8 @@ class gametaskinternal extends control
 
     public function completedlist($orderBy='id_desc', $recTotal = 0, $recPerPage = 20, $pageID = 0)
     {
+        $this->view->tools = $this->config->gametaskinternal->toolsCompletedlist;
+        $this->view->customFieldsName = "indexField";
         $this->setupViewTasks($orderBy, $recTotal, $recPerPage, $pageID, -1, "", "", 0, 1);
         $this->setupCommonViewVars();
         $this->display();
@@ -87,6 +99,8 @@ class gametaskinternal extends control
 
     public function incompletelist($orderBy='id_desc', $recTotal = 0, $recPerPage = 20, $pageID = 0)
     {
+        $this->view->tools = $this->config->gametaskinternal->toolsIncompletedlist;
+        $this->view->customFieldsName = "indexField";
         $this->setupViewTasks($orderBy, $recTotal, $recPerPage, $pageID, -1, "", "", 0, 0);
         $this->setupCommonViewVars();
         $this->display();
@@ -94,7 +108,28 @@ class gametaskinternal extends control
 
     public function restore($orderBy='id_desc', $recTotal = 0, $recPerPage = 20, $pageID = 0)
     {
+        $this->view->tools = $this->config->gametaskinternal->toolsRestore;
+        $this->view->customFieldsName = "defaultField";
         $this->setupViewTasks($orderBy, $recTotal, $recPerPage, $pageID, -1, "", "", 1);
+        $this->setupCommonViewVars();
+        $this->display();
+    }
+
+    public function view($id)
+    {
+        $gameTask = $this->dao->select()->from(TABLE_GAMETASKINTERNAL)
+            ->where('id')->eq($id)
+            ->fetch();
+
+        $this->view->gameTask = $gameTask;
+
+        $versions = $this->dao->select('id,name')->from(TABLE_GAMETASKINTERNALVERSION)
+            ->where('active')->eq(1)
+            ->orderBy('id desc')
+            ->fetchPairs();
+
+        $this->view->versions = $versions;
+
         $this->setupCommonViewVars();
         $this->display();
     }
