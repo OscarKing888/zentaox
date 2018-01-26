@@ -46,13 +46,13 @@ function on_updateVersionDeadline(id)
             type:     'POST',
             url:      url,
             dataType: 'json',
-            data: {"id": id, "deadline": $("#deadline").val()}
+            data: {"id": id, "deadline": $("#deadline" + id).val()}
         });
     //$("#deadline").val(new Date().toLocaleDateString());
 
     //document.body.appendChild(x);
 
-    alert("更新成功！" + $("#deadline").val());
+    alert("更新成功！" + $("#deadline" + id).val());
 
     document.location.reload();
 }

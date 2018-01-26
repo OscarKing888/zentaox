@@ -87,7 +87,7 @@ include '../../common/view/datatable.fix.html.php';
 
             <td colspan='10' class='text-center'>
                 <?php
-                echo html::linkButton($lang->gametaskinternal->edit, inlink('edit', "id=$gameTask->id"));
+                echo html::submitButton();
                 echo html::backButton();
                 //echo html::a(inlink('edit', "id=$gameTask->id"), $lang->gametaskinternal->edit);
                 ?>
@@ -125,15 +125,15 @@ include '../../common/view/datatable.fix.html.php';
                     </tr>
 
                     <?php if($gameTask->sizeWidth > 0): ?>
-                    <tr>
-                        <th><?php echo $lang->gametaskinternal->width; ?></th>
-                        <td><?php echo $gameTask->sizeWidth; ?></td>
-                    </tr>
+                        <tr>
+                            <th><?php echo $lang->gametaskinternal->width; ?></th>
+                            <td><?php echo $gameTask->sizeWidth; ?></td>
+                        </tr>
 
-                    <tr>
-                        <th><?php echo $lang->gametaskinternal->height; ?></th>
-                        <td><?php echo $gameTask->sizeHeight; ?></td>
-                    </tr>
+                        <tr>
+                            <th><?php echo $lang->gametaskinternal->height; ?></th>
+                            <td><?php echo $gameTask->sizeHeight; ?></td>
+                        </tr>
                     <?php endif;?>
 
                     <tr>

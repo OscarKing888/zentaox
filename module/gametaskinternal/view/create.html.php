@@ -25,6 +25,10 @@
     </div>
 </div>
 
+<legend>
+<div class="red" align="center">零散需求提前1周，大版本需求提前3周</div>
+</legend>
+
 <form method='post'>
     <table class='table table-form with-border' align='left'>
         <tr>
@@ -49,14 +53,14 @@
             <th class='w-30px'><?php echo $lang->idAB; ?></th>
             <th class='w-100px'><?php echo $lang->gametaskinternal->version; ?><span class='required'></span></th>
             <th class='w-120px'><?php echo $lang->gametaskinternal->dept; ?><span class='required'></span></th>
-            <th class='w-150px'><?php echo $lang->gametaskinternal->owner; ?><span class='required'></span></th>
+            <th class='w-110px'><?php echo $lang->gametaskinternal->owner; ?><span class='required'></span></th>
             <th class='w-p20'><?php echo $lang->gametaskinternal->title; ?><span class='required'></span></th>
             <th class='w-50px'><?php echo $lang->gametaskinternal->count; ?></th>
-            <th class='w-80px'><?php echo $lang->gametaskinternal->width; ?></th>
-            <th class='w-80px'><?php echo $lang->gametaskinternal->height; ?></th>
+            <th class='w-70px'><?php echo $lang->gametaskinternal->width; ?></th>
+            <th class='w-70px'><?php echo $lang->gametaskinternal->height; ?></th>
             <th class='w-p20'><?php echo $lang->gametaskinternal->desc; ?></th>
-            <th class='w-100px'><?php echo $lang->gametaskinternal->srcResPath; ?></th>
-            <th class='w-100px'><?php echo $lang->gametaskinternal->gameResPath; ?></th>
+            <th class='w-p20'><?php echo $lang->gametaskinternal->srcResPath; ?></th>
+            <th class='w-p20'><?php echo $lang->gametaskinternal->gameResPath; ?></th>
             <th class='w-70px'><?php echo $lang->gametaskinternal->pri; ?></th>
         </tr>
         </thead>

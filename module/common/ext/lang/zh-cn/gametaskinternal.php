@@ -1,6 +1,6 @@
 <?php
 
-$lang->menu->gametaskinternal     = '内包管理|gametaskinternal|index';
+$lang->menu->gametaskinternal     = '美术内包管理|gametaskinternal|index';
 
 /*oscar:Blog menu*/
 $lang->gametaskinternal = new stdclass();

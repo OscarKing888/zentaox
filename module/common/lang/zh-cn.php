@@ -19,7 +19,7 @@ $lang->null      = '空';
 $lang->ellipsis  = '…';
 
 $lang->zentaoPMS      = '禅道';
-$lang->welcome        = "%s日报系统&nbsp;&nbsp;&nbsp;(内部信息，禁止外传！)";
+$lang->welcome        = "%s研发管理系统&nbsp;&nbsp;&nbsp;(内部信息，禁止外传！)";
 $lang->logout         = '退出';
 $lang->login          = '登录';
 $lang->help           = '帮助';

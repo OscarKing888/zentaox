@@ -83,7 +83,7 @@ class gametaskinternalModel extends model
                     echo $task->workhour;
                     break;
                 case 'title':
-                    echo $task->title;
+                    echo $canView ? html::a($taskLink, $task->title) : $task->title;
                     break;
                 case 'count':
                     echo $task->count;
@@ -106,19 +106,23 @@ class gametaskinternalModel extends model
                     break;
 
                 case 'desc':
-                    echo $task->desc;
+                    if(!empty($task->desc))  echo html::a($taskLink, $task->desc);
                     break;
                 case 'srcResPath':
-                    echo $task->srcResPath;
+                    if(!empty($task->srcResPath))  echo html::a($taskLink, $task->srcResPath);
                     break;
                 case 'gameResPath':
-                    echo $task->gameResPath;
+                    if(!empty($task->gameResPath))  echo html::a($taskLink, $task->gameResPath);
                     break;
                 case 'completed':
                     echo $task->completed ? $this->lang->gametaskinternal->completed : $this->lang->gametaskinternal->incomplete;
                     break;
                 case 'closed':
                     echo $task->closed ? $this->lang->gametaskinternal->closed : $this->lang->gametaskinternal->unclose;
+                    break;
+
+                case 'createDate':
+                    echo $task->createDate;
                     break;
 
 
@@ -144,11 +148,11 @@ class gametaskinternalModel extends model
                     echo substr($task->closedDate, 5, 11);
                     break;
                 case 'actions':
-                    common::printIcon('gametaskinternal', 'finish', "taskID=$task->id", '', 'list', '', 'hiddenwin', 'iframe', true);
-                    common::printIcon('gametaskinternal', 'close',  "taskID=$task->id", '', 'list', '', 'hiddenwin', 'iframe', true);
+                    //common::printIcon('gametaskinternal', 'finish', "taskID=$task->id", '', 'list', '', 'hiddenwin', 'iframe', true);
+                    //common::printIcon('gametaskinternal', 'close',  "taskID=$task->id", '', 'list', '', 'hiddenwin', 'iframe', true);
                     common::printIcon('gametaskinternal', 'edit',   "taskID=$task->id", '', 'list');
-                    common::printIcon('gametaskinternal', 'delete', "taskid=$task->id", '', 'list');
-                    common::printIcon('gametaskinternal', 'restoreTask', "taskid=$task->id", '', 'list', 'play');
+                    //common::printIcon('gametaskinternal', 'delete', "taskid=$task->id", '', 'list');
+                    //common::printIcon('gametaskinternal', 'restoreTask', "taskid=$task->id", '', 'list', 'play');
                     break;
             }
             echo '</td>';

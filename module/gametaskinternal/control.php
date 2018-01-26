@@ -82,7 +82,7 @@ class gametaskinternal extends control
     {
         $this->view->tools = $this->config->gametaskinternal->toolsMyDept;
         $this->view->customFieldsName = "defaultField";
-        $this->setupViewTasks($orderBy, $recTotal, $recPerPage, $pageID, $this->app->user->dept);
+        $this->setupViewTasksMyDept($orderBy, $recTotal, $recPerPage, $pageID, $this->app->user->dept);
         $this->setupCommonViewVars();
 
         $this->display();
@@ -116,6 +116,25 @@ class gametaskinternal extends control
     }
 
     public function view($id)
+    {
+        $gameTask = $this->dao->select()->from(TABLE_GAMETASKINTERNAL)
+            ->where('id')->eq($id)
+            ->fetch();
+
+        $this->view->gameTask = $gameTask;
+
+        $versions = $this->dao->select('id,name')->from(TABLE_GAMETASKINTERNALVERSION)
+            ->where('active')->eq(1)
+            ->orderBy('id desc')
+            ->fetchPairs();
+
+        $this->view->versions = $versions;
+
+        $this->setupCommonViewVars();
+        $this->display();
+    }
+
+    public function edit($id)
     {
         $gameTask = $this->dao->select()->from(TABLE_GAMETASKINTERNAL)
             ->where('id')->eq($id)
@@ -178,6 +197,64 @@ class gametaskinternal extends control
         $this->view->recPerPage    = $pager->recPerPage;
     }
 
+    public function setupViewTasksMyDept($orderBy='id_desc', $recTotal = 0, $recPerPage = 20, $pageID = 0,
+                                   $matchDept = -1, $matchOwner ='',  $matchAssignedTo='', $matchDeleted = 0,
+                                   $matchCompleted = -1, $matchClosed = -1)
+    {
+        $leaders = $this->dao->select('dept,username')->from(TABLE_GAMEGROUPLEADERS)
+            ->orderBy('dept asc')
+            ->fetchPairs();
+
+        $proxyDepts = array();
+        foreach ($leaders as $key => $leader) {
+            if($leader == $this->app->user->account)
+            {
+                $proxyDepts[$key] = $key;
+            }
+        }
+
+
+        //$this->view->debugStr +=  $this->menu;
+        if(!$orderBy) $orderBy = $this->cookie->gameinternalTaskOrder ? $this->cookie->gameinternalTaskOrder : 'id_desc';
+        setcookie('gameinternalTaskOrder', $orderBy, $this->config->cookieLife, $this->config->webRoot);
+        $sort = $this->loadModel('common')->appendOrder($orderBy);
+
+        $this->app->loadClass('pager');
+        $pager = new pager($recTotal, $recPerPage, $pageID);
+
+        // versions
+        $versions = $this->dao->select('id,name')->from(TABLE_GAMETASKINTERNALVERSION)
+            ->where('active')->eq(1)
+            ->orderBy('id desc')
+            ->fetchPairs();
+
+        $this->view->versions = $versions;
+
+        //foreach (array_keys($versions) as $k) { error_log("oscar: version:k $k");  }
+
+        $gameTasks = $this->dao->select()->from(TABLE_GAMETASKINTERNAL)
+            ->where('deleted')->eq($matchDeleted)
+            ->andWhere('version')->in(array_keys($versions))
+            ->beginIF($matchDept >= 0 )->andWhere('dept')->eq($matchDept)->fi()
+            ->orWhere('dept')->in($proxyDepts)
+            ->beginIF($matchCompleted >= 0 )->andWhere('completed')->eq($matchCompleted)->fi()
+            ->beginIF($matchClosed >= 0 )->andWhere('closed')->eq($matchClosed)->fi()
+            ->beginIF($matchOwner != '')->andWhere('owner')->eq($matchOwner)->fi()
+            ->beginIF($matchAssignedTo != '')->andWhere('assignedTo')->eq($matchAssignedTo)->fi()
+            //->groupBy('version')
+            ->orderBy($sort)
+            ->page($pager)
+            ->fetchAll();
+
+        $this->view->gameTasks = $gameTasks;
+
+        $this->session->set('taskOrderBy', $sort);
+        $this->view->orderBy       = $orderBy;
+        $this->view->pager = $pager;
+        $this->view->recTotal      = $pager->recTotal;
+        $this->view->recPerPage    = $pager->recPerPage;
+    }
+
     public function setupCommonViewVars()
     {
         // products
@@ -195,8 +272,27 @@ class gametaskinternal extends control
         $allUsers = $this->user->getPairs('nodeleted|noclosed');
         $this->view->allUsers = $allUsers;
         $this->view->users = $this->user->getPairs('nodeleted|noclosed|noletter');;
-        $this->view->deptUsers = $this->dept->getDeptUserPairs($this->app->user->dept);
+       $deptUsers = $this->dept->getDeptUserPairs($this->app->user->dept);
         $this->view->user = $this->app->user->account;
+
+        $leaders = $this->dao->select('dept,username')->from(TABLE_GAMEGROUPLEADERS)
+            ->orderBy('dept asc')
+            ->fetchPairs();
+
+
+        foreach ($leaders as $key => $leader) {
+            if($leader == $this->app->user->account)
+            {
+                $deptUsers += $this->dept->getDeptUserPairs($key);
+
+                //error_log("oscar: $key : $leader deptUsers:" . count($deptUsers));
+                //foreach ($deptUsers as $deptUser) {                    error_log("     oscar:$deptUser");                }
+            }
+        }
+
+        $deptUsers = array_unique($deptUsers);
+        $this->view->deptUsers = $deptUsers;
+        //error_log("oscar: deptUsers:" . count($deptUsers));
     }
 
     public function create()
@@ -205,6 +301,7 @@ class gametaskinternal extends control
 
         if (!empty($_POST)) {
             $newGameTasks = fixer::input('post')->get();
+                //->specialchars($this->config->gametaskinternal->fields);
             $batchNum = count($newGameTasks->version);
             //error_log("oscar: batchNum $batchNum count:" . count($newGameTasks));
 
@@ -234,6 +331,9 @@ class gametaskinternal extends control
                 $data[$i]->gameResPath = nl2br($newGameTasks->gameResPath[$i]);
                 $data[$i]->pri = (int)$newGameTasks->pri[$i];
                 $data[$i]->product = (int)$newGameTasks->product;
+                $data[$i]->createDate = helper::now();
+                $data[$i]->sizeWidth = (int)$newGameTasks->sizeWidth[$i];
+                $data[$i]->sizeHeight = (int)$newGameTasks->sizeHeight[$i];
 
                 $this->dao->insert(TABLE_GAMETASKINTERNAL)->data($data[$i])
                     ->autoCheck()
@@ -405,7 +505,7 @@ class gametaskinternal extends control
             $deadline = $postVals->deadline;
             $id = $postVals->id;
 
-            error_log("oscar: updateVersionDeadline $id deadline:$deadline");
+            //error_log("oscar: updateVersionDeadline $id deadline:$deadline");
             $this->dao->update(TABLE_GAMETASKINTERNALVERSION)
                 ->set('deadline')->eq($deadline)
                 ->where('id')->eq($id)

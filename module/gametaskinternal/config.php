@@ -33,10 +33,12 @@ $config->gametaskinternal->priList[3] = '3';
 $config->gametaskinternal->priList[4] = '4';
 
 
+$config->gametaskinternal->fields = 'id,version,dept,owner,assignedTo,workhour,completed,closed,title,count,width,height,desc,srcResPath,gameResPath,pri,createDate';
+
 $config->gametaskinternal->datatable = new stdclass();
 
 $config->gametaskinternal->datatable->defaultField = array('id', 'version', 'dept', 'owner', 'assignedTo', 'workhour', 'completed', 'closed', 'title', 'count', 'width', 'height', 'desc', 'srcResPath', 'gameResPath', 'pri', 'actions');
-$config->gametaskinternal->datatable->indexField = array('id', 'version', 'dept', 'owner', 'assignedTo',  'completed', 'closed', 'title', 'count', 'desc', 'pri', 'actions');
+$config->gametaskinternal->datatable->indexField = array('id', 'version', 'dept', 'owner', 'assignedTo',  'completed', 'closed', 'title', 'count', 'desc', 'pri', 'createDate', 'actions');
 
 $config->gametaskinternal->toolsIndex = array('batchActive'=>true, 'batchClose'=>true, 'batchComplete'=>false, 'batchAssignTo'=>false, 'batchAssignToDept'=>true, 'batchChangeVersion'=>true, 'batchSetWorkhour'=>false, 'batchDelete'=>true, 'batchRestore'=>false);
 $config->gametaskinternal->toolsDetails = array('batchActive'=>true, 'batchClose'=>true, 'batchComplete'=>false, 'batchAssignTo'=>false, 'batchAssignToDept'=>true, 'batchChangeVersion'=>true, 'batchSetWorkhour'=>false, 'batchDelete'=>true, 'batchRestore'=>false);
@@ -127,6 +129,12 @@ $config->gametaskinternal->datatable->fieldList['pri']['title']    = 'pri';
 $config->gametaskinternal->datatable->fieldList['pri']['fixed']    = 'left';
 $config->gametaskinternal->datatable->fieldList['pri']['width']    = 'auto';
 $config->gametaskinternal->datatable->fieldList['pri']['required'] = 'no';
+
+$config->gametaskinternal->datatable->fieldList['createDate']['title']    = 'createDate';
+$config->gametaskinternal->datatable->fieldList['createDate']['fixed']    = 'left';
+$config->gametaskinternal->datatable->fieldList['createDate']['width']    = 'auto';
+$config->gametaskinternal->datatable->fieldList['createDate']['required'] = 'no';
+
 
 
 $config->testcase->datatable->fieldList['actions']['title']    = 'actions';
