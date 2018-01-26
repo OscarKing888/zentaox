@@ -96,6 +96,57 @@ class datatableModel extends model
         return $setting;
     }
 
+    public function getSettingEx($module, $datatableId)
+    {
+        $method      = $this->app->getMethodName();
+        //$datatableId = $module . ucfirst($method);
+
+        $mode = isset($this->config->datatable->$datatableId->mode) ? $this->config->datatable->$datatableId->mode : 'table';
+        $key  = $mode == 'datatable' ? 'cols' : 'tablecols';
+
+        $module = zget($this->config->datatable->moduleAlias, "$module-$method", $module);
+        if(!isset($this->config->$module)) $this->loadModel($module);
+        if(isset($this->config->datatable->$datatableId->$key)) $setting = json_decode($this->config->datatable->$datatableId->$key);
+
+        $fieldList = $this->getFieldList($module);
+        if(empty($setting))
+        {
+            $setting = $this->config->$module->datatable->$datatableId;
+            $order   = 1;
+            foreach($setting as $key => $value)
+            {
+                $id  = $value;
+                $set = new stdclass();;
+                $set->order = $order++;
+                $set->id    = $id;
+                $set->show  = true;
+                $set->width = $fieldList[$id]['width'];
+                $set->fixed = $fieldList[$id]['fixed'];
+                $set->title = $fieldList[$id]['title'];
+                $set->sort  = isset($fieldList[$id]['sort']) ? $fieldList[$id]['sort'] : 'yes';
+                $set->name  = isset($fieldList[$id]['name']) ? $fieldList[$id]['name'] : '';
+                $setting[$key] = $set;
+            }
+        }
+        else
+        {
+            foreach($setting as $key => $set)
+            {
+                if($this->session->currentProductType === 'normal' and $set->id === 'branch')
+                {
+                    unset($setting[$key]);
+                    continue;
+                }
+                $set->title = $fieldList[$set->id]['title'];
+                $set->sort  = isset($fieldList[$set->id]['sort']) ? $fieldList[$set->id]['sort'] : 'yes';
+            }
+        }
+
+        usort($setting, array('datatableModel', 'sortCols'));
+
+        return $setting;
+    }
+
     /**
      * Sort cols.
      * 
