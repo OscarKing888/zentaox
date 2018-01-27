@@ -8,47 +8,42 @@ include '../../common/view/datatable.fix.html.php';
 <div id='titlebar'>
     <div class='heading'>
         <span class='prefix'><?php echo html::icon($lang->icons['task']); ?>
-            <strong><?php echo $gameTask->id; ?></strong></span>
-        <strong style='color: <?php echo $gameTask->color; ?>'>
-            <?php if (!empty($gameTask->parent)) echo '<span class="label">' . $this->lang->task->childrenAB . '</span> '; ?>
-            <?php if (!empty($gameTask->team)) echo '<span class="label">' . $this->lang->task->multipleAB . '</span> '; ?>
-            <?php echo isset($gameTask->parentName) ? $gameTask->parentName . '/' : ''; ?><?php echo $gameTask->title; ?>
+            <strong><?php echo $task->id; ?></strong></span>
+        <strong style='color: <?php echo $task->color; ?>'>
+            <?php echo $task->title; ?>
         </strong>
-        <?php if ($gameTask->deleted): ?>
+        <?php if ($task->deleted): ?>
             <span class='label label-danger'><?php echo $lang->task->deleted; ?></span>
-        <?php endif; ?>
-        <?php if ($gameTask->fromBug != 0): ?>
-            <small><?php echo html::icon($lang->icons['bug']) . " {$lang->task->fromBug}$lang->colon$gameTask->fromBug"; ?></small>
         <?php endif; ?>
     </div>
     <div class='actions'>
         <?php
         $browseLink = $app->session->taskList != false ? $app->session->taskList : $this->createLink('gametaskinternal', 'details', "");
         $actionLinks = '';
-        if (!$gameTask->deleted) {
+        if (!$task->deleted) {
             ob_start();
             echo "<div class='btn-group'>";
-            //common::printIcon('task', 'assignTo',       "projectID=$gameTask->project&taskID=$gameTask->id", $task, 'button', '', '', 'iframe', true, '', empty($gameTask->team) ? $lang->task->assignTo : $lang->task->transfer);
-            //common::printIcon('task', 'start',          "taskID=$gameTask->id", $task, 'button', '', '', 'iframe', true);
-            //common::printIcon('task', 'restart',        "taskID=$gameTask->id", $task, 'button', '', '', 'iframe', true);
-            //common::printIcon('task', 'recordEstimate', "taskID=$gameTask->id", $task, 'button', '', '', 'iframe', true);
-            //common::printIcon('task', 'pause',          "taskID=$gameTask->id", $task, 'button', '', '', 'iframe', true);
-            //common::printIcon('task', 'finish',         "taskID=$gameTask->id", $task, 'button', '', '', 'iframe showinonlybody text-success', true);
-            //common::printIcon('task', 'close',          "taskID=$gameTask->id", $task, 'button', '', '', 'iframe', true);
-            //common::printIcon('task', 'activate',       "taskID=$gameTask->id", $task, 'button', '', '', 'iframe text-success', true);
-            //common::printIcon('task', 'cancel',         "taskID=$gameTask->id", $task, 'button', '', '', 'iframe', true);
+            //common::printIcon('task', 'assignTo',       "projectID=$task->project&taskID=$task->id", $task, 'button', '', '', 'iframe', true, '', empty($task->team) ? $lang->task->assignTo : $lang->task->transfer);
+            //common::printIcon('task', 'start',          "taskID=$task->id", $task, 'button', '', '', 'iframe', true);
+            //common::printIcon('task', 'restart',        "taskID=$task->id", $task, 'button', '', '', 'iframe', true);
+            //common::printIcon('task', 'recordEstimate', "taskID=$task->id", $task, 'button', '', '', 'iframe', true);
+            //common::printIcon('task', 'pause',          "taskID=$task->id", $task, 'button', '', '', 'iframe', true);
+            //common::printIcon('task', 'finish',         "taskID=$task->id", $task, 'button', '', '', 'iframe showinonlybody text-success', true);
+            //common::printIcon('task', 'close',          "taskID=$task->id", $task, 'button', '', '', 'iframe', true);
+            //common::printIcon('task', 'activate',       "taskID=$task->id", $task, 'button', '', '', 'iframe text-success', true);
+            //common::printIcon('task', 'cancel',         "taskID=$task->id", $task, 'button', '', '', 'iframe', true);
             echo '</div>';
 
             echo "<div class='btn-group'>";
-            //if(empty($gameTask->team) or empty($gameTask->children)) common::printIcon('task', 'batchCreate',    "project=$gameTask->project&storyID=$gameTask->story&moduleID=$gameTask->module&taskID=$gameTask->id", $task, 'button','plus','','','','',' ');
-            common::printIcon('task', 'edit', "taskID=$gameTask->id", $task);
+            //if(empty($task->team) or empty($task->children)) common::printIcon('task', 'batchCreate',    "project=$task->project&storyID=$task->story&moduleID=$task->module&taskID=$task->id", $task, 'button','plus','','','','',' ');
+            common::printIcon('gametaskinternal', 'edit', "taskID=$task->id", $task);
             //common::printCommentIcon('task', $task);
-            //common::printIcon('task', 'create', "productID=0&storyID=0&moduleID=0&taskID=$gameTask->id", $task, 'button', 'copy');
-            //common::printIcon('task', 'delete', "projectID=$gameTask->project&taskID=$gameTask->id", $task);
+            //common::printIcon('task', 'create', "productID=0&storyID=0&moduleID=0&taskID=$task->id", $task, 'button', 'copy');
+            //common::printIcon('task', 'delete', "projectID=$task->project&taskID=$task->id", $task);
             echo '</div>';
 
             echo "<div class='btn-group'>";
-            if (!empty($gameTask->parent)) echo html::a(helper::createLink('task', 'view', "taskID=$gameTask->parent"), "<i class='icon-pre icon-double-angle-left'></i>", '', "class='btn' title='{$lang->task->parent}'");
+            if (!empty($task->parent)) echo html::a(helper::createLink('task', 'view', "taskID=$task->parent"), "<i class='icon-pre icon-double-angle-left'></i>", '', "class='btn' title='{$lang->task->parent}'");
             common::printRPN($browseLink, $preAndNext);
             echo '</div>';
 
@@ -65,31 +60,27 @@ include '../../common/view/datatable.fix.html.php';
 <div class='row-table'>
     <div class='col-main'>
         <div class='main'>
-            <fieldset>
-                <legend><?php echo $lang->gametaskinternal->version; ?></legend>
-                <div class='article-content'><?php echo $versions[$gameTask->version]; ?></div>
-            </fieldset>
 
             <fieldset>
                 <legend><?php echo $lang->gametaskinternal->desc; ?></legend>
-                <div class='article-content'><?php echo $gameTask->desc; ?></div>
+                <div class='article-content'><?php echo $task->desc; ?></div>
             </fieldset>
 
             <fieldset>
                 <legend><?php echo $lang->gametaskinternal->srcResPath; ?></legend>
-                <div class='article-content'><?php echo $gameTask->srcResPath; ?></div>
+                <div class='article-content'><?php echo $task->srcResPath; ?></div>
             </fieldset>
 
             <fieldset>
                 <legend><?php echo $lang->gametaskinternal->gameResPath; ?></legend>
-                <div class='article-content'><?php echo $gameTask->gameResPath; ?></div>
+                <div class='article-content'><?php echo $task->gameResPath; ?></div>
             </fieldset>
 
-            <td colspan='10' class='text-center'>
+            <td class='text-center'>
                 <?php
-                echo html::linkButton($lang->gametaskinternal->edit, inlink('edit', "id=$gameTask->id"));
+                echo html::linkButton($lang->gametaskinternal->edit, inlink('edit', "id=$task->id"));
                 echo html::backButton();
-                //echo html::a(inlink('edit', "id=$gameTask->id"), $lang->gametaskinternal->edit);
+                //echo html::a(inlink('edit', "id=$task->id"), $lang->gametaskinternal->edit);
                 ?>
             </td>
         </div>
@@ -102,43 +93,50 @@ include '../../common/view/datatable.fix.html.php';
                 <table class='table table-data table-condensed table-borderless'>
                     <tr>
                         <th class='w-80px'><?php echo $lang->gametaskinternal->product; ?></th>
-                        <td><?php echo $allProducts[$gameTask->product]; ?></td>
+                        <td><?php echo $allProducts[$task->product]; ?></td>
                     </tr>
                     <tr>
                         <th class='w-80px'><?php echo $lang->gametaskinternal->version; ?></th>
-                        <td><?php echo $versions[$gameTask->version]; ?></td>
+                        <td><?php echo $versions[$task->version]; ?></td>
                     </tr>
                     <tr>
                         <th><?php echo $lang->gametaskinternal->dept; ?></th>
-                        <td><?php echo $depts[$gameTask->dept]; ?> </td>
+                        <td><?php echo $depts[$task->dept]; ?> </td>
                     </tr>
                     <tr>
                         <th><?php echo $lang->gametaskinternal->owner; ?></th>
                         <td>
-                            <?php echo $users[$gameTask->owner]; ?>
+                            <?php echo $users[$task->owner]; ?>
                         </td>
                     </tr>
 
                     <tr>
                         <th><?php echo $lang->gametaskinternal->assignedTo; ?></th>
-                        <td><?php echo $gameTask->assignedTo ? $allUsers[$task->assignedTo] : $lang->gametaskinternal->assignedToNull; ?></td>
+                        <td><?php echo $task->assignedTo ? $allUsers[$task->assignedTo] : $lang->gametaskinternal->assignedToNull; ?></td>
                     </tr>
 
-                    <?php if($gameTask->sizeWidth > 0): ?>
+                    <?php if($task->sizeWidth > 0): ?>
                     <tr>
                         <th><?php echo $lang->gametaskinternal->width; ?></th>
-                        <td><?php echo $gameTask->sizeWidth; ?></td>
+                        <td><?php echo $task->sizeWidth; ?></td>
                     </tr>
 
                     <tr>
                         <th><?php echo $lang->gametaskinternal->height; ?></th>
-                        <td><?php echo $gameTask->sizeHeight; ?></td>
+                        <td><?php echo $task->sizeHeight; ?></td>
                     </tr>
                     <?php endif;?>
 
                     <tr>
                         <th><?php echo $lang->gametaskinternal->workhour; ?></th>
-                        <td><?php echo $gameTask->workhour; ?></td>
+                        <td><?php echo $task->workhour; ?></td>
+                    </tr>
+
+                    <tr>
+                        <th><?php echo $lang->gametaskinternal->pri; ?></th>
+                        <td><?php  echo "<span class='pri" .$task->pri . "'>";
+                            echo $task->pri == '0' ? '' : $task->pri;
+                            echo "</span>"; ?></td>
                     </tr>
 
 
@@ -151,6 +149,17 @@ include '../../common/view/datatable.fix.html.php';
                     <tr>
                         <th><?php echo $lang->gametaskinternal->closeStat; ?></th>
                         <td><?php echo $task->closed ? $this->lang->gametaskinternal->closed : $this->lang->gametaskinternal->unclose; ?></td>
+                    </tr>
+
+                    <tr>
+                        <th><?php echo "操作" ?></th>
+                    <td>
+                        <?php
+                        echo html::linkButton($lang->gametaskinternal->edit, inlink('edit', "id=$task->id"));
+                        echo html::backButton();
+                        //echo html::a(inlink('edit', "id=$task->id"), $lang->gametaskinternal->edit);
+                        ?>
+                    </td>
                     </tr>
                 </table>
             </fieldset>

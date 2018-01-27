@@ -34,6 +34,28 @@ class gametaskinternal extends control
         $this->loadModel('task');
     }
 
+    function convertImageURL($tasks)
+    {
+        foreach ($tasks as $task) {
+            $this->convertImageURLTask($task);
+        }
+        return $tasks;
+    }
+
+    function convertImageURLTask($task)
+    {
+        $task = $this->file->replaceImgURL($task, "desc");
+        $task->desc = htmlspecialchars_decode($task->desc);
+
+        $task = $this->file->replaceImgURL($task, "srcResPath");
+        $task->srcResPath = htmlspecialchars_decode($task->srcResPath);
+
+        $task = $this->file->replaceImgURL($task, "gameResPath");
+        $task->gameResPath = htmlspecialchars_decode($task->gameResPath);
+        return $task;
+    }
+
+
     /**
      * The index page of gametaskinternal module.
      *
@@ -62,7 +84,7 @@ class gametaskinternal extends control
     public function mytasks($orderBy='pri_asc', $recTotal = 0, $recPerPage = 20, $pageID = 0)
     {
         $this->view->tools = $this->config->gametaskinternal->toolsMyTask;
-        $this->view->customFieldsName = "defaultField";
+        $this->view->customFieldsName = "ownerTaskField";
         $this->setupViewTasks($orderBy, $recTotal, $recPerPage, $pageID, -1, $this->app->user->account);
         $this->setupCommonViewVars();
         $this->display();
@@ -71,7 +93,7 @@ class gametaskinternal extends control
     public function assignedtome($orderBy='pri_asc', $recTotal = 0, $recPerPage = 20, $pageID = 0)
     {
         $this->view->tools = $this->config->gametaskinternal->toolsAssignedToMe;
-        $this->view->customFieldsName = "defaultField";
+        $this->view->customFieldsName = "myTaskField";
         $this->setupViewTasks($orderBy, $recTotal, $recPerPage, $pageID, -1, "", $this->app->user->account);
         $this->setupCommonViewVars();
         $this->display();
@@ -81,7 +103,7 @@ class gametaskinternal extends control
     public function mydept($orderBy='pri_asc', $recTotal = 0, $recPerPage = 20, $pageID = 1)
     {
         $this->view->tools = $this->config->gametaskinternal->toolsMyDept;
-        $this->view->customFieldsName = "defaultField";
+        $this->view->customFieldsName = "myDeptTaskField";
         $this->setupViewTasksMyDept($orderBy, $recTotal, $recPerPage, $pageID, $this->app->user->dept);
         $this->setupCommonViewVars();
 
@@ -121,7 +143,8 @@ class gametaskinternal extends control
             ->where('id')->eq($id)
             ->fetch();
 
-        $this->view->gameTask = $gameTask;
+        $gameTask = $this->convertImageURLTask($gameTask);
+        $this->view->task = $gameTask;
 
         $versions = $this->dao->select('id,name')->from(TABLE_GAMETASKINTERNALVERSION)
             ->where('active')->eq(1)
@@ -136,11 +159,26 @@ class gametaskinternal extends control
 
     public function edit($id)
     {
+        if(!empty($_POST)) {
+            $task = fixer::input('post')->specialchars($this->config->gametaskinternal->editFields)
+                ->add('lastUpdateBy', $this->app->user->account)
+                ->add('lastUpdateDate', helper::now())
+                ->stripTags($this->config->gametaskinternal->editor->edit['id'], $this->config->allowedTags)
+                ->get();
+
+            $this->dao->update(TABLE_GAMETASKINTERNAL)->data($task)
+                ->batchCheck('version,dept,title,owner,product', 'notempty')
+                ->where('id')->eq((int)$id)->exec();
+
+            die(js::locate($this->createLink('gametaskinternal', 'view', "id=$id"), 'parent'));
+        }
+
         $gameTask = $this->dao->select()->from(TABLE_GAMETASKINTERNAL)
             ->where('id')->eq($id)
             ->fetch();
 
-        $this->view->gameTask = $gameTask;
+        $gameTask = $this->convertImageURLTask($gameTask);
+        $this->view->task = $gameTask;
 
         $versions = $this->dao->select('id,name')->from(TABLE_GAMETASKINTERNALVERSION)
             ->where('active')->eq(1)
@@ -188,6 +226,7 @@ class gametaskinternal extends control
             ->page($pager)
             ->fetchAll();
 
+        $gameTasks = $this->convertImageURL($gameTasks);
         $this->view->gameTasks = $gameTasks;
 
         $this->session->set('taskOrderBy', $sort);
@@ -246,6 +285,7 @@ class gametaskinternal extends control
             ->page($pager)
             ->fetchAll();
 
+        $gameTasks = $this->convertImageURL($gameTasks);
         $this->view->gameTasks = $gameTasks;
 
         $this->session->set('taskOrderBy', $sort);
@@ -367,6 +407,8 @@ class gametaskinternal extends control
             for ($i = 1; $i <= $paddingCount; $i++)
                 $gameTasks[$i] = $newTask;
         }
+
+        //$gameTasks = $this->convertImageURL($gameTasks);
         $this->view->gameTasks = $gameTasks;
 
         $this->view->allProducts = array(0 => '') + $this->product->getPairs('noclosed|nocode');
@@ -817,7 +859,7 @@ class gametaskinternal extends control
             $taskIDList = $this->post->taskIDList;
             $taskIDList = array_unique($taskIDList);
             //unset($_POST['taskIDList']);
-            if(!is_array($taskIDList)) die(js::locate($this->createLink('gametaskinternal', 'mydept', ""), 'parent'));
+            if(!is_array($taskIDList)) die(js::locate($this->createLink('gametaskinternal', 'mytasks', ""), 'parent'));
 
 
             foreach($taskIDList as $taskID)
@@ -836,7 +878,7 @@ class gametaskinternal extends control
                 //$this->task->sendmail($taskID, $actionID);
             }
             //if(!dao::isError()) $this->loadModel('score')->create('ajax', 'batchOther');
-            die(js::reload('parent'));
+            die(js::locate($this->createLink('gametaskinternal', 'mytasks', ""), 'parent'));
             //echo js::alert("assignTo: $assignedTo");
         }
     }

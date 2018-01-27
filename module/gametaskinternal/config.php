@@ -6,8 +6,7 @@ $config->gametaskinternal->debug = false;
 
 
 $config->gametaskinternal->editor = new stdclass();
-$config->gametaskinternal->editor->create     = array('id' => 'contentimages', 'tools' => 'pipelineImageTools');
-$config->gametaskinternal->editor->edit     = array('id' => 'contentimages', 'tools' => 'pipelineImageTools');
+$config->gametaskinternal->editor->edit     = array('id' => 'desc,srcResPath,gameResPath', 'tools' => 'simpleTools');
 
 
 
@@ -33,12 +32,17 @@ $config->gametaskinternal->priList[3] = '3';
 $config->gametaskinternal->priList[4] = '4';
 
 
-$config->gametaskinternal->fields = 'id,version,dept,owner,assignedTo,workhour,completed,closed,title,count,width,height,desc,srcResPath,gameResPath,pri,createDate';
+$config->gametaskinternal->fields = 'id,product,version,dept,owner,assignedTo,workhour,completed,closed,title,count,width,height,desc,srcResPath,gameResPath,pri,createDate';
+$config->gametaskinternal->editFields = 'product,version,dept,owner,assignedTo,workhour,title,count,width,height,desc,srcResPath,gameResPath,pri';
 
 $config->gametaskinternal->datatable = new stdclass();
 
-$config->gametaskinternal->datatable->defaultField = array('id', 'version', 'dept', 'owner', 'assignedTo', 'workhour', 'completed', 'closed', 'title', 'count', 'width', 'height', 'desc', 'srcResPath', 'gameResPath', 'pri', 'actions');
-$config->gametaskinternal->datatable->indexField = array('id', 'version', 'dept', 'owner', 'assignedTo',  'completed', 'closed', 'title', 'count', 'desc', 'pri', 'createDate', 'actions');
+$config->gametaskinternal->datatable->defaultField = array('id', 'pri', 'title', 'version', 'dept', 'owner', 'assignedTo', 'workhour', 'completed', 'closed', 'count', 'width', 'height', 'desc', 'srcResPath', 'gameResPath', 'actions');
+$config->gametaskinternal->datatable->indexField = array('id', 'pri', 'title', 'version', 'dept', 'owner', 'assignedTo', 'count', 'desc', 'actions');
+
+$config->gametaskinternal->datatable->ownerTaskField = array('id', 'pri', 'title', 'version', 'assignedTo',  'completed', 'closed', 'count', 'desc', 'createDate', 'actions');
+$config->gametaskinternal->datatable->myTaskField = array('id', 'pri', 'title', 'version', 'owner',  'completed', 'closed', 'count', 'desc', 'actions');
+$config->gametaskinternal->datatable->myDeptTaskField = array('id', 'pri', 'title', 'version', 'owner', 'assignedTo', 'completed', 'closed', 'count', 'pri', 'actions');
 
 $config->gametaskinternal->toolsIndex = array('batchActive'=>true, 'batchClose'=>true, 'batchComplete'=>false, 'batchAssignTo'=>false, 'batchAssignToDept'=>true, 'batchChangeVersion'=>true, 'batchSetWorkhour'=>false, 'batchDelete'=>true, 'batchRestore'=>false);
 $config->gametaskinternal->toolsDetails = array('batchActive'=>true, 'batchClose'=>true, 'batchComplete'=>false, 'batchAssignTo'=>false, 'batchAssignToDept'=>true, 'batchChangeVersion'=>true, 'batchSetWorkhour'=>false, 'batchDelete'=>true, 'batchRestore'=>false);
