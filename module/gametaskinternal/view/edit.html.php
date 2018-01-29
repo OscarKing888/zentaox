@@ -89,12 +89,12 @@ include '../../common/view/kindeditor.html.php';
                         </tr>
                         <tr>
                             <th><?php echo $lang->gametaskinternal->owner; ?></th>
-                            <td><?php echo html::select('owner', $users, $task->owner, 'class="form-control chosen"'); ?></td>
+                            <td><?php echo html::select('owner', $allOwners, $task->owner, 'class="form-control chosen"'); ?></td>
                         </tr>
 
                         <tr>
                             <th><?php echo $lang->gametaskinternal->assignedTo; ?></th>
-                            <td><?php echo html::select('assignedTo', $allUsers, $task->assignedTo, 'class="form-control chosen"'); ?></td>
+                            <td><?php echo html::select('assignedTo', $deptUsers, $task->assignedTo, 'class="form-control chosen"'); ?></td>
                         </tr>
 
                         <tr>

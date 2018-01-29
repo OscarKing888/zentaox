@@ -39,6 +39,7 @@ $lang->gametaskinternal->batchActive     = '批量激活';
 $lang->gametaskinternal->batchDelete     = '批量删除';
 $lang->gametaskinternal->batchRestore     = '批量恢复';
 
+$lang->gametaskinternal->deleted = '已删除';
 
 $lang->gametaskinternal->edit    = '编辑';
 $lang->gametaskinternal->delete  = '删除';

@@ -83,6 +83,10 @@ class gametaskinternalModel extends model
                     echo $task->workhour;
                     break;
                 case 'title':
+                    if($task->deleted)
+                    {
+                        echo "<span class='label label-danger'>" . $this->lang->gametaskinternal->deleted . "</span>";
+                    }
                     echo $canView ? html::a($taskLink, $task->title) : $task->title;
                     break;
                 case 'count':

@@ -104,7 +104,7 @@ class gametaskinternal extends control
     {
         $this->view->tools = $this->config->gametaskinternal->toolsMyDept;
         $this->view->customFieldsName = "myDeptTaskField";
-        $this->setupViewTasksMyDept($orderBy, $recTotal, $recPerPage, $pageID, $this->app->user->dept);
+        $this->setupViewTasksMyDept($orderBy, $recTotal, $recPerPage, $pageID, $this->app->user->dept, "", "", 0);
         $this->setupCommonViewVars();
 
         $this->display();
@@ -214,8 +214,8 @@ class gametaskinternal extends control
         //foreach (array_keys($versions) as $k) { error_log("oscar: version:k $k");  }
 
         $gameTasks = $this->dao->select()->from(TABLE_GAMETASKINTERNAL)
-            ->where('deleted')->eq($matchDeleted)
-            ->andWhere('version')->in(array_keys($versions))
+            ->where('version')->in(array_keys($versions))
+            ->beginIF($matchDeleted >= 0 )->andWhere('deleted')->eq($matchDeleted)->fi()
             ->beginIF($matchDept >= 0 )->andWhere('dept')->eq($matchDept)->fi()
             ->beginIF($matchCompleted >= 0 )->andWhere('completed')->eq($matchCompleted)->fi()
             ->beginIF($matchClosed >= 0 )->andWhere('closed')->eq($matchClosed)->fi()
@@ -272,10 +272,9 @@ class gametaskinternal extends control
         //foreach (array_keys($versions) as $k) { error_log("oscar: version:k $k");  }
 
         $gameTasks = $this->dao->select()->from(TABLE_GAMETASKINTERNAL)
-            ->where('deleted')->eq($matchDeleted)
-            ->andWhere('version')->in(array_keys($versions))
-            ->beginIF($matchDept >= 0 )->andWhere('dept')->eq($matchDept)->fi()
-            ->orWhere('dept')->in($proxyDepts)
+            ->where('version')->in(array_keys($versions))
+            ->beginIF($matchDeleted >= 0 )->andWhere('deleted')->eq($matchDeleted)->fi()
+            ->beginIF($matchDept >= 0 )->andWhere('dept', true)->eq($matchDept)->orWhere('dept')->in($proxyDepts)->markRight(1)->fi()
             ->beginIF($matchCompleted >= 0 )->andWhere('completed')->eq($matchCompleted)->fi()
             ->beginIF($matchClosed >= 0 )->andWhere('closed')->eq($matchClosed)->fi()
             ->beginIF($matchOwner != '')->andWhere('owner')->eq($matchOwner)->fi()
@@ -331,6 +330,12 @@ class gametaskinternal extends control
         }
 
         $deptUsers = array_unique($deptUsers);
+
+        foreach ($deptUsers as $account => $user) {
+            $firstLetter = ucfirst(substr($account, 0, 1)) . ':';
+            $deptUsers[$account] = $firstLetter . $user;
+        }
+
         $this->view->deptUsers = $deptUsers;
         //error_log("oscar: deptUsers:" . count($deptUsers));
     }
