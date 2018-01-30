@@ -14,3 +14,4 @@ $lang->resource->books->restore       = 'restore';
 
 $lang->resource->books->borrow       = 'borrow';
 $lang->resource->books->returnBook       = 'return';
+$lang->resource->books->view       = 'view';

@@ -19,6 +19,7 @@ $lang->books->mybooks  = '我的借阅';
 $lang->books->borrow  = '我要借阅';
 $lang->books->report  = '借阅统计';
 $lang->books->return  = '归还';
+$lang->books->view = '查看';
 
 $lang->books->price  = '原价';
 $lang->books->type  = '分类';

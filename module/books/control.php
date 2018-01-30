@@ -46,7 +46,7 @@ class books extends control
     public function setupCommonVars($pager = null, $matchDeleted = 0)
     {
         $this->view->books = $this->books->getBookList($pager, $matchDeleted);
-        $this->view->borrowLogs = $this->books->getBorrowLogList($pager);
+        $this->view->borrowLogs = $this->books->getBorrowLogList();
         $this->view->librarians = ($this->config->books->adminAccounts);
         $this->view->pager    = $pager;
         $this->view->user = $this->app->user->account;
@@ -173,6 +173,7 @@ class books extends control
 
         $this->view->title = $this->lang->books->report;
         $this->setupCommonVars($pager);
+        $this->view->books = $this->books->getBorrowBookList($pager);
         $this->display();
     }
 
@@ -183,7 +184,16 @@ class books extends control
 
         $this->view->title = $this->lang->books->mybooks;
         $this->setupCommonVars($pager);
+        $this->view->books = $this->books->getBorrowBookList($pager, $this->app->user->account);
         $this->display();
+    }
+
+    public function view($id)
+    {
+            $this->view->title = $this->lang->books->view;
+            $this->setupCommonVars();
+            $this->view->book = $this->books->getById($id);
+            $this->display();
     }
 
 }

@@ -42,6 +42,24 @@ class booksModel extends model
         return $this->convertImageURL($books);
     }
 
+    public function getBorrowBookList($pager = null, $matchAccount='')
+    {
+        $logs = $this->dao->select()
+            ->from(TABLE_BOOKSBORROWLOG)
+            ->where('returned')->eq(0)
+            ->beginIF($matchAccount != '')->andWhere('reader')->eq($matchAccount)->fi()
+            ->fetchAll('bookid');
+
+        $books = $this->dao->select('*')
+            ->from(TABLE_BOOKS)
+            ->where('id')->in(array_keys($logs))
+            ->orderBy('id asc')
+            ->page($pager)
+            ->fetchAll();
+
+        return $this->convertImageURL($books);
+    }
+
     public function getBorrowLogList()
     {
         $logs = $this->dao->select('*')
