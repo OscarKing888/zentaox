@@ -71,68 +71,90 @@ class gametaskinternal extends control
         $this->display();
     }
 
-    public function details($orderBy='id_desc', $recTotal = 0, $recPerPage = 20, $pageID = 0)
+    public function details($orderBy='id_desc', $recTotal = 0, $recPerPage = 20, $pageID = 0, $matchVer = '')
     {
         $this->view->tools = $this->config->gametaskinternal->toolsDetails;
         $this->view->customFieldsName = "defaultField";
-        $this->setupViewTasks($orderBy, $recTotal, $recPerPage, $pageID);
+        $this->view->methodName = "details";
+        $this->setupViewTasks($orderBy, $recTotal, $recPerPage, $pageID,
+            -1, '', '', 0,
+            -1,-1,  $matchVer);
         $this->setupCommonViewVars();
 
         $this->display();
     }
 
-    public function mytasks($orderBy='pri_asc', $recTotal = 0, $recPerPage = 20, $pageID = 0)
+    public function mytasks($orderBy='pri_asc', $recTotal = 0, $recPerPage = 20, $pageID = 0, $matchVer = '')
     {
         $this->view->tools = $this->config->gametaskinternal->toolsMyTask;
         $this->view->customFieldsName = "ownerTaskField";
-        $this->setupViewTasks($orderBy, $recTotal, $recPerPage, $pageID, -1, $this->app->user->account);
+        $this->view->methodName = "mytasks";
+        $this->setupViewTasks($orderBy, $recTotal, $recPerPage, $pageID,
+            -1, $this->app->user->account, '', 0,
+            -1,-1,  $matchVer);
         $this->setupCommonViewVars();
         $this->display();
     }
 
-    public function assignedtome($orderBy='pri_asc', $recTotal = 0, $recPerPage = 20, $pageID = 0)
+    public function assignedtome($orderBy='pri_asc', $recTotal = 0, $recPerPage = 20, $pageID = 0, $matchVer = '')
     {
         $this->view->tools = $this->config->gametaskinternal->toolsAssignedToMe;
         $this->view->customFieldsName = "myTaskField";
-        $this->setupViewTasks($orderBy, $recTotal, $recPerPage, $pageID, -1, "", $this->app->user->account);
+        $this->view->methodName = "assignedtome";
+        $this->setupViewTasks($orderBy, $recTotal, $recPerPage, $pageID,
+            -1, '', $this->app->user->account, 0,
+            -1,-1,  $matchVer);
         $this->setupCommonViewVars();
         $this->display();
     }
 
 
-    public function mydept($orderBy='pri_asc', $recTotal = 0, $recPerPage = 20, $pageID = 1)
+    public function mydept($orderBy='pri_asc', $recTotal = 0, $recPerPage = 20, $pageID = 1, $matchVer = '')
     {
         $this->view->tools = $this->config->gametaskinternal->toolsMyDept;
         $this->view->customFieldsName = "myDeptTaskField";
-        $this->setupViewTasksMyDept($orderBy, $recTotal, $recPerPage, $pageID, $this->app->user->dept, "", "", 0);
+        $this->view->methodName = "mydept";
+        $this->setupViewTasks($orderBy, $recTotal, $recPerPage, $pageID,
+            $this->app->user->dept, '', '', 0,
+            -1,-1,  $matchVer);
         $this->setupCommonViewVars();
 
         $this->display();
     }
 
-    public function completedlist($orderBy='id_desc', $recTotal = 0, $recPerPage = 20, $pageID = 0)
+    public function completedlist($orderBy='id_desc', $recTotal = 0, $recPerPage = 20, $pageID = 0, $matchVer = '')
     {
         $this->view->tools = $this->config->gametaskinternal->toolsCompletedlist;
         $this->view->customFieldsName = "indexField";
-        $this->setupViewTasks($orderBy, $recTotal, $recPerPage, $pageID, -1, "", "", 0, 1);
+        $this->view->methodName = "completedlist";
+        $this->setupViewTasks($orderBy, $recTotal, $recPerPage, $pageID,
+            $this->app->user->dept, '', '', 0,
+            1,-1,  $matchVer);
+
         $this->setupCommonViewVars();
         $this->display();
     }
 
-    public function incompletelist($orderBy='id_desc', $recTotal = 0, $recPerPage = 20, $pageID = 0)
+    public function incompletelist($orderBy='id_desc', $recTotal = 0, $recPerPage = 20, $pageID = 0, $matchVer = '')
     {
         $this->view->tools = $this->config->gametaskinternal->toolsIncompletedlist;
         $this->view->customFieldsName = "indexField";
-        $this->setupViewTasks($orderBy, $recTotal, $recPerPage, $pageID, -1, "", "", 0, 0);
+        $this->view->methodName = "incompletelist";
+        $this->setupViewTasks($orderBy, $recTotal, $recPerPage, $pageID,
+            $this->app->user->dept, '', '', 0,
+            0,-1,  $matchVer);
         $this->setupCommonViewVars();
         $this->display();
     }
 
-    public function restore($orderBy='id_desc', $recTotal = 0, $recPerPage = 20, $pageID = 0)
+    public function restore($orderBy='id_desc', $recTotal = 0, $recPerPage = 20, $pageID = 0, $matchVer = '')
     {
         $this->view->tools = $this->config->gametaskinternal->toolsRestore;
         $this->view->customFieldsName = "defaultField";
-        $this->setupViewTasks($orderBy, $recTotal, $recPerPage, $pageID, -1, "", "", 1);
+        $this->view->methodName = "restore";
+        $this->setupViewTasks($orderBy, $recTotal, $recPerPage, $pageID,
+            -1, '', '', 1,
+            -1,-1,  $matchVer);
         $this->setupCommonViewVars();
         $this->display();
     }
@@ -193,7 +215,7 @@ class gametaskinternal extends control
 
     public function setupViewTasks($orderBy='id_desc', $recTotal = 0, $recPerPage = 20, $pageID = 0,
                                    $matchDept = -1, $matchOwner ='',  $matchAssignedTo='', $matchDeleted = 0,
-                                   $matchCompleted = -1, $matchClosed = -1)
+                                   $matchCompleted = -1, $matchClosed = -1, $matchVer = '')
     {
         //$this->view->debugStr +=  $this->menu;
         if(!$orderBy) $orderBy = $this->cookie->gameinternalTaskOrder ? $this->cookie->gameinternalTaskOrder : 'id_desc';
@@ -214,7 +236,8 @@ class gametaskinternal extends control
         //foreach (array_keys($versions) as $k) { error_log("oscar: version:k $k");  }
 
         $gameTasks = $this->dao->select()->from(TABLE_GAMETASKINTERNAL)
-            ->where('version')->in(array_keys($versions))
+            ->beginIF($matchVer == '')->where('version')->in(array_keys($versions))->fi()
+            ->beginIF($matchVer != '')->where('version')->eq($matchVer)->fi()
             ->beginIF($matchDeleted >= 0 )->andWhere('deleted')->eq($matchDeleted)->fi()
             ->beginIF($matchDept >= 0 )->andWhere('dept')->eq($matchDept)->fi()
             ->beginIF($matchCompleted >= 0 )->andWhere('completed')->eq($matchCompleted)->fi()
@@ -337,6 +360,13 @@ class gametaskinternal extends control
         }
 
         $this->view->deptUsers = $deptUsers;
+
+        // versions
+        $verDeadlines = $this->dao->select('id,deadline')->from(TABLE_GAMETASKINTERNALVERSION)
+            ->where('active')->eq(1)
+            ->orderBy('id desc')
+            ->fetchPairs();
+        $this->view->verDeadlines = $verDeadlines;
         //error_log("oscar: deptUsers:" . count($deptUsers));
     }
 
@@ -905,6 +935,7 @@ class gametaskinternal extends control
             {
                 $this->dao->update(TABLE_GAMETASKINTERNAL)
                     ->set('completed')->eq(1)
+                    ->set('completeDate')->eq(helper::now())
                     ->where('id')->eq($taskID)
                     ->exec();
 

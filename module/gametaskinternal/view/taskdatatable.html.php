@@ -1,47 +1,10 @@
-<?php
-/**
- * The html template file of index method of pipeline module of ZenTaoPHP.
- *
- * The author disclaims copyright to this source code.  In place of
- * a legal notice, here is a blessing:
- *
- *  May you do good and not evil.
- *  May you find forgiveness for yourself and forgive others.
- *  May you share freely, never taking more than you give.
- */
-?>
-<?php include '../../common/view/header.html.php'; ?>
-<?php include 'debug.html.php'; ?>
-<?php
-include '../../common/view/chart.html.php';
-include '../../common/view/datepicker.html.php';
-include '../../common/view/datatable.fix.html.php';
-//include './taskheader.html.php';
-?>
+
 
 <?php
-
-/*
-common::printIcon('gametaskinternal', 'music',   "", $task, 'list');
-common::printIcon('gametaskinternal', 'start',   "", $task, 'list');
-common::printIcon('gametaskinternal', 'star-empty',   "", $task, 'list');
-common::printIcon('gametaskinternal', 'user',   "", $task, 'list');
-common::printIcon('gametaskinternal', 'film',   "", $task, 'list');
-common::printIcon('gametaskinternal', 'off',   "", $task, 'list');
-//*/
-
-$verTasks = array();
-
-foreach ($gameTasks as $t) {
-    if (!array_key_exists($t->version)) {
-        $verTasks[$t->version] = array();
-    }
-
-    $verTasks[$t->version][$t->id] = $t;
-}
 
 $columns = 14;
 $taskLink = helper::createLink('gametaskinternal', 'view', "taskID=$task->id");
+//echo $customFieldsName;
 ?>
 
 
@@ -60,14 +23,6 @@ $taskLink = helper::createLink('gametaskinternal', 'view', "taskID=$task->id");
         //$customFields = $this->datatable->getSettingEx('gametaskinternal', 'indexField');
         $customFields = $this->datatable->getSettingEx('gametaskinternal', $customFieldsName);
 
-        //foreach ($customFields as $id => $customField) { echo "customField:    $id = $customField->title <br>";}
-        /*if ($project->type == 'ops')
-        {
-            foreach ($customFields as $id => $customField) {
-                if ($customField->id == 'story') unset($customFields[$id]);
-            }
-        }
-        //*/
         $widths = $this->datatable->setFixedFieldWidth($customFields);
         $columns = 0;
         ?>
@@ -289,9 +244,3 @@ $taskLink = helper::createLink('gametaskinternal', 'view', "taskID=$task->id");
 </div>
 <?php js::set('checkedSummary', $lang->gametaskinternal->checkedSummary); ?>
 <?php js::set('replaceID', 'taskList') ?>
-<script>
-</script>
-<?php include '../../common/view/footer.html.php'; ?>
-<?php
-//echo js::alert("datatableId:" . $this->view->datatableId . "module:$module method:$method mode:$mode");
-?>

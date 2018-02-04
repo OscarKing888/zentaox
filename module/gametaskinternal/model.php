@@ -87,7 +87,7 @@ class gametaskinternalModel extends model
                     {
                         echo "<span class='label label-danger'>" . $this->lang->gametaskinternal->deleted . "</span>";
                     }
-                    echo $canView ? html::a($taskLink, $task->title) : $task->title;
+                    echo html::a($taskLink, $task->title);
                     break;
                 case 'count':
                     echo $task->count;

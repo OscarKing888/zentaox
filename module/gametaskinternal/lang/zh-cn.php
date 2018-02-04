@@ -64,6 +64,7 @@ $lang->gametaskinternal->changeWorkHour = "设置工时";
 $lang->gametaskinternal->assignedToNull = "未指派";
 
 $lang->gametaskinternal->workhour = "工时(H)";
+$lang->gametaskinternal->totalworkhours = "累计工时(H)";
 
 $lang->gametaskinternal->completeStat = "完成情况";
 $lang->gametaskinternal->completed = "已完成";
@@ -88,6 +89,7 @@ $lang->gametaskinternal->height     = '高度(像素)';
 $lang->gametaskinternal->createDate = '创建时间';
 $lang->gametaskinternal->product = '所属产品';
 
+$lang->gametaskinternal->progress      = '进度';
 
 $lang->gametaskinternal->checkedSummary  = "选中 <strong>%total%</strong> 个任务";
 
