@@ -79,7 +79,7 @@
 
             <div align="right" class='content'>
                 <?php
-                $pager->show('right', 'short');
+                $pager->show();
                 ?>
             </div>
         </div>

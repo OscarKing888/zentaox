@@ -116,9 +116,11 @@ class blog extends control
      * @access public
      * @return void
      */
-    public function view()
+    public function view($recTotal = 0, $recPerPage = 20, $pageID = 0)
     {
-        //$pager = new pager($recTotal, $recPerPage, $pageID);
+        $this->app->loadClass('pager');
+        $pager = new pager($recTotal, $recPerPage, $pageID);
+
         $user = $this->app->user->account;
 
         if(!empty($_POST))
@@ -128,7 +130,7 @@ class blog extends control
         }
 
 
-        $articles = $this->blog->getListByUser($user);
+        $articles = $this->blog->getListByUser($user, $pager);
         $newarticles = $this->processArticles($articles);
         $this->view->articles = $newarticles;
 
@@ -137,7 +139,7 @@ class blog extends control
         $allUsers = $this->user->getpairs('nodeleted|noclosed');
         $this->view->allUsers = $allUsers;
         $this->view->user = $user;
-        //$this->view->pager    = $pager;
+        $this->view->pager    = $pager;
 
         $this->display();
     }

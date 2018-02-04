@@ -77,6 +77,12 @@
 
             <?php endforeach; ?>
 
+            <div align="right" class='content'>
+                <?php
+                $pager->show();
+                ?>
+            </div>
+
 
         </div>
     </div>

@@ -63,7 +63,7 @@
             <tr>
                 <td colspan='4'>
                     <?php
-                    $pager->show('right', 'short');
+                    $pager->show();
                     ?>
                 </td>
             </tr>
