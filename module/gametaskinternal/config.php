@@ -25,6 +25,8 @@ $config->gametaskinternal->create->requiredFields      = 'version,dept,owner,tit
 $config->gametaskinternal->reqSizeDeptList[0] = '美术-原画';
 $config->gametaskinternal->reqSizeDeptList[1] = '美术-UI';
 
+$config->gametaskinteranl->unassigned = 'unassigned';
+
 $config->gametaskinternal->priList[0] = '';
 $config->gametaskinternal->priList[1] = '1';
 $config->gametaskinternal->priList[2] = '2';

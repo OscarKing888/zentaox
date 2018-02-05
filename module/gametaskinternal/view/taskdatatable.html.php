@@ -5,6 +5,7 @@
 $columns = 14;
 $taskLink = helper::createLink('gametaskinternal', 'view', "taskID=$task->id");
 //echo $customFieldsName;
+//echo count($gameTasks);
 ?>
 
 

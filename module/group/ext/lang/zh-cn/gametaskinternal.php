@@ -10,6 +10,7 @@ $lang->resource->gametaskinternal->assignedtome = 'assignedtome';
 $lang->resource->gametaskinternal->mydept = 'mydept';
 $lang->resource->gametaskinternal->completedlist = 'completedlist';
 $lang->resource->gametaskinternal->incompletelist = 'incompletelist';
+$lang->resource->gametaskinternal->unassigned = 'assignedToNull';
 $lang->resource->gametaskinternal->groupleaders = 'groupleaders';
 $lang->resource->gametaskinternal->restore = 'restorepage';
 

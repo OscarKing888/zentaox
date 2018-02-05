@@ -114,7 +114,7 @@ class gametaskinternal extends control
         $this->view->tools = $this->config->gametaskinternal->toolsMyDept;
         $this->view->customFieldsName = "myDeptTaskField";
         $this->view->methodName = "mydept";
-        $this->setupViewTasks($orderBy, $recTotal, $recPerPage, $pageID,
+        $this->setupViewTasksMyDept($orderBy, $recTotal, $recPerPage, $pageID,
             $this->app->user->dept, '', '', 0,
             -1,-1,  $matchVer);
         $this->setupCommonViewVars();
@@ -128,7 +128,7 @@ class gametaskinternal extends control
         $this->view->customFieldsName = "indexField";
         $this->view->methodName = "completedlist";
         $this->setupViewTasks($orderBy, $recTotal, $recPerPage, $pageID,
-            $this->app->user->dept, '', '', 0,
+            -1, '', '', 0,
             1,-1,  $matchVer);
 
         $this->setupCommonViewVars();
@@ -141,8 +141,20 @@ class gametaskinternal extends control
         $this->view->customFieldsName = "indexField";
         $this->view->methodName = "incompletelist";
         $this->setupViewTasks($orderBy, $recTotal, $recPerPage, $pageID,
-            $this->app->user->dept, '', '', 0,
+            -1, '', '', 0,
             0,-1,  $matchVer);
+        $this->setupCommonViewVars();
+        $this->display();
+    }
+
+    public function unassigned($orderBy='id_desc', $recTotal = 0, $recPerPage = 20, $pageID = 0, $matchVer = '')
+    {
+        $this->view->tools = $this->config->gametaskinternal->toolsIncompletedlist;
+        $this->view->customFieldsName = "indexField";
+        $this->view->methodName = "unassigned";
+        $this->setupViewTasks($orderBy, $recTotal, $recPerPage, $pageID,
+            -1, '', $this->config->gametaskinteranl->unassigned, 0,
+            -1,-1,  $matchVer);
         $this->setupCommonViewVars();
         $this->display();
     }
@@ -243,7 +255,8 @@ class gametaskinternal extends control
             ->beginIF($matchCompleted >= 0 )->andWhere('completed')->eq($matchCompleted)->fi()
             ->beginIF($matchClosed >= 0 )->andWhere('closed')->eq($matchClosed)->fi()
             ->beginIF($matchOwner != '')->andWhere('owner')->eq($matchOwner)->fi()
-            ->beginIF($matchAssignedTo != '')->andWhere('assignedTo')->eq($matchAssignedTo)->fi()
+            ->beginIF($matchAssignedTo == $this->config->gametaskinteranl->unassigned)->andWhere('assignedTo')->eq('')->fi()
+            ->beginIF($matchAssignedTo != '' && $matchAssignedTo != $this->config->gametaskinteranl->unassigned)->andWhere('assignedTo')->eq($matchAssignedTo)->fi()
             //->groupBy('version')
             ->orderBy($sort)
             ->page($pager)
@@ -261,7 +274,7 @@ class gametaskinternal extends control
 
     public function setupViewTasksMyDept($orderBy='id_desc', $recTotal = 0, $recPerPage = 20, $pageID = 0,
                                    $matchDept = -1, $matchOwner ='',  $matchAssignedTo='', $matchDeleted = 0,
-                                   $matchCompleted = -1, $matchClosed = -1)
+                                   $matchCompleted = -1, $matchClosed = -1, $matchVer = '')
     {
         $leaders = $this->dao->select('dept,username')->from(TABLE_GAMEGROUPLEADERS)
             ->orderBy('dept asc')
@@ -295,7 +308,8 @@ class gametaskinternal extends control
         //foreach (array_keys($versions) as $k) { error_log("oscar: version:k $k");  }
 
         $gameTasks = $this->dao->select()->from(TABLE_GAMETASKINTERNAL)
-            ->where('version')->in(array_keys($versions))
+            ->beginIF($matchVer == '')->where('version')->in(array_keys($versions))->fi()
+            ->beginIF($matchVer != '')->where('version')->eq($matchVer)->fi()
             ->beginIF($matchDeleted >= 0 )->andWhere('deleted')->eq($matchDeleted)->fi()
             ->beginIF($matchDept >= 0 )->andWhere('dept', true)->eq($matchDept)->orWhere('dept')->in($proxyDepts)->markRight(1)->fi()
             ->beginIF($matchCompleted >= 0 )->andWhere('completed')->eq($matchCompleted)->fi()
