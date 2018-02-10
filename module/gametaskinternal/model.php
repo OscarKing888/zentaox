@@ -129,6 +129,10 @@ class gametaskinternalModel extends model
                     echo $task->createDate;
                     break;
 
+                case 'completeDate':
+                    echo $task->completeDate;
+                    break;
+
 
                 case 'deadline':
                     if(substr($task->deadline, 0, 4) > 0) echo substr($task->deadline, 5, 6);

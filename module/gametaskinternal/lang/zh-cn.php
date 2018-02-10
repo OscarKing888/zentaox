@@ -70,6 +70,8 @@ $lang->gametaskinternal->completeStat = "完成情况";
 $lang->gametaskinternal->completed = "已完成";
 $lang->gametaskinternal->incomplete = "未完成";
 $lang->gametaskinternal->complete = "完成";
+$lang->gametaskinternal->completedDate = "完成时间";
+
 
 $lang->gametaskinternal->closeStat = "验收情况";
 $lang->gametaskinternal->closed = "已验收";

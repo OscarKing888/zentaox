@@ -41,6 +41,7 @@ $config->gametaskinternal->datatable = new stdclass();
 
 $config->gametaskinternal->datatable->defaultField = array('id', 'pri', 'title', 'version', 'dept', 'owner', 'assignedTo', 'workhour', 'completed', 'closed', 'count', 'width', 'height', 'desc', 'srcResPath', 'gameResPath', 'actions');
 $config->gametaskinternal->datatable->indexField = array('id', 'pri', 'title', 'version', 'dept', 'owner', 'assignedTo', 'count', 'desc', 'actions');
+$config->gametaskinternal->datatable->completedField = array('id', 'pri', 'title', 'version', 'dept', 'owner', 'assignedTo', 'count', 'completeDate', 'desc', 'actions');
 
 $config->gametaskinternal->datatable->ownerTaskField = array('id', 'pri', 'title', 'version', 'assignedTo',  'completed', 'closed', 'count', 'desc', 'createDate', 'actions');
 $config->gametaskinternal->datatable->myTaskField = array('id', 'pri', 'title', 'version', 'owner',  'completed', 'closed', 'count', 'desc', 'actions');
@@ -120,6 +121,7 @@ $config->gametaskinternal->datatable->fieldList['desc']['title']    = 'desc';
 $config->gametaskinternal->datatable->fieldList['desc']['fixed']    = 'left';
 $config->gametaskinternal->datatable->fieldList['desc']['width']    = 'auto';
 $config->gametaskinternal->datatable->fieldList['desc']['required'] = 'no';
+$config->gametaskinternal->datatable->fieldList['desc']['sort']     = 'no';
 
 $config->gametaskinternal->datatable->fieldList['srcResPath']['title']    = 'srcResPath';
 $config->gametaskinternal->datatable->fieldList['srcResPath']['fixed']    = 'left';
@@ -141,10 +143,13 @@ $config->gametaskinternal->datatable->fieldList['createDate']['fixed']    = 'lef
 $config->gametaskinternal->datatable->fieldList['createDate']['width']    = 'auto';
 $config->gametaskinternal->datatable->fieldList['createDate']['required'] = 'no';
 
+$config->gametaskinternal->datatable->fieldList['completeDate']['title']    = 'completedDate';
+$config->gametaskinternal->datatable->fieldList['completeDate']['fixed']    = 'left';
+$config->gametaskinternal->datatable->fieldList['completeDate']['width']    = 'auto';
+$config->gametaskinternal->datatable->fieldList['completeDate']['required'] = 'no';
 
-
-$config->testcase->datatable->fieldList['actions']['title']    = 'actions';
-$config->testcase->datatable->fieldList['actions']['fixed']    = 'right';
-$config->testcase->datatable->fieldList['actions']['width']    = '240';
-$config->testcase->datatable->fieldList['actions']['required'] = 'yes';
-$config->testcase->datatable->fieldList['actions']['sort']     = 'no';
+$config->gametaskinternal->datatable->fieldList['actions']['title']    = 'actions';
+$config->gametaskinternal->datatable->fieldList['actions']['fixed']    = 'right';
+$config->gametaskinternal->datatable->fieldList['actions']['width']    = '240';
+$config->gametaskinternal->datatable->fieldList['actions']['required'] = 'yes';
+$config->gametaskinternal->datatable->fieldList['actions']['sort']     = 'no';

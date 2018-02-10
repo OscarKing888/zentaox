@@ -96,10 +96,10 @@ class datatableModel extends model
         return $setting;
     }
 
-    public function getSettingEx($module, $datatableId)
+    public function getSettingEx($module, $datatableFieldsID)
     {
         $method      = $this->app->getMethodName();
-        //$datatableId = $module . ucfirst($method);
+        $datatableId = $module . ucfirst($method);
 
         $mode = isset($this->config->datatable->$datatableId->mode) ? $this->config->datatable->$datatableId->mode : 'table';
         $key  = $mode == 'datatable' ? 'cols' : 'tablecols';
@@ -111,7 +111,7 @@ class datatableModel extends model
         $fieldList = $this->getFieldList($module);
         if(empty($setting))
         {
-            $setting = $this->config->$module->datatable->$datatableId;
+            $setting = $this->config->$module->datatable->$datatableFieldsID;
             $order   = 1;
             foreach($setting as $key => $value)
             {

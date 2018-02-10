@@ -125,7 +125,7 @@ class gametaskinternal extends control
     public function completedlist($orderBy='id_desc', $recTotal = 0, $recPerPage = 20, $pageID = 0, $matchVer = '')
     {
         $this->view->tools = $this->config->gametaskinternal->toolsCompletedlist;
-        $this->view->customFieldsName = "indexField";
+        $this->view->customFieldsName = "completedField";
         $this->view->methodName = "completedlist";
         $this->setupViewTasks($orderBy, $recTotal, $recPerPage, $pageID,
             -1, '', '', 0,
@@ -232,7 +232,13 @@ class gametaskinternal extends control
         //$this->view->debugStr +=  $this->menu;
         if(!$orderBy) $orderBy = $this->cookie->gameinternalTaskOrder ? $this->cookie->gameinternalTaskOrder : 'id_desc';
         setcookie('gameinternalTaskOrder', $orderBy, $this->config->cookieLife, $this->config->webRoot);
+
         $sort = $this->loadModel('common')->appendOrder($orderBy);
+        //$sort = $orderBy;
+        //$sort = str_replace('desc asc', "\'desc\' asc", $sort);
+        //$sort = str_replace('desc desc', "\'desc\' desc", $sort);
+
+        error_log("oscar:+++++ orderby:$orderBy  sort:$sort");
 
         $this->app->loadClass('pager');
         $pager = new pager($recTotal, $recPerPage, $pageID);

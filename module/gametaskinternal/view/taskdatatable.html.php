@@ -17,7 +17,7 @@ $taskLink = helper::createLink('gametaskinternal', 'view', "taskID=$task->id");
         $datatableId = $this->moduleName . ucfirst($this->methodName);
         //echo "oscar: datableId = " . $datatableId;
 
-        $useDatatable = true;//(isset($this->config->datatable->$datatableId->mode) and $this->config->datatable->$datatableId->mode == 'datatable');
+        $useDatatable = false;//(isset($this->config->datatable->$datatableId->mode) and $this->config->datatable->$datatableId->mode == 'datatable');
         $vars = "orderBy=%s&recTotal=$recTotal&recPerPage=$recPerPage";
 
         if ($useDatatable) include '../../common/view/datatable.html.php';
@@ -35,11 +35,17 @@ $taskLink = helper::createLink('gametaskinternal', 'view', "taskID=$task->id");
             <tr>
                 <?php
                 foreach ($customFields as $field) {
-                    //if($field->show)
+                    if($field->show)
                     {
-                        echo "<th>$field->title</th>";
-                        //$this->datatable->printHead($field, $orderBy, $vars);
+                        //echo "<th>$field->title</th>";
+                        //echo $field->title;
+                        $this->datatable->printHead($field, $orderBy, $vars);
                         $columns++;
+                    }
+                    else
+                    {
+                        //echo "<th><div class='red'>+++ $field->title</div></th>";
+                        //$columns++;
                     }
                 }
                 ?>
