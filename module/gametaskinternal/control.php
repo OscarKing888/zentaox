@@ -71,6 +71,18 @@ class gametaskinternal extends control
         $this->display();
     }
 
+    public function statbydept($matchVer)
+    {
+        $this->view->tools = $this->config->gametaskinternal->toolsIndex;
+        $this->view->customFieldsName = "indexField";
+        $this->setupViewTasks(0, 0, 0, 0,
+            -1, '', '', 0,
+            -1,-1,  $matchVer);
+        $this->setupCommonViewVars();
+        $this->display();
+    }
+
+
     public function details($orderBy='id_desc', $recTotal = 0, $recPerPage = 20, $pageID = 0, $matchVer = '')
     {
         $this->view->tools = $this->config->gametaskinternal->toolsDetails;
@@ -354,7 +366,7 @@ class gametaskinternal extends control
         $allUsers = $this->user->getPairs('nodeleted|noclosed');
         $this->view->allUsers = $allUsers;
         $this->view->users = $this->user->getPairs('nodeleted|noclosed|noletter');;
-       $deptUsers = $this->dept->getDeptUserPairs($this->app->user->dept);
+        $deptUsers = $this->dept->getDeptUserPairs($this->app->user->dept);
         $this->view->user = $this->app->user->account;
 
         $leaders = $this->dao->select('dept,username')->from(TABLE_GAMEGROUPLEADERS)

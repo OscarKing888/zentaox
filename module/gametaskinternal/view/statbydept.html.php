@@ -23,28 +23,28 @@ common::printIcon('gametaskinternal', 'film',   "", $task, 'list');
 common::printIcon('gametaskinternal', 'off',   "", $task, 'list');
 //*/
 
-$verTasks = array();
+$deptTasks = array();
 $verTasksCompleted = array();
 $verTasksIncompleted = array();
 $verTasksClosed = array();
 $verTasksTotalWorkHours = array();
 
 foreach ($gameTasks as $t) {
-    if (!array_key_exists($t->version, $verTasks)) {
-        $verTasks[$t->version] = array();
+    if (!array_key_exists($t->dept, $deptTasks)) {
+        $deptTasks[$t->dept] = array();
 
-        $verTasksCompleted[$t->version] = 0;
-        $verTasksIncompleted[$t->version] = 0;
-        $verTasksClosed[$t->version] = 0;
-        $verTasksTotalWorkHours[$t->version] = 0;
+        $verTasksCompleted[$t->dept] = 0;
+        $verTasksIncompleted[$t->dept] = 0;
+        $verTasksClosed[$t->dept] = 0;
+        $verTasksTotalWorkHours[$t->dept] = 0;
     }
 
-    $verTasks[$t->version][$t->id] = $t;
+    $deptTasks[$t->dept][$t->id] = $t;
 
-    $verTasksCompleted[$t->version] += $t->completed ? 1 : 0;
-    $verTasksIncompleted[$t->version] += $t->completed ? 0 : 1;
-    $verTasksClosed[$t->version] += $t->closed ? 1 : 0;
-    $verTasksTotalWorkHours[$t->version] += $t->workhour;
+    $verTasksCompleted[$t->dept] += $t->completed ? 1 : 0;
+    $verTasksIncompleted[$t->dept] += $t->completed ? 0 : 1;
+    $verTasksClosed[$t->dept] += $t->closed ? 1 : 0;
+    $verTasksTotalWorkHours[$t->dept] += $t->workhour;
 }
 
 ?>
@@ -52,8 +52,7 @@ foreach ($gameTasks as $t) {
 <table class='table tablesorter table-data table-hover table-striped table-fixed block-project'>
     <thead>
     <tr class='text-center'>
-        <th class='text-left'><?php echo $lang->gametaskinternal->version; ?></th>
-        <th width='150'><?php echo $lang->gametaskinternal->deadline; ?></th>
+        <th class='text-left'><?php echo $lang->gametaskinternal->dept; ?></th>
         <th width='50'><?php echo $lang->gametaskinternal->incomplete; ?></th>
         <th width='80'><?php echo $lang->gametaskinternal->completed; ?></th>
         <th width='60'><?php echo $lang->gametaskinternal->closed; ?></th>
@@ -62,40 +61,36 @@ foreach ($gameTasks as $t) {
     </tr>
     </thead>
     <tbody>
-    <?php foreach ($verTasks as $ver => $tasks): ?>
+    <?php foreach ($deptTasks as $d => $tasks): ?>
         <tr>
             <td class='text-left'>
-                <?php
-                $vars = "matchVer=$ver";
-                $indexVerLink = helper::createLink('gametaskinternal', 'statbydept', $vars);
-                echo html::a($indexVerLink, $versions[$ver]);
-                ?>
+                <?php echo $depts[$d]; ?>
             </td>
             <td class='text-center'>
-                <?php echo date("Y-m-d", strtotime($verDeadlines[$ver]));?>
+                <?php echo($verTasksIncompleted[$d]); ?>
             </td>
             <td class='text-center'>
-                <?php echo ($verTasksIncompleted[$ver]);?>
+                <?php echo($verTasksCompleted[$d]); ?>
             </td>
             <td class='text-center'>
-                <?php echo ($verTasksCompleted[$ver]);?>
+                <?php echo($verTasksClosed[$d]); ?>
             </td>
             <td class='text-center'>
-                <?php echo ($verTasksClosed[$ver]);?>
-            </td>
-            <td class='text-center'>
-                <?php echo ($verTasksTotalWorkHours[$ver]);?>
+                <?php echo($verTasksTotalWorkHours[$d]); ?>
             </td>
             <td class='text-left'>
                 <img class='progressbar'
                      src='<?php echo $this->app->getWebRoot(); ?>theme/default/images/main/green.png' alt='' height='16'
-                     width='<?php echo $verTasksCompleted[$ver]/count($verTasks[$ver]) * 0.7 * 115; ?>'>
-                <small><?php echo round($verTasksCompleted[$ver]/count($verTasks[$ver]) * 100); ?>%</small>
+                     width='<?php echo $verTasksCompleted[$d] / count($deptTasks[$d]) * 0.7 * 115; ?>'>
+                <small><?php echo round($verTasksCompleted[$d] / count($deptTasks[$d]) * 100); ?>%</small>
             </td>
         </tr>
     <?php endforeach; ?>
     </tbody>
 </table>
 
+<br>
+
+<div align="center"><?php echo html::backButton(); ?></div>
 
 <?php include '../../common/view/footer.html.php'; ?>
