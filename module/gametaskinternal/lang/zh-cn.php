@@ -93,6 +93,8 @@ $lang->gametaskinternal->product = '所属产品';
 
 $lang->gametaskinternal->progress      = '进度';
 
+$lang->gametaskinternal->statbydept      = '分版本统计';
+
 $lang->gametaskinternal->checkedSummary  = "选中 <strong>%total%</strong> 个任务";
 
 $lang->gametaskinternal->methodOrder[5] = 'index';

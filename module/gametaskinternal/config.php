@@ -111,11 +111,13 @@ $config->gametaskinternal->datatable->fieldList['width']['title']    = 'width';
 $config->gametaskinternal->datatable->fieldList['width']['fixed']    = 'left';
 $config->gametaskinternal->datatable->fieldList['width']['width']    = 'auto';
 $config->gametaskinternal->datatable->fieldList['width']['required'] = 'no';
+$config->gametaskinternal->datatable->fieldList['width']['sort']     = 'no';
 
 $config->gametaskinternal->datatable->fieldList['height']['title']    = 'height';
 $config->gametaskinternal->datatable->fieldList['height']['fixed']    = 'left';
 $config->gametaskinternal->datatable->fieldList['height']['width']    = 'auto';
 $config->gametaskinternal->datatable->fieldList['height']['required'] = 'no';
+$config->gametaskinternal->datatable->fieldList['height']['sort']     = 'no';
 
 $config->gametaskinternal->datatable->fieldList['desc']['title']    = 'desc';
 $config->gametaskinternal->datatable->fieldList['desc']['fixed']    = 'left';

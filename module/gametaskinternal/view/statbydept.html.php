@@ -28,6 +28,7 @@ $verTasksCompleted = array();
 $verTasksIncompleted = array();
 $verTasksClosed = array();
 $verTasksTotalWorkHours = array();
+$worksHoursByMonty = array();
 
 foreach ($gameTasks as $t) {
     if (!array_key_exists($t->dept, $deptTasks)) {
@@ -45,6 +46,16 @@ foreach ($gameTasks as $t) {
     $verTasksIncompleted[$t->dept] += $t->completed ? 0 : 1;
     $verTasksClosed[$t->dept] += $t->closed ? 1 : 0;
     $verTasksTotalWorkHours[$t->dept] += $t->workhour;
+
+    $completeInMonth = date("m", $t->completeDate);
+
+    if(!array_key_exists($completeInMonth, $worksHoursByMonty))
+    {
+        $worksHoursByMonty[$completeInMonth] = array();
+        $worksHoursByMonty[$completeInMonth][$t->dept] = 0;
+    }
+
+    $worksHoursByMonty[$completeInMonth][$t->dept] += $t->workhour;
 }
 
 ?>
@@ -90,6 +101,32 @@ foreach ($gameTasks as $t) {
 </table>
 
 <br>
+<table class='table tablesorter table-data table-hover table-striped table-fixed block-project'>
+    <thead>
+    <tr class='text-center'>
+        <th class='text-left'><?php echo $lang->gametaskinternal->dept; ?> > 工时</th>
+        <?php foreach ($worksHoursByMonty as $m => $tasks): ?>
+            <th  width='50'><?php echo $m; ?>月(H)</th>
+        <?php endforeach; ?>
+    </tr>
+    </thead>
+    <tbody>
+    <?php foreach ($deptTasks as $d => $tasks): ?>
+    <tr>
+        <td class='text-left'>
+            <?php echo $depts[$d]; ?>
+        </td>
+        <?php foreach ($worksHoursByMonty as $m => $tasks): ?>
+            <td  width='50' class='text-center'>
+                <?php echo $tasks[$d]; ?>
+            </td>
+        <?php endforeach; ?>
+    </tr>
+    <?php endforeach; ?>
+
+    </tbody>
+</table>
+
 
 <div align="center"><?php echo html::backButton(); ?></div>
 

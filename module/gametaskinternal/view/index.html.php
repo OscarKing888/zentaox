@@ -73,6 +73,7 @@ foreach ($gameTasks as $t) {
             </td>
             <td class='text-center'>
                 <?php echo date("Y-m-d", strtotime($verDeadlines[$ver]));?>
+                <?php echo date("m", strtotime($verDeadlines[$ver]));?>
             </td>
             <td class='text-center'>
                 <?php echo ($verTasksIncompleted[$ver]);?>

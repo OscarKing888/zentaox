@@ -29,6 +29,8 @@ $lang->resource->gametaskinternal->restoreTask = 'restore';
 
 $lang->resource->gametaskinternal->create       = 'add';
 
+$lang->resource->gametaskinternal->statbydept       = 'statbydept';
+
 $lang->resource->gametaskinternal->batchAssignTo       = 'batchAssignTo';
 $lang->resource->gametaskinternal->batchAssignToDept       = 'batchAssignToDept';
 $lang->resource->gametaskinternal->batchChangeVersion       = 'batchChangeVersion';
@@ -38,6 +40,7 @@ $lang->resource->gametaskinternal->batchComplete       = 'batchComplete';
 $lang->resource->gametaskinternal->batchActive       = 'batchActive';
 $lang->resource->gametaskinternal->batchDelete       = 'batchDelete';
 $lang->resource->gametaskinternal->batchRestore       = 'batchRestore';
+
 
 
 /*
