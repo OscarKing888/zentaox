@@ -26,6 +26,7 @@ class artstation extends control
         $this->loadModel('file');
         $this->loadModel('product');
         $this->loadModel('user');
+        $this->loadModel('story');
     }
 
     /**
@@ -86,6 +87,7 @@ class artstation extends control
      */
     public function create()
     {
+        $product = 1;
         if(!empty($_POST))
         {
             $blogID = $this->artstation->create();
@@ -97,6 +99,11 @@ class artstation extends control
         //$this->view->products = $products;
         $this->view->allProducts   = array(0 => '') + $this->product->getPairs('noclosed|nocode');
         $this->view->title = $this->lang->artstation->add;
+
+
+        $stories = $this->story->getProductStories($product);
+        //$stories = $this->story->getProjectStoryPairs(1);
+        $this->view->stories = $stories;
         $this->display();
     }
 
@@ -148,13 +155,29 @@ class artstation extends control
 
         $this->view->allProducts   = array(0 => '') + $this->product->getPairs('noclosed|nocode');
         $this->view->title   = $this->lang->artstation->view;
-        $allUsers = $this->user->getpairs('nodeleted|noclosed');
+        $allUsers = $this->user->getpairs('nodeleted|noclosed|noletter');
         $this->view->allUsers = $allUsers;
         $this->view->user = $user;
 
         $this->display();
     }
 
+    public function like()
+    {
+        $userid = "";
+        $imageid = -1;
+        if(!empty($_POST)) {
+            $postVals = fixer::input('post')->get();
+            $userid = $postVals->userid;
+            $imageid = $postVals->imageid;
+        }
+        else
+        {
+            return false;
+        }
+
+        $this->artstation->like($userid, $imageid);
+    }
     /**
      * Delete an article.
      * 

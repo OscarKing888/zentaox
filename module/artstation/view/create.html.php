@@ -61,6 +61,16 @@ include '../../common/view/datepicker.html.php';
                 </tr>
 
                 <tr>
+                    <th><?php echo $lang->artstation->requirement;?></th>
+                    <td colspan='5'>
+                        <div class='input-group'>
+                                <?php echo html::select('story', $stories, 0, "class='form-control chosen' onchange='setStoryRelated();'");?>
+                                <span class='input-group-btn' id='preview'><a href='#' class='btn iframe'><?php echo $lang->preview;?></a></span>
+                        </div>
+                    </td>
+                </tr>
+
+                <tr>
                     <th><?php echo $lang->artstation->content; ?></th>
 
                     <td>

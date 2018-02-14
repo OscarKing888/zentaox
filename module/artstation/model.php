@@ -95,8 +95,29 @@ class artstationModel extends model
     {
         $art = $this->dao->findById($id)->from(TABLE_ARTSTATION)->fetch();
         $art->files = $this->loadModel('file')->getByObject('artstation', $art->id);
+        $art->likes = $this->dao->select("user,imageId")->from(TABLE_ARTSTATION_LIKE)
+            ->where('imageId')->eq($id)
+            ->fetchPairs();
 
-            return $art;
+        return $art;
+    }
+
+    public function like($user, $imageid)
+    {
+        $lk = $this->dao->select()->from(TABLE_ARTSTATION_LIKE)
+            ->where('imageId')->eq($imageid)
+            ->andWhere('user')->eq($user)
+            ->fetch();
+
+        if(!empty($lk))
+        {
+            return;
+        }
+
+        $data = new stdclass();
+        $data->user = $user;
+        $data->imageId = $imageid;
+        $this->dao->insert(TABLE_ARTSTATION_LIKE)->data($data)->exec();
     }
 
     /**

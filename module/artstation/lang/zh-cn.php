@@ -5,6 +5,7 @@ $lang->artstation->index   = '首页';
 $lang->artstation->add     = '添加美术作品';
 $lang->artstation->edit    = '编辑';
 $lang->artstation->delete  = '删除';
+$lang->artstation->deleted            = "已删除";
 $lang->artstation->restore  = '恢复';
 $lang->artstation->restorepage  = '恢复页面';
 $lang->artstation->reportmyteam  = '部门汇总';
@@ -13,14 +14,20 @@ $lang->artstation->search  = '分类查询';
 $lang->artstation->view    = '用户查询';
 $lang->artstation->id      = '编号';
 $lang->artstation->title   = '标题';
-$lang->artstation->date    = '日期';
+$lang->artstation->createDate    = '创建日期';
 $lang->artstation->content = '描述';
 $lang->artstation->pic = '图片';
 $lang->artstation->action  = '操作';
 
+$lang->artstation->legendBasic  = '基本信息';
+
+$lang->artstation->Like  = 'Like';
+
 $lang->artstation->files  = 'PSD文件';
 $lang->artstation->tags  = '标签';
-$lang->artstation->type  = '美术作品类型';
+$lang->artstation->type  = '作品类型';
+$lang->artstation->owner  = '作者';
+$lang->artstation->requirement  = '关联需求';
 
 $lang->artstation->typeList[-1] = '无';
 $lang->artstation->typeList[0] = '角色';
