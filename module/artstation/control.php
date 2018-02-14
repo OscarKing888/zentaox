@@ -50,6 +50,22 @@ class artstation extends control
         $this->display();
     }
 
+    public function my($recTotal = 0, $recPerPage = 20, $pageID = 0)
+    {
+        //$this->view->debugStr +=  $this->menu;
+
+        $this->app->loadClass('pager');
+        $pager = new pager($recTotal, $recPerPage, $pageID);
+
+        $products = $this->product->getPairs();
+        $this->view->products = $products;
+        $this->view->allProducts   = array(0 => '') + $this->product->getPairs('noclosed|nocode');
+        $this->view->title    = $this->lang->artstation->index;
+        $this->view->articles = $this->artstation->getListByUser($this->app->user->account, $pager);
+        $this->view->pager    = $pager;
+        $this->display();
+    }
+
     /*
     public function browse()
     {
@@ -116,11 +132,8 @@ class artstation extends control
      * @access public
      * @return void
      */
-    public function view($recTotal = 0, $recPerPage = 20, $pageID = 0)
+    public function view($id)
     {
-        $this->app->loadClass('pager');
-        $pager = new pager($recTotal, $recPerPage, $pageID);
-
         $user = $this->app->user->account;
 
         if(!empty($_POST))
@@ -129,17 +142,15 @@ class artstation extends control
                 ->get()->user;
         }
 
-
-        $articles = $this->artstation->getListByUser($user, $pager);
-        $newarticles = $this->processArticles($articles);
-        $this->view->articles = $newarticles;
+        $article = $this->artstation->getById($id);
+        //$newarticles = $this->processArticles($articles);
+        $this->view->article = $article;
 
         $this->view->allProducts   = array(0 => '') + $this->product->getPairs('noclosed|nocode');
         $this->view->title   = $this->lang->artstation->view;
         $allUsers = $this->user->getpairs('nodeleted|noclosed');
         $this->view->allUsers = $allUsers;
         $this->view->user = $user;
-        $this->view->pager    = $pager;
 
         $this->display();
     }
@@ -165,154 +176,40 @@ class artstation extends control
         $products = $this->product->getPairs();
         $this->view->products = $products;
         $this->view->allProducts   = array(0 => '') + $this->product->getPairs('noclosed|nocode');
-        $this->view->title    = $this->lang->artstation->index;
+        $this->view->title    = $this->lang->artstation->restore;
         $this->view->articles = $this->artstation->getDeletedList($pager);
         $this->view->pager    = $pager;
         $this->display();
     }
 
-    public function restoreblog($id)
+    public function restoreartstation($id)
     {
         $this->artstation->restore($id);
         $this->locate(inlink('restore'));
     }
 
-    public function reportmyteam()
+    public function search($recTotal = 0, $recPerPage = 20, $pageID = 0)
     {
-        $day = helper::today();
+        $this->app->loadClass('pager');
+        $pager = new pager($recTotal, $recPerPage, $pageID);
+
         $product = 1;
+        $type = -1;
+        $tags = "";
+        $user = "";
 
         if(!empty($_POST))
         {
-            $day = fixer::input('post')
-                //->specialchars('day')
-                ->get()->day;
+            $pst = fixer::input('post')
+                ->get();
 
-            $product = fixer::input('post')
-                ->get()->product;
+            $product = $pst->product;
+            $type = $pst->type;
+            $tags = $pst->tags;
+            $user = $pst->user;
         }
 
-        $articles = $this->artstation->getGroupReport($day, $product, (int)$this->app->user->dept);
-        //$articles = $this->artstation->getAllReport($day);
-        //$articles = $this->dao->select("name")->from('zt_dept')->fetchAll();
-        //$articles = $this->dao->select("*")->from('gameblog')->fetchAll();
-
-        //$products = $this->product->getPairs();
-        //$this->view->products = $products;
-        $this->view->allProducts   = array(0 => '') + $this->product->getPairs('noclosed|nocode');
-        $this->view->title    = $this->lang->artstation->reportmyteam;
-
-        $newarticles = $this->processArticles($articles);
-        $this->view->articles = $newarticles;
-
-        $this->view->mydept = $this->app->user->dept;
-        $this->view->mydeptName = $this->dept->getById($this->app->user->dept)->name;
-        $this->view->day = $day;
-        $this->view->product = $product;
-        $depts = $this->dao->select('id,name')->from(TABLE_DEPT)->fetchPairs();
-        $this->view->depts = $depts;
-        $this->view->showstat = 1;
-        $this->view->userAbsent = $this->artstation->getUserAbsent($day);
-
-        //foreach (array_keys($depts) as $d)
-        {
-            $this->view->deptusers[$this->app->user->dept] = $this->dao->select('account,realname')->from(TABLE_USER)
-                ->where('deleted')->eq(0)
-                ->andWhere('dept')->eq($this->app->user->dept)
-                ->orderBy('account')
-                ->fetchPairs();
-        }
-
-        $this->display();
-    }
-
-
-    //public $showstat;
-    public function reportproject()
-    {
-        $day = helper::today();
-        $product = 1;
-        $showstat = 1;
-
-        if(!empty($_POST))
-        {
-            $day = fixer::input('post')
-                //->specialchars('day')
-                ->get()->day;
-
-            $product = fixer::input('post')
-                ->get()->product;
-
-            //$showstat = fixer::input('post')
-                //->get()->showstat;
-
-            //var_dump($_POST['checkbox']);
-
-            if(!is_null($_POST['checkbox']))
-            {
-                $showstat = 1;
-            }
-            else
-            {
-                $showstat = 0;
-            }
-            //error_log("oscar: showstat=$showstats postempty:". empty($_POST['showstat']));
-            //error_log("oscar: checkbox:". is_null($_POST['checkbox']));
-        }
-        //error_log("oscar: showstat=$showstats");
-
-        $articles = $this->artstation->getAllReport($day);
-        //$articles = $this->dao->select("name")->from('zt_dept')->fetchAll();
-        //$articles = $this->dao->select("*")->from('gameblog')->fetchAll();
-
-        //$products = $this->product->getPairs();
-        //$this->view->products = $products;
-        $this->view->allProducts   = array(0 => '') + $this->product->getPairs('noclosed|nocode');
-        $this->view->title    = $this->lang->artstation->reportproject;
-
-        $newarticles = $this->processArticles($articles);
-        $this->view->articles = $newarticles;
-
-        $this->view->dept = $this->dept->getById($this->app->user->dept)->name;
-        $this->view->day = $day;
-        $this->view->product = $product;
-        $depts = $this->dao->select('id,name')->from(TABLE_DEPT)->fetchPairs();
-        $this->view->depts = $depts;
-        $this->view->showstat = $showstat;
-        $this->view->userAbsent = $this->artstation->getUserAbsent($day);
-
-        foreach (array_keys($depts) as $d) {
-            $this->view->deptusers[$d] = $this->dao->select('account,realname')->from(TABLE_USER)
-                ->where('deleted')->eq(0)
-                ->andWhere('dept')->eq($d)
-                ->orderBy('account')
-                ->fetchPairs();
-        }
-
-        $this->display();
-    }
-
-    public function searchbydepartment()
-    {
-        $dept = 0;
-        $day = helper::today();
-        $product = 1;
-
-        if(!empty($_POST))
-        {
-            $dept = fixer::input('post')
-                //->specialchars('day')
-                ->get()->dept;
-
-            $day = fixer::input('post')
-                //->specialchars('day')
-                ->get()->day;
-
-            $product = fixer::input('post')
-                ->get()->product;
-        }
-
-        $articles = $this->artstation->getGroupReport($day, $product, $dept);
+        $articles = $this->artstation->search($pager, $product, $type, $tags, $user);
 
         $this->view->allProducts   = array(0 => '') + $this->product->getPairs('noclosed|nocode');
         $this->view->title    = $this->lang->artstation->reportproject;
@@ -320,11 +217,16 @@ class artstation extends control
         $newarticles = $this->processArticles($articles);
         $this->view->articles = $newarticles;
 
-        $this->view->deptName = $this->dept->getById($this->app->user->dept)->name;
-        $this->view->day = $day;
         $this->view->product = $product;
-        $this->view->dept = $dept;
+        $this->view->type = $type;
+        $this->view->tags = $tags;
+        $this->view->user = $user;
+
+        $allUsers = array("" => "无") + $this->user->getpairs('nodeleted|noclosed');
+        $this->view->allUsers = $allUsers;
+
         $this->view->depts = $this->dept->getOptionMenu();
+        $this->view->pager    = $pager;
 
         $this->display();
     }
@@ -345,97 +247,5 @@ class artstation extends control
         return $newarticles;
     }
 
-    public function createUserAbsent()
-    {
-        $userid = "";
-        $day = helper::today();
-
-        $msg = "";
-        foreach (array_keys($_POST) as $p)
-        {
-            $msg .= $p . "\n";
-        }
-
-        //error_log("oscar: setUserAbsent :" . $msg);
-
-        if(!empty($_POST)) {
-            $postVals = fixer::input('post')
-                ->get();
-            $userid = $postVals->userid;
-            $day = $postVals->day;
-        }
-        else
-        {
-            return false;
-        }
-
-        $this->artstation->createUserAbsent($userid, $day);
-        //$this->display();
-    }
-
-    public function setUserAbsent()
-    {
-        $userid = "";
-        $day = helper::today();
-
-        $msg = "";
-        foreach (array_keys($_POST) as $p)
-        {
-            $msg .= $p . "\n";
-        }
-
-        //error_log("oscar: setUserAbsent :" . $msg);
-
-        if(!empty($_POST)) {
-            $postVals = fixer::input('post')
-                ->get();
-
-            //error_log("oscar: setUserAbsent postVals:" . $postVals);
-
-            $userid = $postVals->userid;
-
-            //error_log("oscar: setUserAbsent userid:" . $userid);
-
-            $day = $postVals->day;
-
-            //error_log("oscar: setUserAbsent day:" . $day);
-        }
-        else
-        {
-            return false;
-        }
-
-        $this->artstation->setUserAbsent($userid, $day);
-        //$this->display();
-    }
-
-    public function removeUserAbsent()
-    {
-        $userid = "";
-        $day = helper::today();
-        $msg = "";
-
-        if(!empty($_POST)) {
-            $postVals = fixer::input('post')
-                ->get();
-
-            //error_log("oscar: setUserAbsent postVals:" . $postVals);
-
-            $userid = $postVals->userid;
-
-            //error_log("oscar: setUserAbsent userid:" . $userid);
-
-            $day = $postVals->day;
-
-            //error_log("oscar: setUserAbsent day:" . $day);
-        }
-        else
-        {
-            return false;
-        }
-
-        $this->artstation->removeUserAbsent($userid, $day);
-        //$this->display();
-    }
 }
 

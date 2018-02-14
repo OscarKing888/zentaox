@@ -32,7 +32,14 @@ class artstationModel extends model
      */
     public function getList($pager = null)
     {
-        return $this->getListByUser($this->app->user->account, $pager);
+        $articles = $this->dao->select('*')
+            ->from(TABLE_ARTSTATION)
+            ->where('deleted')->eq(0)
+            ->orderBy('id desc')
+            ->page($pager)
+            ->fetchAll();
+
+        return $this->convertImageURL($articles);
     }
 
     function convertImageURL($arr)
@@ -41,10 +48,13 @@ class artstationModel extends model
 
         foreach ($arr as $art) {
             //$art = html_entity_decode($art);
-            $art = $this->file->replaceImgURL($art, $this->config->artstation->imageContentFieldName);
-            $art->contentimages = htmlspecialchars_decode($art->contentimages);
+            //$art = $this->file->replaceImgURL($art, $this->config->artstation->imageContentFieldName);
+            //$art->contentimages = htmlspecialchars_decode($art->contentimages);
+            $art->files = $this->loadModel('file')->getByObject('artstation', $art->id);
+
             $artr[$art->id] = $art;
         }
+
         return $artr;
     }
 
@@ -52,44 +62,26 @@ class artstationModel extends model
     {
         $articles = $this->dao->select('*')
             ->from(TABLE_ARTSTATION)
-            ->where('owner')->eq($this->app->user->account)
-            ->andwhere('deleted')->eq(1)
-            ->orderBy('date desc')->page($pager)->fetchAll();
+            //->where('owner')->eq($this->app->user->account)
+            ->where('deleted')->eq(1)
+            ->orderBy('id desc')->page($pager)->fetchAll();
 
         return $this->convertImageURL($articles);
     }
 
-    /**
-     * Get article lists.
-     * @access public
-     * @return array
-     */
+
     public function getListByUser($userid, $pager = null)
     {
         $articles = $this->dao->select('*')
             ->from(TABLE_ARTSTATION)
             ->where('owner')->eq($userid)
-           ->andwhere('deleted')->eq(0)
+            ->andwhere('deleted')->eq(0)
             ->orderBy('id desc')->page($pager)->fetchAll();
 
         //return $this->convertImageURL($articles);
 
 
-        $lst = $this->convertImageURL($articles);
-
-        $retArr = array();
-        foreach ($lst as $l) {
-            $l->files = $this->loadModel('file')->getByObject('artstation', $l->id);
-            $retArr[$l->id] = $l;
-            /*
-            error_log("****************** artid:$l->id owner:$l->owner");
-            foreach ($l->files as $file) {
-                    error_log(" files:$file->pathname title:$file->title");
-            }
-            //*/
-        }
-
-        return $retArr;
+        return $this->convertImageURL($articles);
     }
 
     /**
@@ -101,29 +93,10 @@ class artstationModel extends model
      */
     public function getById($id)
     {
-        $content = $this->dao->findById($id)->from(TABLE_ARTSTATION)->fetch();
+        $art = $this->dao->findById($id)->from(TABLE_ARTSTATION)->fetch();
+        $art->files = $this->loadModel('file')->getByObject('artstation', $art->id);
 
-        $art = ($content);
-        $art = $this->file->replaceImgURL($art, $this->config->artstation->imageContentFieldName);
-        $art->contentimages = htmlspecialchars_decode($art->contentimages);
-
-        return $art;
-    }
-
-    public function logBlog($log)
-    {
-        if (!$this->config->artstation->debug)
-            return false;
-
-        if (!is_writable($this->app->getLogRoot()))
-            return false;
-
-        $file = $this->app->getLogRoot() . 'blog.' . date('Ymd') . '.log.php';
-        if (!is_file($file)) $log = "<?php\n die();\n" . $log . "\n";
-
-        $fp = fopen($file, "a");
-        fwrite($fp, $log);
-        fclose($fp);
+            return $art;
     }
 
     /**
@@ -199,66 +172,17 @@ class artstationModel extends model
             ->set('deleted')->eq(0)->where('id')->eq($id)->exec();
     }
 
-    public function getGroupReport($day, $product, $dept)
-    {
-        //error_log("oscar: [getGroupReport] day:$day product:$product dept:$dept");
-
-        $deptUsers = $this->dao->select('account')->from(TABLE_USER)
-            ->where('dept')->eq($dept)
-            //->fetchAll();
-            ->fetchAll('account');
-
-        //foreach ($deptUsers as $depu){ error_log('=====>depu:' . $depu->id);        }
-
-        $dptus = array_keys($deptUsers);
-        //foreach ($dptus as $depu)        {  error_log('=====depu:' . $depu);        }
-
-        //error_log("=== [getGroupReport]" . $day);
-        $articles = $this->dao->select('*')
-            ->from(TABLE_ARTSTATION)
-            ->where('owner')->in($dptus)
-            ->andwhere('deleted')->eq(0)
-            ->andWhere('date')->between(date('Y-m-d 00:00:00', strtotime($day)), date('Y-m-d 23:59:59', strtotime($day)))
-            //->andwhere('product')->eq($product)
-            ->orderBy('date asc')
-            ->fetchAll();
-
-        $articles = $this->convertImageURL($articles);
-        /*
-        foreach ($articles as $art) {
-            $art->contentimages = $this->file->setImgSize($art->contentimages, 512);
-        }
-        //*/
-        return $articles;
-    }
-
-    public function getProjectReport($day, $product)
-    {
-        //error_log("=== [getProjectReport]" . $day);
-        $articles = $this->dao->select('*')
-            ->from(TABLE_ARTSTATION)
-            ->where('date')->between(date('Y-m-d 00:00:00', strtotime($day)), date('Y-m-d 23:59:59', strtotime($day)))
-            ->andwhere('deleted')->eq(0)
-            ->andwhere('product')->eq($product)
-            ->orderBy('date asc')
-            ->fetchAll();
-
-        $articles = $this->convertImageURL($articles);
-        /*
-        foreach ($articles as $art) {
-            $art->contentimages = $this->file->setImgSize($art->contentimages, 512);
-        }
-        //*/
-        return $articles;
-    }
-
-    public function getAllReport($day)
+    public function search($pager, $product, $type, $tags, $owner)
     {
         $articles = $this->dao->select('*')
             ->from(TABLE_ARTSTATION)
-            ->where('date')->between(date('Y-m-d 00:00:00', strtotime($day)), date('Y-m-d 23:59:59', strtotime($day)))
-            ->andwhere('deleted')->eq(0)
-            ->orderBy('date asc')
+            ->where('deleted')->eq(0)
+            ->beginIF($product >= 0)->andWhere('product')->eq($product)->fi()
+            ->beginIF($type >= 0)->andWhere('type')->eq($type)->fi()
+            ->beginIF($owner != '' )->andWhere('owner')->eq($owner)->fi()
+            ->beginIF($tags != '' )->andWhere('tags')->like('%' . $tags . '%')->fi()
+            ->orderBy('id desc')
+            ->page($pager)
             ->fetchAll();
 
         $articles = $this->convertImageURL($articles);
@@ -266,47 +190,4 @@ class artstationModel extends model
         return $articles;
     }
 
-    public function getUserAbsent($day)
-    {
-        $userinfo = $this->dao->select('*')
-            ->from(TABLE_ARTSTATIONUserinfo)
-            ->where('date')->between(date('Y-m-d 00:00:00', strtotime($day)), date('Y-m-d 23:59:59', strtotime($day)))
-            ->fetchAll();
-
-        return $userinfo;
-    }
-
-    public function createUserAbsent($userid, $day)
-    {
-        //error_log("oscar: model + createUserAbsent  userid:$userid   day:$day");
-
-        $data = new stdclass();
-        $data->owner = $userid;
-        $data->date = $day;
-        $data->absent = 1;
-
-        $this->dao->insert(TABLE_ARTSTATIONUserinfo)->data($data)->exec();
-    }
-
-    public function setUserAbsent($userid, $day)
-    {
-        //error_log("oscar: model * setUserAbsent  userid:$userid   day:$day");
-
-        $this->dao->update(TABLE_ARTSTATIONUserinfo)
-            ->set('absent')->eq(1)
-            ->where('owner')->eq($userid)
-            ->andWhere('date')->between(date('Y-m-d 00:00:00', strtotime($day)), date('Y-m-d 23:59:59', strtotime($day)))
-            ->exec();
-    }
-
-    public function removeUserAbsent($userid, $day)
-    {
-        //error_log("oscar: model - removeUserAbsent  userid:$userid   day:$day");
-
-        $this->dao->update(TABLE_ARTSTATIONUserinfo)
-            ->set('absent')->eq(0)
-            ->where('owner')->eq($userid)
-            ->andWhere('date')->between(date('Y-m-d 00:00:00', strtotime($day)), date('Y-m-d 23:59:59', strtotime($day)))
-            ->exec();
-    }
 }

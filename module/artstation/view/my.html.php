@@ -26,5 +26,4 @@
 </nav>
 <br>
 <?php include 'imagethumbview.html.php'; ?>
-
 <?php include '../../common/view/footer.html.php'; ?>

@@ -1,6 +1,5 @@
 <?php
-$lang->artstation = new stdclass();
-$lang->artstation->common           = 'artstation';
+$lang->artstation->common           = 'Art Station';
 
 $lang->artstation->index   = '首页';
 $lang->artstation->add     = '添加美术作品';
@@ -10,7 +9,7 @@ $lang->artstation->restore  = '恢复';
 $lang->artstation->restorepage  = '恢复页面';
 $lang->artstation->reportmyteam  = '部门汇总';
 $lang->artstation->reportproject  = '项目汇总';
-$lang->artstation->searchbydepartment  = '部门查询';
+$lang->artstation->search  = '分类查询';
 $lang->artstation->view    = '用户查询';
 $lang->artstation->id      = '编号';
 $lang->artstation->title   = '标题';
@@ -21,8 +20,9 @@ $lang->artstation->action  = '操作';
 
 $lang->artstation->files  = 'PSD文件';
 $lang->artstation->tags  = '标签';
-$lang->artstation->type  = '原画类型';
+$lang->artstation->type  = '美术作品类型';
 
+$lang->artstation->typeList[-1] = '无';
 $lang->artstation->typeList[0] = '角色';
 $lang->artstation->typeList[1] = '场景';
 $lang->artstation->typeList[2] = '氛围';

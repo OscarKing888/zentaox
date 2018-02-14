@@ -18,6 +18,7 @@ $config->artstation->editor->edit     = array('id' => 'contentimages', 'tools' =
 //$config->artstation->editor->activate   = array('id' => 'comment', 'tools' => 'bugTools');
 
 define('TABLE_ARTSTATION',                   'artstation');
+define('TABLE_ARTSTATION_LIKE',              'artstationlike');
 
 $config->artstation->fields = 'product,type,title,tags,content';
 $config->artstation->imageContentFieldName = "contentimages";

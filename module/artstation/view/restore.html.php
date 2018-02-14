@@ -1,6 +1,6 @@
 <?php
 /**
- * The html template file of index method of blog module of ZenTaoPHP.
+ * The html template file of index method of artstation module of ZenTaoPHP.
  *
  * The author disclaims copyright to this source code.  In place of
  * a legal notice, here is a blessing:
@@ -17,37 +17,57 @@
 <div class='container'>
     <div class='panel'>
         <div class='panel-heading'>
-            <strong> <?php echo $lang->blog->restore; ?></strong>
+            <strong> <?php echo $lang->artstation->restore; ?></strong>
 
         </div>
         <table class='table table-list table-hover'>
             <thead>
             <tr>
-                <td class='text-center' width='150'><?php echo $lang->blog->date; ?></td>
                 <td width='50'><?php echo $lang->product->name; ?></td>
-                <td><?php echo $lang->blog->content; ?></td>
-                <td class='text-center' width='120'><?php echo $lang->blog->action; ?></td>
+                <td><?php echo $lang->artstation->content; ?></td>
+                <td class='text-center' width='120'><?php echo $lang->artstation->action; ?></td>
             </tr>
             </thead>
             <tbody>
             <?php foreach ($articles as $article): ?>
                 <tr>
-                    <td><?php echo formatTime("YYYY-MM-DD",$article->date); ?></td>
                     <td class='text-center'><?php echo $products[$article->product]; ?></td>
-                    <td>
+                    <td >
                         <fieldset>
                             <div class='content'>
                                 <?php
+                                echo $article->title;
                                 echo $article->content;
-                                echo "<br>";
-                                echo  $article->contentimages;
                                 ?>
+                                <br>
+
+                                <?php foreach ($articles as $article): ?>
+                                    <?php
+                                    foreach ($article->files as $file) {
+                                        $imageSize  = getimagesize($file->realPath);
+                                        $imageWidth = $imageSize ? $imageSize[0] : 256;
+                                        $imageHeight = $imageSize ? $imageSize[1] : 256;
+                                        $imgAttr = "";
+                                        if($imageWidth > $imageHeight)
+                                        {
+                                            $imgAttr = " width='256' ";
+                                        }
+                                        else {
+                                            $imgAttr = " height='256' ";
+                                        }
+
+                                        //echo "w:$imageWidth h:$imageHeight";
+                                        echo html::image($this->createLink('file', 'read', "fileID=$file->id"),  "$imgAttr title='$file->title'");
+                                    }
+                                    ?>
+
+                                <?php endforeach; ?>
                             </div>
                         </fieldset>
                     </td>
                     <td>
                         <?php
-                        echo html::a($this->createLink('blog', 'restoreblog', "id=$article->id"), $lang->blog->restore);
+                        echo html::a($this->createLink('artstation', 'restoreartstation', "id=$article->id"), $lang->artstation->restore);
                         ?>
                     </td>
                 </tr>
