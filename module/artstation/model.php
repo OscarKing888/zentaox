@@ -111,6 +111,7 @@ class artstationModel extends model
 
         if(!empty($lk))
         {
+            error_log("oscar: already liked by user:$user with:$imageid");
             return;
         }
 
@@ -151,7 +152,7 @@ class artstationModel extends model
             $this->file->updateObjectID($this->post->uid, $imageID, 'artstation');
             $this->file->saveUpload('artstation', $imageID);
         }
-        return $this->dao->lastInsertID();
+        return $imageID;
     }
 
     /**
@@ -165,6 +166,7 @@ class artstationModel extends model
     {
         $article = fixer::input('post')->specialchars($this->config->artstation->fields)
             ->stripTags($this->config->artstation->editor->edit['id'], $this->config->allowedTags)
+            ->remove('files,labels')
             ->get();
 
         $this->dao->update(TABLE_ARTSTATION)

@@ -24,7 +24,7 @@
 
                     //echo "w:$imageWidth h:$imageHeight";
                     echo $k;
-                    $img = html::image($this->createLink('file', 'read', "fileID=$file->id"),  "$imgAttr title='$file->title'");
+                    $img = html::image($this->createLink('file', 'readthumb', "fileID=$file->id"),  "$imgAttr title='$file->title'");
 
                     echo html::a(inlink('view', "id=$article->id"), $img);
                 }

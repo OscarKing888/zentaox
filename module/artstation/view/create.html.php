@@ -79,7 +79,7 @@ include '../../common/view/datepicker.html.php';
                 </tr>
                 <tr>
                     <th><?php echo $lang->artstation->files;?></th>
-                    <td><?php echo $this->fetch('file', 'buildform', 'fileCount=1&percent=0.85');?></td>
+                    <td><?php echo $this->fetch('file', 'buildformsingle', 'fileCount=1&percent=0.85');?></td>
                 </tr>
                 <tr>
                     <th></th>

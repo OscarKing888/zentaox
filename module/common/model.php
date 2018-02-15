@@ -415,7 +415,7 @@ class commonModel extends model
 
         if(!isset($lang->$moduleName->menu))
         {
-            echo "<ul></ul>";
+            echo "<ul> lang-> $moduleName ->menu not set</ul>";
             return;
         }
 

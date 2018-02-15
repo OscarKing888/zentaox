@@ -67,32 +67,14 @@ class artstation extends control
         $this->display();
     }
 
-    /*
-    public function browse()
-    {
-        $this->view->debugStr += "browse()    ";
-    }
-
-    public function commonAction()
-    {
-        $this->view->debugStr += "commonAction()    ";
-    }
-    */
-
-    /**
-     * Create an article.
-     * 
-     * @access public
-     * @return void
-     */
     public function create()
     {
         $product = 1;
         if(!empty($_POST))
         {
-            $blogID = $this->artstation->create();
+            $nid = $this->artstation->create();
             if(dao::isError()) die(js::error(dao::getError()) . js::locate('back'));
-            die(js::locate(inlink('index')));
+            die(js::locate(inlink('view', "id=$nid")));
         }
 
         //$products = $this->product->getPairs();
@@ -107,60 +89,47 @@ class artstation extends control
         $this->display();
     }
 
-   /**
-     * Update an article.
-     * 
-     * @param  int    $id 
-     * @access public
-     * @return void
-     */
+
     public function edit($id)
     {
         if(!empty($_POST))
         {
             $this->artstation->update($id);
-            $this->locate(inlink('index'));
+            $this->locate(inlink('view', "id=$id"));
         }
         else
         {
-            //$products = $this->product->getPairs();
-            $this->view->allProducts   = array(0 => '') + $this->product->getPairs('noclosed|nocode');
-            $this->view->title   = $this->lang->artstation->edit;
-            $article = $this->artstation->getByID($id);
+            $article = $this->artstation->getById($id);
             $this->view->article = $article;
-            $this->view->product = $article->product;
+
+            $this->view->allProducts   = array(0 => '') + $this->product->getPairs('noclosed|nocode');
+            $this->view->title   = $this->lang->artstation->view;
+            $allUsers = $this->user->getpairs('nodeleted|noclosed|noletter');
+            $this->view->allUsers = $allUsers;
             $this->display();
         }
     }
 
-    /**
-     * View an article.
-     *
-     * @access public
-     * @return void
-     */
     public function view($id)
     {
-        $user = $this->app->user->account;
-
         if(!empty($_POST))
         {
-            $user = fixer::input('post')
-                ->get()->user;
+            //$user = fixer::input('post')->get()->user;
         }
 
         $article = $this->artstation->getById($id);
-        //$newarticles = $this->processArticles($articles);
         $this->view->article = $article;
 
         $this->view->allProducts   = array(0 => '') + $this->product->getPairs('noclosed|nocode');
         $this->view->title   = $this->lang->artstation->view;
         $allUsers = $this->user->getpairs('nodeleted|noclosed|noletter');
         $this->view->allUsers = $allUsers;
-        $this->view->user = $user;
+
 
         $this->display();
     }
+
+
 
     public function like()
     {
@@ -178,13 +147,7 @@ class artstation extends control
 
         $this->artstation->like($userid, $imageid);
     }
-    /**
-     * Delete an article.
-     * 
-     * @param  int    $id 
-     * @access public
-     * @return void
-     */
+
     public function delete($id)
     {
         $this->artstation->delete($id);

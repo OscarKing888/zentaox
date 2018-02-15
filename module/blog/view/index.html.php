@@ -39,9 +39,9 @@
                         //$cnt = str_replace("\n", "<br>", $article->content);
                         $cnt = nl2br($article->content);
                         echo $cnt;
-                        //echo "<br>";
+                        echo "<br>";
                         //$imgs = str_replace("<img", "<br><img", $article->contentimages);
-                        $cnt = nl2br($article->contentimages);
+                        $imgs = nl2br($article->contentimages);
                         $imgs = htmlspecialchars_decode($imgs);
                         echo $imgs;
                         //$steps = $article->contentimages;

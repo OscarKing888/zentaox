@@ -20,6 +20,6 @@ $lang->gametaskinternal->menu->restore        = '恢复|gametaskinternal|restore
 
 
 /* gametaskinternal menu order. */
-$lang->menuOrder[1]  = 'gametaskinternal';
+$lang->menuOrder[2]  = 'gametaskinternal';
 $lang->gametaskinternal->menuOrder[5]  = 'index';
 $lang->gametaskinternal->menuOrder[10] = 'version';
