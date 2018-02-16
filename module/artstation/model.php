@@ -145,7 +145,7 @@ class artstationModel extends model
 
         $imageID = $this->dao->lastInsertID();
 
-        error_log("oscar: **** imageID:$imageID" );
+        //error_log("oscar: **** imageID:$imageID" );
 
         //if(!dao::isError())
         {

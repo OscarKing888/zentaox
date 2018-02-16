@@ -513,8 +513,10 @@ class file extends control
 
         if ($file->extension !== 'psd') {
             $filePath = $file->realPath;
+            //error_log("oscar: _____ hd:$filePath");
         } else {
             $filePath = $this->file->getHDThumbFile($file);
+            //error_log("oscar: _____ hd thumb:$filePath");
         }
 
         $handle = fopen($filePath, "r");

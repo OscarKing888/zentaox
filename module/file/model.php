@@ -92,13 +92,22 @@ class fileModel extends model
         $now = helper::today();
         $files = $this->getUpload($filesName, $labelsName);
 
-        error_log("============");
+        error_log("oscar: saveUpload============");
         foreach ($files as $id => $file) {
-            error_log(" objType:$objectType file:" . $file['pathname']);
+            error_log("oscar: objType:$objectType file:" . $file['pathname']);
             if ($file['size'] == 0) continue;
             if (!move_uploaded_file($file['tmpname'], $this->savePath . $this->getSaveName($file['pathname']))) return false;
 
             $file = $this->compressImage($file);
+
+            $file['objectType'] = $objectType;
+            $file['objectID'] = $objectID;
+            $file['addedBy'] = $this->app->user->account;
+            $file['addedDate'] = $now;
+            $file['extra'] = $extra;
+            unset($file['tmpname']);
+            $this->dao->insert(TABLE_FILE)->data($file)->exec();
+            $fileTitles[$this->dao->lastInsertId()] = $file['title'];
 
             /*
             // oscar
@@ -112,16 +121,8 @@ class fileModel extends model
             // oscar
             //*/
 
-            $file['objectType'] = $objectType;
-            $file['objectID'] = $objectID;
-            $file['addedBy'] = $this->app->user->account;
-            $file['addedDate'] = $now;
-            $file['extra'] = $extra;
-            unset($file['tmpname']);
-            $this->dao->insert(TABLE_FILE)->data($file)->exec();
-            $fileTitles[$this->dao->lastInsertId()] = $file['title'];
         }
-        error_log("============");
+
         return $fileTitles;
     }
 
@@ -146,7 +147,7 @@ class fileModel extends model
 
 
         $path = $file->realPath;
-
+        error_log("checkAndGenThumb:$path");
         $new_width = 256;
 
 
@@ -169,7 +170,7 @@ class fileModel extends model
             //echo js::alert("$file->extension");
 
             //echo js::alert("psd:$thumbImgHDPath");
-            error_log("oscar =======psd:$thumbImgHDPath");
+            //error_log("oscar =======psd:$thumbImgHDPath");
 
             if (!file_exists($thumbImgHDPath)) {
                 $psdImg = new Imagick($path);
@@ -180,16 +181,79 @@ class fileModel extends model
             }
         } elseif (stripos($file->extension, 'gif') !== false) {
             if (!file_exists($thumbImgPath)) {
+
                 $image = new Imagick($path);
-                $w = $image->getImageWidth() / 2;
-                $h = $image->getImageHeight() / 2;
-                $image = $image->coalesceImages();
-                foreach ($image as $frame) {
-                    $frame->thumbnailImage($w, $h);
+                $w = $image->getImageWidth();
+                $h = $image->getImageHeight();
+
+                $wc = (int)floor($w / 50);
+                $hc = (int)floor($h / 50);
+
+                $dc = $wc;
+                if($wc > $hc)
+                {
+                    $dc = $hc;
                 }
-                $image = $image->optimizeImageLayers();
-                $image->writeImages($thumbImgPath, true);
-                $image->destroy();
+
+                $dc = max($dc, 1);
+
+                $dw =  $w / $dc;
+                $dh = $h / $dc;
+
+                error_log("oscar: ____ proc gif:$thumbImgPath src:$path");
+                error_log("oscar: ____ proc divide:$dc w:$w h:$h  dw:$dw dh:$dh");
+
+                //$image = $image->coalesceImages();
+                //$newImg = new Imagick();
+                $newImg = $image;
+
+                /*
+                $i = true;
+                while($image->hasNextImage()) {
+                    if($i)
+                    {
+                        //$frame->thumbnailImage($w, $h);
+                        $newImg->addImage($image);
+                        //$newImg->removeImage();
+                        //$i = false;
+                        error_log("oscar:_____ add image:$image");
+                    }
+                    $image->nextImage();
+                    $i = !$i;
+                }
+
+
+                //*/
+
+                /*
+                $newImg = $newImg->coalesceImages();
+                foreach ($newImg as $frame) {
+                    $frame->thumbnailImage($dw, $dh, true);
+                }
+                //*/
+
+                //*
+                $newImg = $newImg->coalesceImages();
+                $canvas = new Imagick();
+                $m = (int)round($newImg->getNumberImages() / 30);
+                $i = 0;
+                foreach($newImg as $frame){
+                    if($i % $m == 0) {
+                        $img = new Imagick();
+                        $img->readImageBlob($frame);
+                        $img->thumbnailImage($dw, $dh, true);
+
+                        $canvas->addImage($img);
+                        $canvas->setImageDelay($img->getImageDelay());
+                    }
+                    ++$i;
+                }
+                $newImg = $canvas;
+                //*/
+
+                $newImg = $newImg->optimizeImageLayers();
+                $newImg->writeImages($thumbImgPath, true);
+                $newImg->destroy();
             }
         } elseif (!file_exists($thumbImgPath)) {
             //$height = 0;
@@ -208,7 +272,7 @@ class fileModel extends model
             if (stripos('bmp', $file->extension) !== false) {
                 $image = imagecreatefrombmp($path);
             } elseif (stripos('gif', $file->extension) !== false) {
-                $image = imagecreatefromgif($path);
+                //$image = imagecreatefromgif($path);
             } elseif (stripos('png', $file->extension) !== false) {
                 $image = imagecreatefrompng($path);
             } elseif (stripos('psd', $file->extension) !== false) {
