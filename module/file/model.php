@@ -147,7 +147,7 @@ class fileModel extends model
 
 
         $path = $file->realPath;
-        error_log("checkAndGenThumb:$path");
+        //error_log("checkAndGenThumb:$path");
         $new_width = 256;
 
 
@@ -158,9 +158,16 @@ class fileModel extends model
 
         if (stripos($file->extension, 'psd') !== false) {
 
+            $psdImg = new Imagick($path);
+            $w = $psdImg->getImageWidth();
+            if($new_width > $w)
+            {
+                $new_width = $w;
+            }
+
             //foreach($psdImg->getImageProperties("*") as $k => $v) print("$k: $v<br/>\n");
             if (!file_exists($thumbImgPath)) {
-                $psdImg = new Imagick($path);
+                //$psdImg = new Imagick($path);
                 $psdImg->thumbnailImage($new_width, 0);
                 $psdImg->writeImage($thumbImgPath);
                 $psdImg->destroy();
@@ -186,11 +193,12 @@ class fileModel extends model
                 $w = $image->getImageWidth();
                 $h = $image->getImageHeight();
 
+                // 最多50像素，取最大边匹配
                 $wc = (int)floor($w / 50);
                 $hc = (int)floor($h / 50);
 
                 $dc = $wc;
-                if($wc > $hc)
+                if($wc < $hc)
                 {
                     $dc = $hc;
                 }
@@ -200,8 +208,8 @@ class fileModel extends model
                 $dw =  $w / $dc;
                 $dh = $h / $dc;
 
-                error_log("oscar: ____ proc gif:$thumbImgPath src:$path");
-                error_log("oscar: ____ proc divide:$dc w:$w h:$h  dw:$dw dh:$dh");
+                //error_log("oscar: ____ proc gif:$thumbImgPath src:$path");
+                //error_log("oscar: ____ proc divide:$dc w:$w h:$h  dw:$dw dh:$dh");
 
                 //$image = $image->coalesceImages();
                 //$newImg = new Imagick();
@@ -232,10 +240,24 @@ class fileModel extends model
                 }
                 //*/
 
+                // 抽帧，最多25帧，按1/3取最少帧数
                 //*
                 $newImg = $newImg->coalesceImages();
                 $canvas = new Imagick();
-                $m = (int)round($newImg->getNumberImages() / 30);
+                $m1frames = 25;
+                $m1 = (int)round($newImg->getNumberImages() / $m1frames);
+                $m2frames = $newImg->getNumberImages() / 3;
+                if($m1frames < $m2frames)
+                {
+                    $m = $m1;
+                }
+                else
+                {
+                    $m = 3;
+                }
+
+                //error_log("oscar: t:".$newImg->getNumberImages()." m:$m  m1:$m1 m1f:$m1frames m2f:$m2frames");
+
                 $i = 0;
                 foreach($newImg as $frame){
                     if($i % $m == 0) {
@@ -263,7 +285,22 @@ class fileModel extends model
             list($width, $height) = getimagesize($path);
             //echo "w:$width h:$height<br>";
 
-            $new_height = abs($new_width * $height / $width);
+            if($new_width > $width)
+            {
+                $new_width = $width;
+                $new_height = $height;
+            }
+            else{
+                if($width < $height)
+                {
+                    // 以高度为256最大
+                    $new_height = $new_width;
+                    $new_width = abs($new_height * $width/$height);
+                }
+                else{
+                    $new_height = abs($new_width * $height / $width);
+                }
+            }
 
             $image_p = imagecreatetruecolor($new_width, $new_height);
 
