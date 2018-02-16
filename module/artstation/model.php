@@ -171,6 +171,9 @@ class artstationModel extends model
 
         $this->dao->update(TABLE_ARTSTATION)
             ->data($article)->where('id')->eq($articleID)->exec();
+
+        $this->file->updateObjectID($this->post->uid, $articleID, 'artstation');
+        $this->file->saveUpload('artstation', $articleID);
     }
 
     /**

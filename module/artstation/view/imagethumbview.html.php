@@ -8,7 +8,7 @@
 
                 $file = end($article->files);
 
-                //foreach ($article->files as $k => $file)
+                if(!empty($file))
                 {
                     $imageSize  = getimagesize($file->realPath);
                     $imageWidth = $imageSize ? $imageSize[0] : 256;
@@ -27,6 +27,11 @@
                     $img = html::image($this->createLink('file', 'readthumb', "fileID=$file->id"),  "$imgAttr title='$file->title'");
 
                     echo html::a(inlink('view', "id=$article->id"), $img);
+                }
+                else
+                {
+                    echo html::a(inlink('view', "id=$article->id"),
+                        "<img src='error.png'/>");
                 }
                 ?>
 

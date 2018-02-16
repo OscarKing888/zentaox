@@ -993,6 +993,13 @@ $lang->resource->file->delete       = 'delete';
 $lang->resource->file->uploadImages = 'uploadImages';
 $lang->resource->file->setPublic     = 'setPublic';
 
+//oscar:
+$lang->resource->file->downloadthumb     = 'downloadthumb';
+$lang->resource->file->downloadToDisk     = 'downloadToDisk';
+$lang->resource->file->buildFormsingle     = 'buildFormsingle';
+$lang->resource->file->readthumb     = 'readthumb';
+//oscar:
+
 $lang->file->methodOrder[5]  = 'download';
 $lang->file->methodOrder[10] = 'edit';
 $lang->file->methodOrder[15] = 'delete';

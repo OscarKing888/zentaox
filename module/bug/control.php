@@ -461,7 +461,7 @@ class bug extends control
      * @access public
      * @return void
      */
-    public function view($bugID)
+        public function view($bugID)
     {
         /* Judge bug exits or not. */
         $bug = $this->bug->getById($bugID, true);

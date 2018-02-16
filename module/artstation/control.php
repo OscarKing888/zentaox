@@ -35,7 +35,7 @@ class artstation extends control
      * @access public
      * @return void
      */
-    public function index($recTotal = 0, $recPerPage = 20, $pageID = 0)
+    public function index($recTotal = 0, $recPerPage = 100, $pageID = 0)
     {
         //$this->view->debugStr +=  $this->menu;
 

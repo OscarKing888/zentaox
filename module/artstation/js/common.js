@@ -14,3 +14,12 @@ function on_like(userid, imageid) {
 
     document.location.reload();
 }
+
+function downloadFileToDisk(fileID)
+{
+    if(!fileID) return;
+    var sessionString = '<?php echo $sessionString;?>';
+    var url = createLink('file', 'downloadToDisk', 'fileID=' + fileID);// + sessionString;
+    window.open(url, '_blank');
+    return false;
+}

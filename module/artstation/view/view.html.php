@@ -129,6 +129,11 @@ $sessionString .= session_name() . '=' . session_id();
                         echo html::a($this->createLink('file', 'download', "fileID=$file->id") . $sessionString,
                         $img, '_blank', "onclick=\"return downloadFile($file->id, '$file->extension', $imageWidth)\"");
 
+                        echo "<div align='right'>";
+                        echo html::a($this->createLink('file', 'download', "fileID=$file->id") . $sessionString,
+                            "下载", '_blank',
+                            "class='btn' onclick=\"return downloadFileToDisk($file->id, '$file->extension')\"");
+                        echo "</div>";
 
                         //echo html::a($this->createLink('file', 'downloadthumb', "fileID=$file->id") . $sessionString,
                         //    $img, '_blank', "onclick=\"return downloadthumbFile($file->id, '$file->extension', $imageWidth)\"");
@@ -224,7 +229,7 @@ $sessionString .= session_name() . '=' . session_id();
                         <td>
                             <?php
                             if ($article->owner == $this->app->user->account) {
-                                echo html::a(inlink('edit', "id=$article->id"), $lang->artstation->edit);
+                                echo html::a(inlink('edit', "id=$article->id"), $lang->artstation->edit, '', "class='btn'");
                             }
                             echo html::backButton();
                             ?>

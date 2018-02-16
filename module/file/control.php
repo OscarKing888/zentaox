@@ -146,13 +146,13 @@ class file extends control
 
         /* Judge the mode, down or open. */
         $mode = 'down';
-        $fileTypes = 'txt|jpg|jpeg|gif|png|bmp|xml|html';
+        $fileTypes = 'txt|jpg|jpeg|gif|png|bmp|psd|xml|html';
         if (stripos($fileTypes, $file->extension) !== false and $mouse == 'left') $mode = 'open';
 
         if (file_exists($file->realPath)) {
             /* If the mode is open, locate directly. */
             if ($mode == 'open') {
-                if (stripos('txt|jpg|jpeg|gif|png|bmp', $file->extension) !== false) {
+                if (stripos('txt|jpg|jpeg|gif|png|bmp|psd', $file->extension) !== false) {
                     $this->view->file = $file;
                     $this->view->charset = $this->get->charset ? $this->get->charset : $this->config->charset;
                     $this->view->fileType = ($file->extension == 'txt') ? 'txt' : 'image';
@@ -166,6 +166,29 @@ class file extends control
                 $fileData = file_get_contents($file->realPath);
                 $this->sendDownHeader($fileName, $file->extension, $fileData);
             }
+        } else {
+            $this->app->triggerError("The file you visit $fileID not found.", __FILE__, __LINE__, true);
+        }
+    }
+
+    public function downloadToDisk($fileID)
+    {
+        /* When get sid then change session id. */
+        if (isset($_GET[$this->config->sessionVar])) {
+            $sessionID = isset($_COOKIE[$this->config->sessionVar]) ? $_COOKIE[$this->config->sessionVar] : sha1(mt_rand());
+            session_write_close();
+            session_id($sessionID);
+            session_start();
+        }
+
+        $file = $this->file->getById($fileID);
+
+        if (file_exists($file->realPath)) {
+            /* Down the file. */
+            $fileName = $file->title . '.' . $file->extension;
+            $fileData = file_get_contents($file->realPath);
+            $this->sendDownHeader($fileName, $file->extension, $fileData);
+
         } else {
             $this->app->triggerError("The file you visit $fileID not found.", __FILE__, __LINE__, true);
         }
@@ -185,7 +208,7 @@ class file extends control
 
         /* Judge the mode, down or open. */
         $mode = 'down';
-        $fileTypes = 'txt|jpg|jpeg|gif|png|bmp|xml|html';
+        $fileTypes = 'txt|jpg|jpeg|gif|png|bmp|psd|xml|html';
         if (stripos($fileTypes, $file->extension) !== false and $mouse == 'left') $mode = 'open';
 
         if (file_exists($file->realPath)) {

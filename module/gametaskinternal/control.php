@@ -250,7 +250,7 @@ class gametaskinternal extends control
         //$sort = str_replace('desc asc', "\'desc\' asc", $sort);
         //$sort = str_replace('desc desc', "\'desc\' desc", $sort);
 
-        error_log("oscar:+++++ orderby:$orderBy  sort:$sort");
+        //error_log("oscar:+++++ orderby:$orderBy  sort:$sort");
 
         $this->app->loadClass('pager');
         $pager = new pager($recTotal, $recPerPage, $pageID);

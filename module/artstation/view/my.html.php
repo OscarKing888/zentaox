@@ -14,16 +14,17 @@
 <?php include '../../common/view/kindeditor.html.php'; ?>
 
 
-<nav id="modulemenu">
-    <ul class="nav">
-        <li class="right" data-id="create">
-            <?php
-            $lnk = html::a(inlink('create'), "<i class='icon icon-plus'></i>" . $lang->artstation->add);
-            echo $lnk;
-            ?>
-        </li>
-    </ul>
-</nav>
-<br>
+<div id='titlebar'>
+    <div class='heading' align='right'>
+
+        <?php
+        $lnk = html::a(inlink('create'),
+            "<i class='icon icon-plus'></i>" . $lang->artstation->add,
+            "", "class='btn'");
+        echo $lnk;
+        ?>
+    </div>
+</div>
+
 <?php include 'imagethumbview.html.php'; ?>
 <?php include '../../common/view/footer.html.php'; ?>
