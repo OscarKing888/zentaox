@@ -237,6 +237,42 @@ $sessionString .= session_name() . '=' . session_id();
                     </tr>
                 </table>
             </fieldset>
+
+            <fieldset>
+                <legend><?php echo $lang->artstation->comment; ?></legend>
+
+                <table class='table table-data table-condensed table-borderless'>
+                    <?php $l = 1; foreach ($comments as $comment):?>
+                    <tr>
+                        <td>
+                            <?php
+                            echo "第 $l 楼&nbsp;&nbsp;" .
+                                $comment->date . "&nbsp;&nbsp;" .
+                                $allUsers[$comment->owner] . "<br>" .
+                                $comment->content . "<br><br>";
+                            ++$l;
+                            ?>
+                        </td>
+                    </tr>
+                    <?php endforeach;?>
+                </table>
+
+                <form method='post'>
+                    <table class='table table-form table-borderless'>
+                        <tr>
+                            <td>
+                                <?php echo html::input("imageid", $article->id, "class='hidden form-control text-left' autocomplete='on'"); ?>
+                                <?php echo html::textarea('content', '', "rows='5' class='form-control'");?>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td align="right">
+                                <?php echo html::submitButton(); ?>
+                            </td>
+                        </tr>
+                    </table>
+                </form>
+            </fieldset>
         </div>
     </div>
 </div>

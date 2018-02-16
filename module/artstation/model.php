@@ -84,6 +84,18 @@ class artstationModel extends model
         return $this->convertImageURL($articles);
     }
 
+    public function getComments($imageid)
+    {
+        $comments = $this->dao->select('*')
+            ->from(TABLE_ARTSTATION_COMMENT)
+            ->where('imageid')->eq($imageid)
+            ->andwhere('deleted')->eq(0)
+            ->orderBy('id asc')
+            ->fetchAll();
+
+        return $comments;
+    }
+
     /**
      * Get an article.
      *

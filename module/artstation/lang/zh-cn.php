@@ -23,6 +23,7 @@ $lang->artstation->my  = '我的作品';
 $lang->artstation->legendBasic  = '基本信息';
 
 $lang->artstation->like  = '点赞';
+$lang->artstation->comment  = '评论';
 
 $lang->artstation->files  = 'PSD文件';
 $lang->artstation->tags  = '标签';

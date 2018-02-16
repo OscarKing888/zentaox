@@ -114,7 +114,24 @@ class artstation extends control
     {
         if(!empty($_POST))
         {
-            //$user = fixer::input('post')->get()->user;
+            $data = fixer::input('post')
+                ->specialchars($this->config->artstation->commentFields)
+                ->add('date', helper::now())
+                ->add('owner', $this->app->user->account)
+                ->get();
+
+            $lk = $this->dao->select()->from(TABLE_ARTSTATION_COMMENT)
+                ->where('owner')->eq($data->owner)
+                ->andWhere('content')->eq($data->content)
+                ->fetch();
+
+            if(!empty($lk))
+            {
+                error_log("oscar: add duplicate comment:$data->owner content:$data->content");
+            }
+            else{
+                $this->dao->insert(TABLE_ARTSTATION_COMMENT)->data($data)->exec();
+            }
         }
 
         $article = $this->artstation->getById($id);
@@ -124,6 +141,7 @@ class artstation extends control
         $this->view->title   = $this->lang->artstation->view;
         $allUsers = $this->user->getpairs('nodeleted|noclosed|noletter');
         $this->view->allUsers = $allUsers;
+        $this->view->comments = $this->artstation->getComments($id);
 
 
         $this->display();

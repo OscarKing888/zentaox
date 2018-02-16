@@ -361,7 +361,7 @@ class fileModel extends model
 
         /* If the file var name is an array. */
         if (is_array($_FILES[$htmlTagName]['name'])) {
-            error_log("     ======== is_array");
+            //error_log("oscar:     ======== is_array");
             extract($_FILES[$htmlTagName]);
             foreach ($name as $id => $filename) {
                 if (empty($filename)) continue;
