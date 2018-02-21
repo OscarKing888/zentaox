@@ -57,7 +57,7 @@ include '../../common/view/datepicker.html.php';
 
                 <tr>
                     <th><?php echo $lang->artstation->tags; ?></th>
-                    <td ><?php echo html::input("tags", '', "placeholder='用逗号分割，如:兽王,部落,boss' class='form-control text-left' autocomplete='on' placement='用,分割'"); ?></td>
+                    <td ><?php echo html::input("tags", '', "placeholder='用英文逗号分割，如:“兽王,部落,boss”，只能用字母、汉字、数字！' class='form-control text-left' autocomplete='on' placement='用,分割'"); ?></td>
                 </tr>
 
                 <tr>

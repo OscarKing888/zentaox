@@ -187,7 +187,15 @@ $sessionString .= session_name() . '=' . session_id();
 
                     <tr>
                         <th class='w-80px'><?php echo $lang->artstation->tags; ?></th>
-                        <td><?php echo $article->tags; ?></td>
+                        <td><?php
+                            $tags = explode(',', $article->tags);
+                            foreach ($tags as $tag) {
+                                echo html::a(
+                                        inlink('search', "tags=$tag"), '#' . $tag);
+                            }
+
+
+                            ?></td>
                     </tr>
 
                     <tr>

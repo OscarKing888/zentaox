@@ -192,14 +192,14 @@ class artstation extends control
         $this->locate(inlink('restore'));
     }
 
-    public function search($recTotal = 0, $recPerPage = 20, $pageID = 0)
+    public function search($tags = '', $recTotal = 0, $recPerPage = 20, $pageID = 0)
     {
         $this->app->loadClass('pager');
         $pager = new pager($recTotal, $recPerPage, $pageID);
 
         $product = 1;
         $type = -1;
-        $tags = "";
+        //$tags = "";
         $user = "";
 
         if(!empty($_POST))
@@ -209,7 +209,7 @@ class artstation extends control
 
             $product = $pst->product;
             $type = $pst->type;
-            $tags = $pst->tags;
+            //$tags = $pst->tags;
             $user = $pst->user;
         }
 
