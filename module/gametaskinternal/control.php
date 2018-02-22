@@ -200,6 +200,8 @@ class gametaskinternal extends control
         $this->view->versions = $versions;
 
         $this->setupCommonViewVars();
+        $this->view->deptUsers = $this->user->getPairs('nodeleted|noclosed|noletter');
+        $this->view->allUsers = $this->user->getPairs('nodeleted|noclosed|noletter');
         $this->display();
     }
 
@@ -234,6 +236,8 @@ class gametaskinternal extends control
         $this->view->versions = $versions;
 
         $this->setupCommonViewVars();
+
+        $this->view->deptUsers = $this->user->getPairs('nodeleted|noclosed');
         $this->display();
     }
 
@@ -356,7 +360,9 @@ class gametaskinternal extends control
         $depts = $this->dao->select('id,name')->from(TABLE_DEPT)->fetchPairs();
 
         // depts
-        $this->view->depts = $depts;
+        //$this->view->depts = $depts;
+        $this->view->depts = $this->dept->getOptionMenu();
+
         $this->view->dept = $this->app->user->dept;
 
         // owners
@@ -365,7 +371,7 @@ class gametaskinternal extends control
         // users
         $allUsers = $this->user->getPairs('nodeleted|noclosed');
         $this->view->allUsers = $allUsers;
-        $this->view->users = $this->user->getPairs('nodeleted|noclosed|noletter');;
+        $this->view->users = $this->user->getPairs('nodeleted|noclosed|noletter');
         $deptUsers = $this->dept->getDeptUserPairs($this->app->user->dept);
         $this->view->user = $this->app->user->account;
 
