@@ -21,7 +21,7 @@ define('TABLE_ARTSTATION',                   'artstation');
 define('TABLE_ARTSTATION_LIKE',              'artstationlike');
 define('TABLE_ARTSTATION_COMMENT',           'artstationcomment');
 
-$config->artstation->fields = 'product,type,title,tags,content';
+$config->artstation->fields = 'product,type,title,tags,content,requirement';
 $config->artstation->commentFields = 'imageid,content';
 $config->artstation->imageContentFieldName = "contentimages";
 //$config->artstation->imageContentFieldName = "content";

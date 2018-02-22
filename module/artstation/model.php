@@ -215,7 +215,7 @@ class artstationModel extends model
         $articles = $this->dao->select('*')
             ->from(TABLE_ARTSTATION)
             ->where('deleted')->eq(0)
-            ->beginIF($product >= 0)->andWhere('product')->eq($product)->fi()
+            ->beginIF($product > 0)->andWhere('product')->eq($product)->fi()
             ->beginIF($type >= 0)->andWhere('type')->eq($type)->fi()
             ->beginIF($owner != '' )->andWhere('owner')->eq($owner)->fi()
             ->beginIF($tags != '' )->andWhere('tags')->like('%' . $tags . '%')->fi()

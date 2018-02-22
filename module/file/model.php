@@ -128,7 +128,7 @@ class fileModel extends model
 
     public function getHDThumbFile($file)
     {
-        return $file->realPath . "_hdthumb.jpg";
+        return $file->realPath . "_thumb_hd.jpg";
     }
 
     public function getThumbFile($file)
@@ -150,7 +150,6 @@ class fileModel extends model
         //error_log("checkAndGenThumb:$path");
         $new_width = 256;
 
-
         if (!file_exists($path)) {
             echo "file not found:$path thum:$thumbImgPath thumHD:$thumbImgHDPath";
             exit;
@@ -158,16 +157,22 @@ class fileModel extends model
 
         if (stripos($file->extension, 'psd') !== false) {
 
-            $psdImg = new Imagick($path);
-            $w = $psdImg->getImageWidth();
-            if($new_width > $w)
-            {
-                $new_width = $w;
-            }
+            $Img4KW = 3840;
+            $Img4KH = 2150;
 
             //foreach($psdImg->getImageProperties("*") as $k => $v) print("$k: $v<br/>\n");
             if (!file_exists($thumbImgPath)) {
+                $psdImg = new Imagick($path);
+                $w = $psdImg->getImageWidth();
+                if($new_width > $w)
+                {
+                    $new_width = $w;
+                }
                 //$psdImg = new Imagick($path);
+                //$psdImg->setImageIndex(0);
+                $psdImg->setIteratorIndex(0);
+                $psdImg->stripImage(); //去除图片信息
+                $psdImg->setImageCompressionQuality(80); //图片质量
                 $psdImg->thumbnailImage($new_width, 0);
                 $psdImg->writeImage($thumbImgPath);
                 $psdImg->destroy();
@@ -181,7 +186,49 @@ class fileModel extends model
 
             if (!file_exists($thumbImgHDPath)) {
                 $psdImg = new Imagick($path);
-                $psdImg->thumbnailImage($psdImg->getImageWidth(), $psdImg->getImageHeight());
+
+                $imageSize  = getimagesize($file->realPath);
+                $imageWidth = $imageSize ? $imageSize[0] : 0;
+
+                $new_width = $psdImg->getImageWidth();
+                $new_height = $psdImg->getImageHeight();
+
+                $new_width = $imageSize ? $imageSize[0] : 0;
+                $new_height = $imageSize ? $imageSize[1] : 0;
+
+                $w = $new_width;
+                $h = $new_height;
+
+                //error_log("oscar: file:$path w:$w h:$h newW:$new_width newH:$new_height 4kw:$Img4KW 4kh:$Img4KH");
+
+                if ($w > $Img4KW) {
+                    $new_width = $Img4KW;
+                }
+
+                if ($h > $Img4KH)
+                {
+                    $new_height = $Img4KH;
+                }
+
+                //error_log("oscar: w:$w h:$h newW:$new_width newH:$new_height");
+
+                $psdImg->setIteratorIndex(0);
+                //$psdImg->stripImage(); //去除图片信息
+                $psdImg->setImageCompressionQuality(100); //图片质量
+
+                if($w >= $h)
+                {
+                    //$psdImg->thumbnailImage($new_width, 0);
+                    $psdImg->scaleImage($new_width, 0);
+                }
+                else
+                {
+                    //$psdImg->thumbnailImage(0, $new_height);
+                    $psdImg->scaleImage(0, $new_height);
+                }
+
+                //$psdImg->thumbnailImage($w, $h, true);
+
                 $psdImg->writeImage($thumbImgHDPath);
                 $psdImg->destroy();
                 //echo $psdImg;

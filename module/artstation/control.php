@@ -192,12 +192,12 @@ class artstation extends control
         $this->locate(inlink('restore'));
     }
 
-    public function search($tags = '', $recTotal = 0, $recPerPage = 20, $pageID = 0)
+    public function search($tags = '', $product=0, $recTotal = 0, $recPerPage = 20, $pageID = 0)
     {
         $this->app->loadClass('pager');
         $pager = new pager($recTotal, $recPerPage, $pageID);
 
-        $product = 1;
+        //$product = 0;
         $type = -1;
         //$tags = "";
         $user = "";
@@ -207,7 +207,7 @@ class artstation extends control
             $pst = fixer::input('post')
                 ->get();
 
-            $product = $pst->product;
+            //$product = $pst->product;
             $type = $pst->type;
             //$tags = $pst->tags;
             $user = $pst->user;
@@ -215,7 +215,7 @@ class artstation extends control
 
         $articles = $this->artstation->search($pager, $product, $type, $tags, $user);
 
-        $this->view->allProducts   = array(0 => '') + $this->product->getPairs('noclosed|nocode');
+        $this->view->allProducts   = array(0 => '无') + $this->product->getPairs('noclosed|nocode');
         $this->view->title    = $this->lang->artstation->reportproject;
 
         $newarticles = $this->processArticles($articles);

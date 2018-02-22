@@ -32,7 +32,7 @@ $sessionString .= session_name() . '=' . session_id();
     function downloadFile(fileID, extension, imageWidth)
     {
         if(!fileID) return;
-        var fileTypes     = 'txt,jpg,jpeg,gif,png,bmp';
+        var fileTypes     = 'txt,jpg,jpeg,gif,png,bmp,psd';
         var sessionString = '<?php echo $sessionString;?>';
         var windowWidth   = $(window).width();
         var url           = createLink('file', 'download', 'fileID=' + fileID + '&mouse=left') + sessionString;
@@ -45,6 +45,17 @@ $sessionString .= session_name() . '=' . session_id();
         {
             window.open(url, '_blank');
         }
+        return false;
+    }
+
+    function downloadFileToDisk(fileID)
+    {
+        if(!fileID) return;
+
+        var sessionString = '<?php echo $sessionString;?>';
+        var url           = createLink('file', 'downloadToDisk', 'fileID=' + fileID) + sessionString;
+        window.open(url, '_blank');
+
         return false;
     }
 
@@ -124,15 +135,16 @@ $sessionString .= session_name() . '=' . session_id();
                         {
                             $imageSize  = getimagesize($file->realPath);
                             $imageWidth = $imageSize ? $imageSize[0] : 0;
+                            //error_log("oscar: getimagesize w:$imageWidth path:$file->realPath");
                         }
 
                         echo html::a($this->createLink('file', 'download', "fileID=$file->id") . $sessionString,
                         $img, '_blank', "onclick=\"return downloadFile($file->id, '$file->extension', $imageWidth)\"");
 
                         echo "<div align='right'>";
-                        echo html::a($this->createLink('file', 'download', "fileID=$file->id") . $sessionString,
+                        echo html::a($this->createLink('file', 'downloadFileToDisk', "fileID=$file->id") . $sessionString,
                             "下载", '_blank',
-                            "class='btn' onclick=\"return downloadFileToDisk($file->id, '$file->extension')\"");
+                            "class='btn' onclick=\"return downloadFileToDisk($file->id)\"");
                         echo "</div>";
 
                         //echo html::a($this->createLink('file', 'downloadthumb', "fileID=$file->id") . $sessionString,
@@ -191,7 +203,7 @@ $sessionString .= session_name() . '=' . session_id();
                             $tags = explode(',', $article->tags);
                             foreach ($tags as $tag) {
                                 echo html::a(
-                                        inlink('search', "tags=$tag"), '#' . $tag);
+                                        inlink('search', "tags=$tag&product=$article->product"), '#' . $tag);
                             }
 
 
