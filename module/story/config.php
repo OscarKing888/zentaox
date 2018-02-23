@@ -37,13 +37,16 @@ $config->story->list->exportFields      = '
     lastEditedBy, lastEditedDate,
     childStories, linkStories, duplicateStory, files';
 
-$config->story->list->customCreateFields      = 'source,verify,pri,estimate,mailto,keywords';
+//oscar:$config->story->list->customCreateFields      = 'source,verify,pri,estimate,mailto,keywords';
+$config->story->list->customCreateFields      = 'pri';
 $config->story->list->customBatchCreateFields = 'plan,spec,source,verify,pri,estimate,review,keywords';
 $config->story->list->customBatchEditFields   = 'branch,plan,estimate,pri,assignedTo,source,stage,closedBy,closedReason,keywords';
 
 $config->story->custom = new stdclass();
 $config->story->custom->createFields      = $config->story->list->customCreateFields;
-$config->story->custom->batchCreateFields = 'module,plan,spec,pri,estimate,review';
+//oscar:$config->story->custom->batchCreateFields = 'module,plan,spec,pri,estimate,review';
+$config->story->custom->batchCreateFields = 'module,spec,pri';
+
 $config->story->custom->batchEditFields   = 'branch,module,plan,estimate,pri,source,stage,closedBy,closedReason';
 
 $config->story->datatable = new stdclass();

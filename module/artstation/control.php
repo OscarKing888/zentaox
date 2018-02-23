@@ -83,7 +83,7 @@ class artstation extends control
         $this->view->title = $this->lang->artstation->add;
 
 
-        $stories = $this->story->getProductStories($product);
+        $stories = $this->story->getProjectStoryByProduct($product);
         //$stories = $this->story->getProjectStoryPairs(1);
         $this->view->stories = $stories;
         $this->display();

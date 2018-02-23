@@ -105,7 +105,11 @@
         <legend><?php echo $lang->story->legendSpec;?></legend>
         <div class='article-content'><?php echo $story->spec;?></div>
       </fieldset>
-
+      <fieldset>
+        <legend><?php echo $lang->story->legendVerify;?></legend>
+        <div class='article-content'><?php echo $story->verify;?></div>
+      </fieldset>
+      <?php echo $this->fetch('file', 'printFiles', array('files' => $story->files, 'fieldset' => 'true'));?>
       <?php include '../../common/view/action.html.php';?>
       <div class='actions'>
         <?php if(!$story->deleted) echo $actionLinks;?>

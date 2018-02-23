@@ -54,25 +54,21 @@
                 <td></td>
             </tr>
             <tr>
-
-                <?php if (strpos(",$showFields,", ',plan,') !== false): ?>
-                    <th><?php echo $lang->story->plan; ?></th>
-                    <td>
-                        <div class='input-group' id='planIdBox'>
-                            <?php
-                            echo html::select('plan', $plans, $planID, "class='form-control chosen'");
-                            if (count($plans) == 1) {
-                                echo "<span class='input-group-btn'>";
-                                echo html::a($this->createLink('productplan', 'create', "productID=$productID&branch=$branch"), "<i class='icon icon-plus'></i>", '_blank', "class='btn' data-toggle='tooltip' title='{$lang->productplan->create}'");
-                                echo '&nbsp; ';
-                                echo html::a("javascript:loadProductPlans($productID)", "<i class='icon icon-refresh'></i>", '', "class='btn' data-toggle='tooltip' title='{$lang->refresh}'");
-                                echo '</span>';
-                            }
-                            ?>
-                        </div>
-                    </td>
-                <?php endif; ?>
-
+                <th><?php echo $lang->story->plan; ?></th>
+                <td>
+                    <div class='input-group' id='planIdBox'>
+                        <?php
+                        echo html::select('plan', $plans, $planID, "class='form-control chosen'");
+                        if (count($plans) == 1) {
+                            echo "<span class='input-group-btn'>";
+                            echo html::a($this->createLink('productplan', 'create', "productID=$productID&branch=$branch"), "<i class='icon icon-plus'></i>", '_blank', "class='btn' data-toggle='tooltip' title='{$lang->productplan->create}'");
+                            echo '&nbsp; ';
+                            echo html::a("javascript:loadProductPlans($productID)", "<i class='icon icon-refresh'></i>", '', "class='btn' data-toggle='tooltip' title='{$lang->refresh}'");
+                            echo '</span>';
+                        }
+                        ?>
+                    </div>
+                </td>
                 <?php if (strpos(",$showFields,", ',source,') !== false): ?>
                     <td>
                         <div class='input-group'>
@@ -84,8 +80,6 @@
                     </td>
                 <?php endif; ?>
             </tr>
-
-            <?php if (strpos(",$showFields,", ',reviewedBy,') !== false): ?>
             <tr>
                 <th><?php echo $lang->story->reviewedBy; ?></th>
                 <td>
@@ -97,8 +91,6 @@
                     </div>
                 </td>
             </tr>
-            <?php endif;?>
-
             <tr>
                 <th><?php echo $lang->story->title; ?></th>
                 <td colspan='2'>
@@ -194,14 +186,10 @@
                     <?php endif; ?>
                 </tr>
             <?php endif; ?>
-
-            <?php if (strpos(",$showFields,", ',files,') !== false): ?>
-                <tr>
-                    <th><?php echo $lang->story->legendAttatch; ?></th>
-                    <td colspan='2'><?php echo $this->fetch('file', 'buildform'); ?></td>
-                </tr>
-            <?php endif; ?>
-
+            <tr>
+                <th><?php echo $lang->story->legendAttatch; ?></th>
+                <td colspan='2'><?php echo $this->fetch('file', 'buildform'); ?></td>
+            </tr>
             <tr>
                 <td></td>
                 <td colspan='2' class='text-center'><?php echo html::submitButton() . html::backButton(); ?></td>

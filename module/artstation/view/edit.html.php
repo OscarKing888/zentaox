@@ -28,7 +28,7 @@ include '../../common/view/datepicker.html.php';
                         <div class='row'>
                             <div class='col-sm-3'>
                                 <div class='input-group'>
-                                    <?php echo html::select("product", $allProducts, $article->product, "class='form-control chosen' onchange=''"); ?>
+                                    <?php echo html::select("product", $allProducts, $article->product, "class='form-control chosen' onchange='reloadStoriesByProduct();'"); ?>
 
                                 </div>
                             </div>
@@ -38,7 +38,7 @@ include '../../common/view/datepicker.html.php';
 
                 <tr>
                     <th><?php echo $lang->artstation->type; ?></th>
-                    <td class='text-left' id='productsBox'>
+                    <td class='text-left' id='typeBox'>
                         <div class='row'>
                             <div class='col-sm-3'>
                                 <div class='input-group'>
@@ -64,7 +64,7 @@ include '../../common/view/datepicker.html.php';
                     <th><?php echo $lang->artstation->requirement; ?></th>
                     <td colspan='5'>
                         <div class='input-group'>
-                            <?php echo html::select('requirement', $stories, $article->requirement, "class='form-control chosen' onchange='setStoryRelated();'"); ?>
+                            <?php echo html::select('story', $stories, $article->requirement, "class='form-control chosen' onchange='setStoryRelated();'"); ?>
                             <span class='input-group-btn' id='preview'><a href='#'
                                                                           class='btn iframe'><?php echo $lang->preview; ?></a></span>
                         </div>

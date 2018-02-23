@@ -296,3 +296,10 @@ $lang->story->chosen->reviewedBy = '选择评审人...';
 
 $lang->story->notice = new stdClass();
 $lang->story->notice->closed = '您选择的需求已经被关闭了！';
+
+
+$lang->story->pipelineType[0] = '无';
+$lang->story->pipelineType[1] = '角色';
+$lang->story->pipelineType[2] = '场景';
+$lang->story->pipelineType[3] = '技能';
+$lang->story->pipelineType[4] = '关卡';

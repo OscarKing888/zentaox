@@ -28,7 +28,7 @@ include '../../common/view/datepicker.html.php';
                         <div class='row'>
                             <div class='col-sm-3'>
                                 <div class='input-group'>
-                                    <?php echo html::select("product", $allProducts, 1, "class='form-control chosen' onchange=''"); ?>
+                                    <?php echo html::select("product", $allProducts, 1, "class='form-control chosen' onchange='reloadStoriesByProduct();'"); ?>
 
                                 </div>
                             </div>
@@ -38,34 +38,33 @@ include '../../common/view/datepicker.html.php';
 
                 <tr>
                     <th><?php echo $lang->artstation->type; ?></th>
-                    <td class='text-left' id='productsBox'>
-                        <div class='row'>
-                            <div class='col-sm-3'>
-                                <div class='input-group'>
-                                    <?php echo html::select("type", (array)$lang->artstation->typeList, 0, "class='form-control chosen' onchange=''"); ?>
-
-                                </div>
-                            </div>
-                        </div>
+                    <td class='text-left' id='typeBox'>
+                        <?php echo html::select("type", (array)$lang->artstation->typeList, 0, "class='form-control chosen' onchange=''"); ?>
                     </td>
                 </tr>
 
                 <tr>
                     <th><?php echo $lang->artstation->title; ?></th>
-                    <td ><?php echo html::input("title", '', "class='form-control text-left' autocomplete='on'"); ?></td>
+                    <td><?php echo html::input("title", '', "class='form-control text-left' autocomplete='on'"); ?></td>
                 </tr>
 
                 <tr>
                     <th><?php echo $lang->artstation->tags; ?></th>
-                    <td ><?php echo html::input("tags", '', "placeholder='用英文逗号分割，如:“兽王,部落,boss”，只能用字母、汉字、数字！' class='form-control text-left' autocomplete='on' placement='用,分割'"); ?></td>
+                    <td><?php echo html::input("tags", '', "placeholder='用英文逗号分割，如:“兽王,部落,boss”，只能用字母、汉字、数字！' class='form-control text-left' autocomplete='on' placement='用,分割'"); ?></td>
                 </tr>
 
                 <tr>
-                    <th><?php echo $lang->artstation->requirement;?></th>
-                    <td colspan='5'>
-                        <div class='input-group'>
-                                <?php echo html::select('requirement', $stories, 0, "class='form-control chosen' onchange='setStoryRelated();'");?>
-                                <span class='input-group-btn' id='preview'><a href='#' class='btn iframe'><?php echo $lang->preview;?></a></span>
+                    <th><?php echo $lang->artstation->requirement; ?></th>
+                    <td colspan='1'>
+                        <div class='row-table'>
+                            <div class='col-table'>
+                                <div class='input-group w-p100'>
+                                    <?php echo html::select('story', $stories, 0, "class='form-control chosen' onchange='setStoryRelated();'"); ?>
+
+                                    <span class='input-group-btn' id='preview'><a href='#'
+                                                                                  class='btn iframe'><?php echo $lang->preview; ?></a></span>
+                                </div>
+                            </div>
                         </div>
                     </td>
                 </tr>
@@ -74,22 +73,24 @@ include '../../common/view/datepicker.html.php';
                     <th><?php echo $lang->artstation->content; ?></th>
 
                     <td>
-                        <?php echo html::textarea('content', '', "rows='5' class='form-control'");?>
+                        <?php echo html::textarea('content', '', "rows='5' class='form-control'"); ?>
                     </td>
                 </tr>
                 <tr>
-                    <th><?php echo $lang->artstation->files;?></th>
-                    <td><?php echo $this->fetch('file', 'buildformsingle', 'fileCount=1&percent=0.85');?></td>
+                    <th><?php echo $lang->artstation->files; ?></th>
+                    <td><?php echo $this->fetch('file', 'buildformsingle', 'fileCount=1&percent=0.85'); ?></td>
                 </tr>
                 <tr>
                     <th></th>
                     <td>
                         <?php echo html::submitButton(); ?>
-                        <?php echo html::backButton();?>
+                        <?php echo html::backButton(); ?>
                     </td>
                 </tr>
             </table>
         </form>
     </div>
 </div>
+<?php $customLink = $this->createLink('custom', 'ajaxSaveCustomFields', 'module=task&section=custom&key=createFields') ?>
+<?php include '../../common/view/customfield.html.php'; ?>
 <?php include '../../common/view/footer.html.php'; ?>

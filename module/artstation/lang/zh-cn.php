@@ -36,9 +36,15 @@ $lang->artstation->typeList[0] = '角色';
 $lang->artstation->typeList[1] = '场景';
 $lang->artstation->typeList[2] = '氛围';
 $lang->artstation->typeList[3] = '海报';
-$lang->artstation->typeList[4] = '3D角色';
-$lang->artstation->typeList[5] = '3D场景';
-$lang->artstation->typeList[6] = 'UI';
+$lang->artstation->typeList[4] = '武器';
+$lang->artstation->typeList[5] = '装备';
+$lang->artstation->typeList[6] = '道具';
+$lang->artstation->typeList[7] = '物件';
+$lang->artstation->typeList[8] = '特效';
+$lang->artstation->typeList[9] = '3D角色';
+$lang->artstation->typeList[10] = '3D场景';
+$lang->artstation->typeList[11] = 'UI';
+
 
 
 $lang->artstation->createUserAbsent  = '创建请假';
