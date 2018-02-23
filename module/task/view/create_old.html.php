@@ -41,7 +41,7 @@
             </tr>
             <tr>
                 <th><?php echo $lang->task->type; ?></th>
-                <td><?php echo html::select('dept', $depts, $task->dept, 'class=form-control onchange="setOwners(this.value)"'); ?></td>
+                <td><?php echo html::select('type', $lang->task->typeList, $task->type, 'class=form-control onchange="setOwners(this.value)"'); ?></td>
                 <td></td>
             </tr>
             <?php if (strpos(",$showFields,", ',assignedTo,') !== false): ?>
@@ -189,14 +189,10 @@
                     </td>
                 </tr>
             <?php endif; ?>
-
-            <?php if (strpos(",$showFields,", ',files,') !== false): ?>
             <tr>
                 <th><?php echo $lang->files; ?></th>
                 <td colspan='5'><?php echo $this->fetch('file', 'buildform'); ?></td>
             </tr>
-            <?php endif;?>
-
             <tr <?php echo $this->config->global->flow == 'onlyTask' ? "class='hidden'" : ''; ?>>
                 <th><?php echo $lang->task->afterSubmit; ?></th>
                 <td colspan='5'><?php echo html::radio('after', $lang->task->afterChoices, $this->config->global->flow == 'onlyTask' || !empty($task->id) ? 'toTaskList' : 'continueAdding'); ?></td>

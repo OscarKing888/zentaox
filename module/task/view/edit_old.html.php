@@ -104,7 +104,7 @@
                         </tr>
                         <tr>
                             <th><?php echo $lang->task->type; ?></th>
-                            <td><?php echo html::select('dept', $depts, $task->dept, 'class=form-control'); ?></td>
+                            <td><?php echo html::select('type', $lang->task->typeList, $task->type, 'class=form-control'); ?></td>
                         </tr>
                         <?php if (empty($task->children)): ?>
                             <tr>

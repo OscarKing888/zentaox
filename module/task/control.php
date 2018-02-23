@@ -23,6 +23,7 @@ class task extends control
         $this->loadModel('project');
         $this->loadModel('story');
         $this->loadModel('tree');
+        $this->loadModel('dept');
 
         if($this->config->global->flow == 'onlyTask')
         {
@@ -165,6 +166,9 @@ class task extends control
         $this->view->stories          = $stories;
         $this->view->members          = $members;
         $this->view->moduleOptionMenu = $moduleOptionMenu;
+
+        $this->view->depts = $this->dept->getOptionMenu(); //oscar:
+
         $this->display();
     }
 
@@ -223,6 +227,9 @@ class task extends control
         $this->view->story      = $this->story->getByID($storyID);
         $this->view->storyTasks = $this->task->getStoryTaskCounts(array_keys($stories), $projectID);
         $this->view->members    = $members;
+
+        $this->view->depts = $this->dept->getOptionMenu(); //oscar:
+
         $this->display();
     }
 
@@ -304,6 +311,8 @@ class task extends control
         $this->view->stories    = $this->story->getProjectStoryPairs($this->view->project->id);
         $this->view->users      = $this->loadModel('user')->getPairs('nodeleted', "{$this->view->task->openedBy},{$this->view->task->canceledBy},{$this->view->task->closedBy}");
         $this->view->modules    = $this->tree->getTaskOptionMenu($this->view->task->project);
+        $this->view->depts = $this->dept->getOptionMenu(); //oscar:
+
         $this->display();
     }
 
@@ -406,6 +415,8 @@ class task extends control
         $this->view->taskIDList  = $taskIDList;
         $this->view->tasks       = $tasks;
         $this->view->projectName = isset($project) ? $project->name : '';
+
+        $this->view->depts = $this->dept->getOptionMenu(); //oscar:
 
         $this->display();
     }
@@ -565,6 +576,7 @@ class task extends control
         $this->view->preAndNext  = $this->loadModel('common')->getPreAndNextObject('task', $taskID);
         $this->view->product     = $this->tree->getProduct($task->module);
         $this->view->modulePath  = $this->tree->getParents($task->module);
+        $this->view->depts = $this->dept->getOptionMenu(); //oscar:
         $this->display();
     }
 

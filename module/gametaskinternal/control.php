@@ -238,6 +238,7 @@ class gametaskinternal extends control
         $this->setupCommonViewVars();
 
         $this->view->deptUsers = $this->user->getPairs('nodeleted|noclosed');
+
         $this->display();
     }
 
@@ -485,8 +486,9 @@ class gametaskinternal extends control
         $this->view->gameTasks = $gameTasks;
 
         $this->view->allProducts = array(0 => '') + $this->product->getPairs('noclosed|nocode');
-        $depts = $this->dao->select('id,name')->from(TABLE_DEPT)->fetchPairs();
-        $this->view->depts = $depts;
+        //$depts = $this->dao->select('id,name')->from(TABLE_DEPT)->fetchPairs();
+        //$this->view->depts = $depts;
+        $this->view->depts = $this->dept->getOptionMenu();
 
         $this->view->allOwners = $this->getUserByGroupName(GROUPNAME_CQYH);
 

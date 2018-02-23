@@ -62,9 +62,6 @@ if ($hiddenStory and isset($visibleFields['story'])) $colspan -= 1;
         $lang->task->typeList['ditto'] = $lang->task->ditto;
         $members['ditto'] = $lang->task->ditto;
         $modules['ditto'] = $lang->task->ditto;
-
-        $depts['ditto'] = $lang->task->ditto; //oscar:
-
         if ($project->type == 'ops') $colspan = $colspan - 1;
         ?>
         <?php for ($i = 0; $i < $config->task->batchCreate; $i++): ?>
@@ -72,11 +69,10 @@ if ($hiddenStory and isset($visibleFields['story'])) $colspan -= 1;
             if ($i == 0) {
                 $currentStory = $storyID;
                 $type = '';
-                $dept = '';
                 $member = '';
                 $module = $story ? $story->module : '';
             } else {
-                $dept = $currentStory = $type = $member = $module = 'ditto';
+                $currentStory = $type = $member = $module = 'ditto';
             }
             ?>
             <?php $pri = 3; ?>
@@ -103,7 +99,7 @@ if ($hiddenStory and isset($visibleFields['story'])) $colspan -= 1;
                         <?php echo html::input("name[$i]", '', "class='form-control' autocomplete='off'"); ?>
                     </div>
                 </td>
-                <td><?php echo html::select("$dept[$i]", $depts, $dept, 'class=form-control'); ?></td>
+                <td><?php echo html::select("type[$i]", $lang->task->typeList, $type, 'class=form-control'); ?></td>
                 <td <?php echo zget($visibleFields, 'assignedTo', "class='hidden'") ?>
                         style='overflow:visible'><?php echo html::select("assignedTo[$i]", $members, $member, "class='form-control chosen'"); ?></td>
                 <td <?php echo zget($visibleFields, 'estimate', "class='hidden'") ?>><?php echo html::input("estimate[$i]", '', "class='form-control text-center' autocomplete='off'"); ?></td>
@@ -141,7 +137,7 @@ if ($hiddenStory and isset($visibleFields['story'])) $colspan -= 1;
                 <?php echo html::input("name[%s]", '', "class='form-control' autocomplete='off'"); ?>
             </div>
         </td>
-        <td><?php echo html::select("type[%s]", $depts, $dept, 'class=form-control'); ?></td>
+        <td><?php echo html::select("type[%s]", $lang->task->typeList, $type, 'class=form-control'); ?></td>
         <td <?php echo zget($visibleFields, 'assignedTo', "class='hidden'") ?>
                 style='overflow:visible'><?php echo html::select("assignedTo[%s]", $members, $member, "class='form-control'"); ?></td>
         <td <?php echo zget($visibleFields, 'estimate', "class='hidden'") ?>><?php echo html::input("estimate[%s]", '', "class='form-control text-center' autocomplete='off'"); ?></td>

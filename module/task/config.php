@@ -8,7 +8,7 @@ $config->task->start    = new stdclass();
 $config->task->finish   = new stdclass();
 $config->task->activate = new stdclass();
 
-$config->task->create->requiredFields      = 'name,type';
+$config->task->create->requiredFields      = 'name,dept';
 $config->task->edit->requiredFields        = $config->task->create->requiredFields;
 $config->task->finish->requiredFields      = 'consumed';
 $config->task->activate->requiredFields    = 'left';
@@ -38,8 +38,10 @@ $config->task->exportFields = '
     ';
 if($config->global->flow == 'onlyTask') $config->task->exportFields = str_replace(array(' story,'), '', $config->task->exportFields);
 
-$config->task->customCreateFields      = 'story,estStarted,deadline,mailto,pri,estimate'; 
-$config->task->customBatchCreateFields = 'module,story,assignedTo,estimate,estStarted,deadline,desc,pri'; 
+//oscar: $config->task->customCreateFields      = 'story,estStarted,deadline,mailto,pri,estimate';
+$config->task->customCreateFields      = 'story,pri';
+//oscar: $config->task->customBatchCreateFields = 'module,story,assignedTo,estimate,estStarted,deadline,desc,pri';
+$config->task->customBatchCreateFields = 'module,story,assignedTo,desc,pri';
 $config->task->customBatchEditFields   = 'module,assignedTo,status,pri,estimate,record,left,estStarted,deadline,finishedBy,canceledBy,closedBy,closedReason';
 
 $config->task->custom = new stdclass();

@@ -42,6 +42,64 @@ class taskModel extends model
             ->remove('after,files,labels,assignedTo,uid,storyEstimate,storyDesc,storyPri,team,teamEstimate,teamMember,multiple,teams')
             ->get();
 
+        $task = $this->file->processImgURL($task, $this->config->task->editor->create['id'], $this->post->uid);
+        $this->dao->insert(TABLE_TASK)->data($task)
+            ->autoCheck()
+            ->batchCheck($this->config->task->create->requiredFields, 'notempty')
+            //->checkIF($task->estimate != '', 'estimate', 'float')
+            //->checkIF($task->deadline != '0000-00-00', 'deadline', 'ge', $task->estStarted)
+            ->exec();
+
+        if(dao::isError()) return false;
+
+        $taskID = $this->dao->lastInsertID();
+        if($this->post->story) $this->loadModel('story')->setStage($this->post->story);
+        $this->file->updateObjectID($this->post->uid, $taskID, 'task');
+        if(!empty($taskFiles))
+        {
+            foreach($taskFiles as $taskFile)
+            {
+                $taskFile->objectID = $taskID;
+                $this->dao->insert(TABLE_FILE)->data($taskFile)->exec();
+            }
+        }
+        else
+        {
+            $taskFileTitle = $this->file->saveUpload('task', $taskID);
+            $taskFiles     = $this->dao->select('*')->from(TABLE_FILE)->where('id')->in(array_keys($taskFileTitle))->fetchAll('id');
+            foreach($taskFiles as $fileID => $taskFile) unset($taskFiles[$fileID]->id);
+        }
+
+
+        if(!dao::isError()) $this->loadModel('score')->create('task', 'create', $taskID);
+        //$taskIdList[$assignedTo] = array('status' => 'created', 'id' => $taskID);
+        $taskIdList[$taskID] =  array('status' => 'created', 'id' => $taskID);
+
+        return $taskIdList;
+    }
+
+    public function createold($projectID)
+    {
+        $taskIdList = array();
+        $taskFiles  = array();
+        $this->loadModel('file');
+        $task = fixer::input('post')
+            ->add('project', (int)$projectID)
+            ->setDefault('estimate, left, story', 0)
+            ->setDefault('status', 'wait')
+            ->setIF($this->post->estimate != false, 'left', $this->post->estimate)
+            ->setIF($this->post->story != false, 'storyVersion', $this->loadModel('story')->getVersion($this->post->story))
+            ->setDefault('estStarted', '0000-00-00')
+            ->setDefault('deadline', '0000-00-00')
+            ->setIF(strpos($this->config->task->create->requiredFields, 'estStarted') !== false, 'estStarted', $this->post->estStarted)
+            ->setIF(strpos($this->config->task->create->requiredFields, 'deadline') !== false, 'deadline', $this->post->deadline)
+            ->setDefault('openedBy',   $this->app->user->account)
+            ->setDefault('openedDate', helper::now())
+            ->stripTags($this->config->task->editor->create['id'], $this->config->allowedTags)
+            ->join('mailto', ',')
+            ->remove('after,files,labels,assignedTo,uid,storyEstimate,storyDesc,storyPri,team,teamEstimate,teamMember,multiple,teams')
+            ->get();
+
         foreach($this->post->assignedTo as $assignedTo)
         {
             /* When type is affair and has assigned then ignore none. */
@@ -133,6 +191,8 @@ class taskModel extends model
             if(!dao::isError()) $this->loadModel('score')->create('task', 'create', $taskID);
             $taskIdList[$assignedTo] = array('status' => 'created', 'id' => $taskID);
         }
+
+        error_log("oscar:___________ task create tasks:" . count($taskIdList));
         return $taskIdList;
     }
 
@@ -192,6 +252,7 @@ class taskModel extends model
         $story      = 0;
         $module     = 0;
         $type       = '';
+        $dept       = 0; //oscar:
         $assignedTo = '';
 
         for($i = 0; $i < $batchNum; $i++)
@@ -199,6 +260,7 @@ class taskModel extends model
             $story      = !isset($tasks->story[$i]) || $tasks->story[$i]           == 'ditto' ? $story     : $tasks->story[$i];
             $module     = !isset($tasks->module[$i]) || $tasks->module[$i]         == 'ditto' ? $module    : $tasks->module[$i];
             $type       = !isset($tasks->type[$i]) || $tasks->type[$i]             == 'ditto' ? $type      : $tasks->type[$i];
+            $dept       = !isset($tasks->dept[$i]) || $tasks->dept[$i]             == 'ditto' ? $dept      : $tasks->dept[$i]; //oscar:
             $assignedTo = !isset($tasks->assignedTo[$i]) || $tasks->assignedTo[$i] == 'ditto' ? $assignedTo: $tasks->assignedTo[$i];
 
             if(empty($tasks->name[$i])) continue;
@@ -221,6 +283,9 @@ class taskModel extends model
             $data[$i]->openedBy   = $this->app->user->account;
             $data[$i]->openedDate = $now;
             $data[$i]->parent     = $tasks->parent[$i];
+
+            $data[$i]->dept     = $tasks->dept[$i]; //oscar:
+
             if($story) $data[$i]->storyVersion = $this->loadModel('story')->getVersion($data[$i]->story);
             if($assignedTo) $data[$i]->assignedDate = $now;
 
@@ -436,6 +501,7 @@ class taskModel extends model
         {
             if(isset($data->modules[$taskID]) and ($data->modules[$taskID] == 'ditto')) $data->modules[$taskID] = isset($prev['module']) ? $prev['module'] : 0;
             if($data->types[$taskID]       == 'ditto') $data->types[$taskID]       = isset($prev['type'])       ? $prev['type']       : '';
+            if($data->depts[$taskID]       == 'ditto') $data->depts[$taskID]       = isset($prev['dept'])       ? $prev['dept']       : ''; // oscar:
             if($data->statuses[$taskID]    == 'ditto') $data->statuses[$taskID]    = isset($prev['status'])     ? $prev['status']     : '';
             if($data->assignedTos[$taskID] == 'ditto') $data->assignedTos[$taskID] = isset($prev['assignedTo']) ? $prev['assignedTo'] : '';
             if($data->pris[$taskID]        == 'ditto') $data->pris[$taskID]        = isset($prev['pri'])        ? $prev['pri']        : 0;
@@ -445,6 +511,7 @@ class taskModel extends model
 
             $prev['module']     = $data->modules[$taskID];
             $prev['type']       = $data->types[$taskID];
+            $prev['dept']       = $data->depts[$taskID]; // oscar:
             $prev['status']     = $data->statuses[$taskID];
             $prev['assignedTo'] = $data->assignedTos[$taskID];
             $prev['pri']        = $data->pris[$taskID];
@@ -463,7 +530,8 @@ class taskModel extends model
             $task->color          = $data->colors[$taskID];
             $task->name           = $data->names[$taskID];
             $task->module         = isset($data->modules[$taskID]) ? $data->modules[$taskID] : 0;
-            $task->type           = $data->types[$taskID];
+            $task->type           = $data->types[$taskID]; // oscar:
+            $task->dept           = $data->depts[$taskID];
             $task->status         = $data->statuses[$taskID];
             $task->assignedTo     = $task->status == 'closed' ? 'closed' : $data->assignedTos[$taskID];
             $task->pri            = $data->pris[$taskID];
@@ -2055,8 +2123,10 @@ class taskModel extends model
                     echo $canView ? html::a($taskLink, sprintf('%03d', $task->id)) : sprintf('%03d', $task->id);
                     break;
                 case 'pri':
-                    echo "<span class='pri" . zget(array_keys($this->lang->task->priList), $task->pri, $task->pri) . "'>";
-                    echo $task->pri == '0' ? '' : zget(array_keys($this->lang->task->priList), $task->pri, $task->pri);
+                    //echo "<span class='pri" . zget(array_keys($this->lang->task->priList), $task->pri, $task->pri) . "'>";
+                    //echo $task->pri == '0' ? '' : zget(array_keys($this->lang->task->priList), $task->pri, $task->pri);
+                    echo "<span class='pri" . $task->pri . "'>";
+                    echo $task->pri == '0' ? '' : $task->pri;
                     echo "</span>";
                     break;
                 case 'name':
