@@ -38,7 +38,7 @@ $config->story->list->exportFields      = '
     childStories, linkStories, duplicateStory, files';
 
 //oscar:$config->story->list->customCreateFields      = 'source,verify,pri,estimate,mailto,keywords';
-$config->story->list->customCreateFields      = 'pri';
+$config->story->list->customCreateFields      = 'pri,files';
 $config->story->list->customBatchCreateFields = 'plan,spec,source,verify,pri,estimate,review,keywords';
 $config->story->list->customBatchEditFields   = 'branch,plan,estimate,pri,assignedTo,source,stage,closedBy,closedReason,keywords';
 

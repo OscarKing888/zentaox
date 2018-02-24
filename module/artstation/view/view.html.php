@@ -193,7 +193,20 @@ $sessionString .= session_name() . '=' . session_id();
 
                     <tr>
                     <th class='w-80px'><?php echo $lang->artstation->requirement; ?></th>
-                    <td><?php echo $article->requirement; ?></td>
+                    <td>
+                        <?php
+
+                        if (!empty($article->storydat)) {
+                            common::printLink('story', 'view',
+                                "storyID=" . $article->story, $article->storydat->title, '',
+                                "class='iframe' data-width='80%'", true, true);
+                        }
+                        else
+                        {
+                            echo $article->story;
+                        }
+                        ?>
+                    </td>
                     </tr>
 
 

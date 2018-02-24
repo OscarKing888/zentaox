@@ -11,7 +11,7 @@
  */
 ?>
 <?php include './header.html.php'; ?>
-<form class='form-condensed' method='post' enctype='multipart/form-data' id='dataform'>
+<form class='form-condensed' method='post' enctype='multipart/form-data' target='hiddenwin' id='dataform'>
     <div id='titlebar'>
         <div class='heading'>
             <span class='prefix'><?php echo html::icon($lang->icons['story']); ?>
@@ -40,13 +40,11 @@
                     <div class='article-content'><?php echo $story->spec; ?></div>
                 </fieldset>
 
-                <?php if (strpos(",$showFields,", ',verify,') !== false): ?>
-                    <fieldset>
-                        <legend><?php echo $lang->story->verify; ?></legend>
-                        <div class='article-content'><?php echo $story->verify; ?></div>
-                    </fieldset>
-                <?php endif; ?>
 
+                <fieldset>
+                    <legend><?php echo $lang->story->verify; ?></legend>
+                    <div class='article-content'><?php echo $story->verify; ?></div>
+                </fieldset>
 
                 <fieldset class='fieldset-pure'>
                     <legend><?php echo $lang->story->comment; ?></legend>
@@ -54,14 +52,6 @@
                         <?php echo html::textarea('comment', '', "rows='5' class='form-control'"); ?>
                     </div>
                 </fieldset>
-
-                <?php echo $this->fetch('file', 'printFiles', array('files' => $story->files, 'fieldset' => 'true'));?>
-
-                <fieldset>
-                    <legend><?php echo $lang->attatch; ?></legend>
-                    <?php echo $this->fetch('file', 'buildform'); ?>
-                </fieldset>
-
                 <div id='linkStoriesBOX'><?php echo html::hidden('linkStories', $story->linkStories); ?></div>
                 <div id='childStoriesBOX'><?php echo html::hidden('childStories', $story->childStories); ?></div>
                 <div class='actions actions-form'>

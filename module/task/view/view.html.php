@@ -160,6 +160,54 @@
                 <?php echo $this->fetch('file', 'printFiles', array('files' => $task->files, 'fieldset' => 'true')); ?>
             <?php endif; ?>
 
+            <fieldset>
+                <legend><?php echo $lang->artstation->common; ?></legend>
+                <?php foreach ($task->story->artstation as $artstation): ?>
+                <div>
+                    <fieldset>
+                        <legend><?php
+                            $lab = "作者：" . $users[$artstation->owner] . " 标题：" . $artstation->title;
+                            echo html::a($this->createLink('artstation', 'view', "id=" . $artstation->id),
+                                $lab, '_blank', "class='btn'");
+                            ?>
+                        </legend>
+
+                        <div class='content'>
+                            <?php
+                            $v = count($artstation->files);
+                            $files = array_reverse($artstation->files);
+                            foreach ($files as $file): ?>
+
+                                <?php
+                                echo " 版本 - V." . ($v) . "&nbsp;&nbsp;&nbsp;&nbsp;" . $lang->file->uploadDate . substr($file->addedDate, 0, 10);
+                                $v--;
+                                ?>
+
+                                <?php
+                                $img = html::image($this->createLink('file', 'read', "fileID=$file->id"), "$imgAttr title='$file->title'");
+                                if (stripos('jpg|jpeg|gif|png|bmp|psd', $file->extension) !== false) {
+                                    $imageSize = getimagesize($file->realPath);
+                                    $imageWidth = $imageSize ? $imageSize[0] : 0;
+                                    //error_log("oscar: getimagesize w:$imageWidth path:$file->realPath");
+                                }
+
+                                echo html::a($this->createLink('file', 'download', "fileID=$file->id") . $sessionString,
+                                    $img, '_blank', "onclick=\"return downloadFile($file->id, '$file->extension', $imageWidth)\"");
+
+                                echo "<div align='right'>";
+                                echo html::a($this->createLink('file', 'downloadFileToDisk', "fileID=$file->id") . $sessionString,
+                                    "下载", '_blank',
+                                    "class='btn' onclick=\"return downloadFileToDisk($file->id)\"");
+
+                                echo "</div>";
+                                ?>
+                            <?php endforeach; ?>
+                        </div>
+
+                    </fieldset>
+                    <?php endforeach; ?>
+            </fieldset>
+
             <?php include '../../common/view/action.html.php'; ?>
             <div class='actions'> <?php if (!$task->deleted) echo $actionLinks; ?></div>
             <fieldset id='commentBox' class='hide'>
@@ -213,7 +261,7 @@
                         <th><?php echo $lang->task->story; ?></th>
                         <td>
                             <?php
-                            if ($task->storyTitle and !common::printLink('story', 'view', "storyID=$task->story", $task->storyTitle, '', "class='iframe' data-width='80%'", true, true)) echo $task->storyTitle;
+                            if ($task->storyTitle and !common::printLink('story', 'view', "storyID=".$task->story->id, $task->storyTitle, '', "class='iframe' data-width='80%'", true, true)) echo $task->storyTitle;
                             if ($task->needConfirm) {
                                 echo "(<span class='warning'>{$lang->story->changed}</span> ";
                                 echo html::a($this->createLink('task', 'confirmStoryChange', "taskID=$task->id"), $lang->confirm, 'hiddenwin');

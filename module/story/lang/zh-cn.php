@@ -209,7 +209,7 @@ $lang->story->action->linkrelatedstory    = array('main' => '$date, 由 <strong>
 $lang->story->action->subdividestory      = array('main' => '$date, 由 <strong>$actor</strong> 细分为需求 <strong>$extra</strong>。');
 $lang->story->action->unlinkrelatedstory  = array('main' => '$date, 由 <strong>$actor</strong> 移除相关需求 <strong>$extra</strong>。');
 $lang->story->action->unlinkchildstory    = array('main' => '$date, 由 <strong>$actor</strong> 移除细分需求 <strong>$extra</strong>。');
-
+$lang->story->action->edit    = array('main' => '$date, 由 <strong>$actor</strong> 编辑 <strong>$extra</strong>。');
 /* 统计报表。*/
 $lang->story->report = new stdclass();
 $lang->story->report->common = '报表';

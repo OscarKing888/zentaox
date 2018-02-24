@@ -106,6 +106,12 @@ class artstation extends control
             $this->view->title   = $this->lang->artstation->view;
             $allUsers = $this->user->getpairs('nodeleted|noclosed|noletter');
             $this->view->allUsers = $allUsers;
+
+            $stories = $this->story->getProjectStoryByProduct($article->product);
+            error_log("oscar:++++++++++  product:" . $article->product . "count:" . count($stories) . " story:" . $article->story);
+            //$stories = $this->story->getProjectStoryByProduct(0);
+            $this->view->stories = $stories;
+
             $this->display();
         }
     }
@@ -142,7 +148,6 @@ class artstation extends control
         $allUsers = $this->user->getpairs('nodeleted|noclosed|noletter');
         $this->view->allUsers = $allUsers;
         $this->view->comments = $this->artstation->getComments($id);
-
 
         $this->display();
     }

@@ -22,6 +22,7 @@ class artstationModel extends model
         $this->loadModel('dept');
         $this->loadModel('file');
         $this->loadModel('user');
+        //$this->loadModel('story');
     }
 
     /**
@@ -37,6 +38,18 @@ class artstationModel extends model
             ->where('deleted')->eq(0)
             ->orderBy('id desc')
             ->page($pager)
+            ->fetchAll();
+
+        return $this->convertImageURL($articles);
+    }
+
+    public function getByStoryID($storyID)
+    {
+        $articles = $this->dao->select('*')
+            ->from(TABLE_ARTSTATION)
+            ->where('deleted')->eq(0)
+            ->andWhere('story')->eq($storyID)
+            ->orderBy('id desc')
             ->fetchAll();
 
         return $this->convertImageURL($articles);
@@ -105,11 +118,20 @@ class artstationModel extends model
      */
     public function getById($id)
     {
-        $art = $this->dao->findById($id)->from(TABLE_ARTSTATION)->fetch();
+        $art = $this->dao->select()->from(TABLE_ARTSTATION)
+            ->where('id')->eq($id)
+            ->fetch();
+
         $art->files = $this->loadModel('file')->getByObject('artstation', $art->id);
         $art->likes = $this->dao->select("user,imageId")->from(TABLE_ARTSTATION_LIKE)
             ->where('imageId')->eq($id)
             ->fetchPairs();
+
+        if($art->story > 0)
+        {
+            $this->loadModel('story');
+            $art->storydat = $this->story->getByID($art->story);
+        }
 
         return $art;
     }

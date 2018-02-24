@@ -354,10 +354,26 @@ class story extends control
         {
             $changes = $this->story->update($storyID);
             if(dao::isError()) die(js::error(dao::getError()));
+
+            /*
             if($this->post->comment != '' or !empty($changes))
             {
                 $action   = !empty($changes) ? 'Edited' : 'Commented';
                 $actionID = $this->action->create('story', $storyID, $action, $this->post->comment);
+                $this->action->logHistory($actionID, $changes);
+                $this->story->sendmail($storyID, $actionID);
+            }
+            //*/
+
+            $version = $this->dao->findById($storyID)->from(TABLE_STORY)->fetch('version');
+            $files = $this->loadModel('file')->saveUpload('story', $storyID, $version);
+            if($this->post->comment != '' or !empty($changes) or !empty($files))
+            {
+                //$action = (!empty($changes) or !empty($files)) ? 'Changed' : 'Commented';
+                $action = 'Edit';
+                $fileAction = '';
+                if(!empty($files)) $fileAction = $this->lang->addFiles . join(',', $files) . "\n" ;
+                $actionID = $this->action->create('story', $storyID, $action, $fileAction . $this->post->comment);
                 $this->action->logHistory($actionID, $changes);
                 $this->story->sendmail($storyID, $actionID);
             }
@@ -375,6 +391,7 @@ class story extends control
         $this->view->users      = $this->user->getPairs('pofirst|nodeleted', "$story->assignedTo,$story->openedBy,$story->closedBy");
         $this->view->product    = $product;
         $this->view->branches   = $product->type == 'normal' ? array() : $this->loadModel('branch')->getPairs($story->product);
+        $story->files = $this->loadModel('file')->getByObject('story', $storyID); // oscar:
         $this->display();
     }
 
@@ -1216,7 +1233,7 @@ class story extends control
         }
 
         $stories = $this->story->getProductStoryPairs($productID, $branch ? "0,$branch" : $branch, $moduleID, $storyStatus, 'id_desc', $limit);
-        $select  = html::select('story', empty($stories) ? array('' => '') : $stories, $storyID, "class='form-control'");
+        $select  = html::select('story', empty($stories) ? array('' => '') : $stories, $storyID, "class='form-control' onchange='setStoryRelated()'");
 
         /* If only need options, remove select wrap. */
         if($onlyOption == 'true') die(substr($select, strpos($select, '>') + 1, -10));

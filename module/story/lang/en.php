@@ -209,7 +209,7 @@ $lang->story->action->linkrelatedstory    = array('main' => '$date, linked by <s
 $lang->story->action->subdividestory      = array('main' => '$date, decomposed by <strong>$actor</strong> to Story <strong>$extra</strong>.');
 $lang->story->action->unlinkrelatedstory  = array('main' => '$date, unlinked by <strong>$actor</strong> from Story <strong>$extra</strong>.');
 $lang->story->action->unlinkchildstory    = array('main' => '$date, unlinked by <strong>$actor</strong> Decomposed Story <strong>$extra</strong>.');
-
+$lang->story->action->edit    = array('main' => '$date, Edit by <strong>$actor</strong><strong>$extra</strong>.');
 /* 统计报表。*/
 $lang->story->report = new stdclass();
 $lang->story->report->common = 'Report';

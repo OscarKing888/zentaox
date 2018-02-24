@@ -58,12 +58,20 @@ function downloadFile(fileID, extension, imageWidth)
           $uploadDate = $lang->file->uploadDate . substr($file->addedDate, 0, 10);
           $fileTitle  = "<li title='{$uploadDate}' class=    'list-group-item'><i class='icon-file-text text-muted icon'></i> &nbsp;" . $file->title .'.' . $file->extension;
           $imageWidth = 0;
-          if(stripos('jpg|jpeg|gif|png|bmp', $file->extension) !== false)
+
+          if(stripos('jpg|jpeg|gif|png|bmp|psd', $file->extension) !== false)
           {
               $imageSize  = getimagesize($file->realPath);
               $imageWidth = $imageSize ? $imageSize[0] : 0;
+
+              $img = html::image($this->createLink('file', 'read', "fileID=$file->id"), "$imgAttr title='$file->title'");
+              echo html::a($this->createLink('file', 'download', "fileID=$file->id") . $sessionString,
+                  $img . $fileTitle, '_blank', "onclick=\"return downloadFile($file->id, '$file->extension', $imageWidth)\"");
           }
-          echo html::a($this->createLink('file', 'download', "fileID=$file->id") . $sessionString, $fileTitle, '_blank', "onclick=\"return downloadFile($file->id, '$file->extension', $imageWidth)\"");
+          else{
+              echo html::a($this->createLink('file', 'download', "fileID=$file->id") . $sessionString,
+                  $fileTitle, '_blank', "onclick=\"return downloadFile($file->id, '$file->extension', $imageWidth)\"");
+          }
 
           /* Show size info. */
           if($file->size < 1024)

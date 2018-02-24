@@ -13,6 +13,14 @@
 <?php
 class storyModel extends model
 {
+    public function __construct($appName = '')
+    {
+        parent::__construct($appName);
+
+        $this->loadModel('artstation');
+        $this->loadModel('file');
+    }
+
     /**
      * Get a story by id.
      *
@@ -62,6 +70,9 @@ class storyModel extends model
         if($story->childStories)   $extraStories = array_merge($extraStories, explode(',', $story->childStories));
         $extraStories = array_unique($extraStories);
         if(!empty($extraStories)) $story->extraStories = $this->dao->select('id,title')->from(TABLE_STORY)->where('id')->in($extraStories)->fetchPairs();
+
+        $story->artstation = $this->artstation->getByStoryID($storyID);
+
         return $story;
     }
 
@@ -463,6 +474,7 @@ class storyModel extends model
         }
 
         $story = fixer::input('post')
+            ->stripTags($this->config->story->editor->change['id'], $this->config->allowedTags)
             ->cleanInt('product,module,pri')
             ->add('assignedDate', $oldStory->assignedDate)
             ->add('lastEditedBy', $this->app->user->account)
@@ -508,6 +520,11 @@ class storyModel extends model
                 }
             }
             if(isset($story->closedReason) and $story->closedReason == 'done') $this->loadModel('score')->create('story', 'close');
+
+            //oscar:
+            $this->file->updateObjectID($this->post->uid, $storyID, 'story');
+            //$this->file->saveUpload('story', $storyID, $extra = 1);
+
             return common::createChanges($oldStory, $story);
         }
     }
@@ -1729,6 +1746,7 @@ class storyModel extends model
     public function getProjectStoryByProduct($productID = 0, $branch = 0, $moduleIdList = 0, $type = 'full')
     {
         if(defined('TUTORIAL')) return $this->loadModel('tutorial')->getProjectStoryPairs();
+        /*
         $stories = $this->dao->select('t2.id, t2.title, t2.module, t2.pri, t2.estimate, t3.name AS product')
             ->from(TABLE_PROJECTSTORY)->alias('t1')
             ->leftJoin(TABLE_STORY)->alias('t2')->on('t1.story = t2.id')
@@ -1738,6 +1756,13 @@ class storyModel extends model
             ->beginIF($branch)->andWhere('t2.branch')->in("0,$branch")->fi()
             ->beginIF($moduleIdList)->andWhere('t2.module')->in($moduleIdList)->fi()
             ->orderBy('t1.`order` desc')
+            ->fetchAll();
+        //*/
+        $stories = $this->dao->select()
+            ->from(TABLE_STORY)
+            ->where('deleted')->eq(0)
+            ->beginIF($productID)->andWhere('product')->eq((int)$productID)->fi()
+            ->orderBy('id desc')
             ->fetchAll();
         if(!$stories) return array();
         return $this->formatStories($stories, $type);
