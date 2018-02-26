@@ -68,6 +68,8 @@
                     <td>
                         <?php
                         echo html::a($this->createLink('artstation', 'restoreartstation', "id=$article->id"), $lang->artstation->restore);
+                        echo html::a($this->createLink('artstation', 'view', "id=$article->id"), $lang->artstation->view);
+
                         ?>
                     </td>
                 </tr>

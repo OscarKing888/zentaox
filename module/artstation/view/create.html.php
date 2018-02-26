@@ -82,6 +82,17 @@ include '../../common/view/datepicker.html.php';
                 </tr>
                 <tr>
                     <th></th>
+                    <td align="left">
+                        <div align="left">建议的画布尺寸,坚版长宽互换即可，16:9或9:16</div>
+                        <div class="red" align="left">7680 x 4320（8K）</div>
+                        <div class="red" align="left">3840 x 2160（4K）</div>
+                        <div class="red" align="left">2560 x 1440（2K）</div>
+                        <div class="red" align="left">1920 x 1080（1K）</div>
+                    </td>
+
+                </tr>
+                <tr>
+                    <th></th>
                     <td>
                         <?php echo html::submitButton(); ?>
                         <?php echo html::backButton(); ?>

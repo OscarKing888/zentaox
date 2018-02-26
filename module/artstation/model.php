@@ -174,6 +174,8 @@ class artstationModel extends model
 
         //$articleProced = $this->file->processImgURL($article, $this->config->artstation->editor->create['id'], $this->post->uid);
 
+        $article->tags = artstationModel::filterTags($article->tags);
+
         $this->dao->insert(TABLE_ARTSTATION)->data($article)
             ->autoCheck()->batchCheck('owner', 'notempty')->exec();
 
@@ -189,6 +191,14 @@ class artstationModel extends model
         return $imageID;
     }
 
+    public static function filterTags($tags)
+    {
+        $tags = str_ireplace(' ', '', $tags);
+        $tags = str_ireplace('，', ',', $tags);
+        $tags = validater::filterTrojan($tags);
+        return $tags;
+    }
+
     /**
      * Update an article.
      *
@@ -202,6 +212,8 @@ class artstationModel extends model
             ->stripTags($this->config->artstation->editor->edit['id'], $this->config->allowedTags)
             ->remove('files,labels')
             ->get();
+
+        $article->tags = artstationModel::filterTags($article->tags);
 
         $this->dao->update(TABLE_ARTSTATION)
             ->data($article)->where('id')->eq($articleID)->exec();

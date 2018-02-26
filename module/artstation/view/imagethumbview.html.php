@@ -33,6 +33,13 @@
                     echo html::a(inlink('view', "id=$article->id"),
                         "<img src='error.png'/>");
                 }
+
+                if($this->app->user->account == "admin")
+                {
+                    echo html::a(inlink('delete', "id=$article->id"),
+                        $lang->artstation->delete);
+                }
+
                 ?>
 
             <?php endforeach; ?>
