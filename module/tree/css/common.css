@@ -19,3 +19,5 @@ table.copy td .form-control {border-right: 0}
 #childrenForm table .chosen-container .chosen-single {border-right-color: transparent}
 #childrenForm table .chosen-container .chosen-single {border-right-color: transparent}
 #childrenForm .col-table + .col-table .form-control {border-left: transparent;}
+
+.red {color: #b90000;font-weight:bold}

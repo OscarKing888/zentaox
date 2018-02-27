@@ -82,7 +82,7 @@ class pipeline extends control
         $this->view->products = $products;
         $this->view->allProducts   = array(0 => '') + $this->product->getPairs('noclosed|nocode');
         $this->view->title = $this->lang->pipeline->add;
-
+        $this->view->depts = $this->dept->getOptionMenu();
         $this->view->steps            = $steps;
 
         $this->display();

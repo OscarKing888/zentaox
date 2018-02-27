@@ -26,7 +26,7 @@ include '../../common/view/datepicker.html.php';
         <form class='form-condensed' method='post' enctype='multipart/form-data' id='dataform' data-type='ajax'>
             <table class='table table-form'>
                 <tr>
-                    <th><?php echo $lang->pipeline->name; ?><span class="required"></span></th>
+                    <th><?php echo $lang->pipeline->name; ?></th>
                     <td class='text-left' id='nameBox' colspan="1">
                         <?php echo html::input('pipename', $pipename, "class='form-control minw-60px' autocomplete='off'"); ?>
                     </td>
@@ -38,9 +38,9 @@ include '../../common/view/datepicker.html.php';
                         <table class='table table-form mg-0 table-bordered' style='border: 1px solid #ddd'>
                             <thead>
                             <tr>
-                                <th><?php echo "顺序";?></th>
-                                <th class='25% text-right'><?php echo "负责部门";?></th>
-                                <th width="25%"><?php echo "预估工时(H)";?></th>
+                                <th class='w-40px text-right'><?php echo "stage name";?></th>
+                                <th width="45%"><?php echo "cost time";?></th>
+                                <th><?php echo "???";?></th>
                                 <th class='step-actions'><?php echo $lang->actions;?></th>
                             </tr>
                             </thead>
@@ -50,10 +50,10 @@ include '../../common/view/datepicker.html.php';
                                 <td>
                                     <div class='input-group'>
                                         <span class='input-group-addon step-item-id'></span>
-                                        <?php echo html::select("steps[]", $depts, 0, 'class=form-control chosen'); ?>
+                                        <textarea rows='1' class='form-control autosize step-steps' name='steps[]'></textarea>
                                         <span class="input-group-addon step-type-toggle">
-                                          <input type='hiddsen' name='stepType[]' value='item' class='step-type'>
-                                          <label class="checkbox-inline"><input tabindex='-1' type="checkbox" class='step-group-toggle'> <?php echo "子流程" ?></label>
+                                          <input type='hidden' name='stepType[]' value='item' class='step-type'>
+                                          <label class="checkbox-inline"><input tabindex='-1' type="checkbox" class='step-group-toggle'> <?php echo $lang->testcase->group ?></label>
                                         </span>
                                     </div>
                                 </td>
@@ -75,16 +75,12 @@ include '../../common/view/datepicker.html.php';
                                     <td>
                                         <div class='input-group'>
                                             <span class='input-group-addon step-item-id'></span>
-
-                                            <?php echo html::select("steps[]", $depts, 0, 'class=form-control chosen'); ?>
+                                            <?php echo html::textarea('steps[]', $step->desc, "rows='1' class='form-control autosize step-steps'") ?>
                                             <span class='input-group-addon step-type-toggle'>
                                                 <?php if(!isset($step->type)) $step->type = 'step';?>
-                                                <input type='hidsden' name='stepType[]' value='<?php echo $step->type;?>' class='step-type'>
-
-                                                <label class="checkbox-inline"><input tabindex='-1' type="checkbox" class='step-group-toggle'> <?php echo "子流程" ?></label>
-                                                <label class="checkbox-inline">
-                                                    <input tabindex='-1' type="checkbox" class='step-group-toggle'<?php if($step->type === 'group') echo ' checked' ?>
-                                                    <?php echo "子流程" ?>
+                                                <input type='hidden' name='stepType[]' value='<?php echo $step->type;?>' class='step-type'>
+                                                <label class="checkbox-inline"><input tabindex='-1' type="checkbox" class='step-group-toggle'<?php if($step->type === 'group') echo ' checked' ?>>
+                                                    <?php echo $lang->testcase->group ?>
                                                 </label>
                                             </span>
                                         </div>

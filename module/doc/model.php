@@ -64,7 +64,7 @@ class docModel extends model
         }
 
         $this->app->loadLang('project');
-        $selectHtml  = "<a id='currentItem' data-lib-id='$libID' href=\"javascript:showLibMenu()\">{$this->lang->doclib->all} <span class='icon-caret-down'></span></a>";
+        $selectHtml  = "<a id='currentItem' data-lib-id='$libID' href=\"javascript:showLibMenu()\"><div class='red'>{$this->lang->doclib->all} <span class='icon-caret-down'></span></div></a>";
         $selectHtml .= "<div id='dropMenu'>";
         $selectHtml .= "<i class='icon icon-spin icon-spinner'></i>";
         $selectHtml .= "<div id='libMenu'>";

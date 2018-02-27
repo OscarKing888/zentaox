@@ -10,6 +10,9 @@
  */
 ?>
 <?php include '../../common/view/header.html.php';?>
+<style>
+    .red {color: #b90000;font-weight:bold}
+</style>
 <?php echo $this->fetch('block', 'dashboard', 'module=project');?>
 <script>
 <?php if($this->config->project->homepage != 'index'):?>

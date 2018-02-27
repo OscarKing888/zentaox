@@ -81,8 +81,8 @@ class productModel extends model
         setCookie("lastProduct", $productID, $this->config->cookieLife, $this->config->webRoot);
         $currentProduct = $this->getById($productID);
         $this->session->set('currentProductType', $currentProduct->type);
-        $output  = "<a id='currentItem' href=\"javascript:showSearchMenu('product', '$productID', '$currentModule', '$currentMethod', '$extra')\">{$currentProduct->name} <span class='icon-caret-down'></span></a><div id='dropMenu'><i class='icon icon-spin icon-spinner'></i></div>";
-        if($isMobile) $output  = "<a id='currentItem' href=\"javascript:showSearchMenu('product', '$productID', '$currentModule', '$currentMethod', '$extra')\">{$currentProduct->name} <span class='icon-caret-down'></span></a><div id='currentItemDropMenu' class='hidden affix enter-from-bottom layer'></div>";
+        $output  = "<a id='currentItem' href=\"javascript:showSearchMenu('product', '$productID', '$currentModule', '$currentMethod', '$extra')\"><div class='red'>{$currentProduct->name} <span class='icon-caret-down'></span></div></a><div id='dropMenu'><i class='icon icon-spin icon-spinner'></i></div>";
+        if($isMobile) $output  = "<a id='currentItem' href=\"javascript:showSearchMenu('product', '$productID', '$currentModule', '$currentMethod', '$extra')\"><div class='red'>{$currentProduct->name} <span class='icon-caret-down'></span></div></a><div id='currentItemDropMenu' class='hidden affix enter-from-bottom layer'></div>";
         if($currentProduct->type == 'normal') unset($this->lang->product->menu->branch);
         if($currentProduct->type != 'normal')
         {

@@ -54,7 +54,7 @@ class testsuiteModel extends model
 
         setCookie("lastProduct", $productID, $this->config->cookieLife, $this->config->webRoot);
         $currentProduct = $this->product->getById($productID);
-        $output = "<a id='currentItem' href=\"javascript:showSearchMenu('product', '$productID', '$currentModule', '$currentMethod', '$extra')\">{$currentProduct->name} <span class='icon-caret-down'></span></a><div id='dropMenu'><i class='icon icon-spin icon-spinner'></i></div>";
+        $output = "<a id='currentItem' href=\"javascript:showSearchMenu('product', '$productID', '$currentModule', '$currentMethod', '$extra')\"><div class='red'>{$currentProduct->name} <span class='icon-caret-down'></span></div></a><div id='dropMenu'><i class='icon icon-spin icon-spinner'></i></div>";
         if($currentProduct->type != 'normal')
         {
             $this->app->loadLang('branch');
@@ -76,7 +76,7 @@ class testsuiteModel extends model
     public function setLibMenu($libraries, $libID, $moduleID = 0)
     {
         $currentLibName = zget($libraries, $libID, '');
-        $selectHtml = empty($libraries) ? '' : "<a id='currentItem' href=\"javascript:showSearchMenu('testsuite', '$libID', 'testsuite', 'library', '')\">{$currentLibName} <span class='icon-caret-down'></span></a><div id='dropMenu'><i class='icon icon-spin icon-spinner'></i></div>";
+        $selectHtml = empty($libraries) ? '' : "<a id='currentItem' href=\"javascript:showSearchMenu('testsuite', '$libID', 'testsuite', 'library', '')\"><div class='red'>{$currentLibName} <span class='icon-caret-down'></span></div></a><div id='dropMenu'><i class='icon icon-spin icon-spinner'></i></div>";
 
         if($this->config->global->flow == 'onlyTest')
         {

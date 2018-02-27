@@ -14,18 +14,18 @@
 <?php include '../../common/view/kindeditor.html.php'; ?>
 <?php include 'debug.html.php'; ?>
 
+<div id='titlebar'>
+    <div class='heading' align='right'>
 
-<nav id="modulemenu">
-    <ul class="nav">
-        <li class="right" data-id="create">
-            <?php
-            $lnk = html::a(inlink('create'), "<i class='icon icon-plus'></i>" . $lang->pipeline->add);
-            echo $lnk;
-            ?>
-        </li>
-    </ul>
-</nav>
-<br>
+        <?php
+        $lnk = html::a(inlink('create'),
+            "<i class='icon icon-plus'></i>" . $lang->pipeline->add,
+            "", "class='btn'");
+        echo $lnk;
+        ?>
+    </div>
+</div>
+
 <div class='row-table'>
     <div class='col-main'>
         <div class='main'>
