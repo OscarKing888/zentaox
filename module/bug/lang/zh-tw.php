@@ -42,6 +42,8 @@ $lang->bug->openedDate       = '創建日期';
 $lang->bug->openedDateAB     = '創建日期';
 $lang->bug->openedBuild      = '影響版本';
 $lang->bug->assignedTo       = '指派給';
+$lang->bug->assignBug        = '指派給';
+$lang->bug->assignedToAB     = '指派給';
 $lang->bug->assignedDate     = '指派日期';
 $lang->bug->resolvedBy       = '解決者';
 $lang->bug->resolvedByAB     = '解決';
@@ -108,6 +110,7 @@ $lang->bug->assignToNull   = '未指派';
 $lang->bug->unResolved     = '未解決';
 $lang->bug->toClosed       = '待關閉';
 $lang->bug->unclosed       = '未關閉';
+$lang->bug->unconfirmed    = '未確認';
 $lang->bug->longLifeBugs   = '久未處理';
 $lang->bug->postponedBugs  = '被延期';
 $lang->bug->overdueBugs    = '過期Bug';
@@ -116,6 +119,10 @@ $lang->bug->byQuery        = '搜索';
 $lang->bug->needConfirm    = '需求變動';
 $lang->bug->allProduct     = '所有' . $lang->productCommon;
 
+
+$lang->bug->assignToMeAB   = '指派給我';
+$lang->bug->openedByMeAB   = '由我創建';
+$lang->bug->resolvedByMeAB = '由我解決';
 
 $lang->bug->ditto       = '同上';
 $lang->bug->dittoNotice = '該bug與上一bug不屬於同一產品！';
@@ -155,8 +162,8 @@ $lang->bug->confirmDeleteTemplate = '您確認要刪除該模板嗎？';
 
 /* 模板。*/
 $lang->bug->tplStep   = "<p>[步驟]</p>";
-$lang->bug->tplResult = "</br><p>[結果]</p>";
-$lang->bug->tplExpect = "</br><p>[期望]</p>";
+$lang->bug->tplResult = "<p>[結果]</p>";
+$lang->bug->tplExpect = "<p>[期望]</p>";
 
 /* 各個欄位取值列表。*/
 $lang->bug->severityList[3] = '3';
@@ -372,7 +379,7 @@ $lang->bug->featureBar['browse']['assigntome']    = $lang->bug->assignToMe;
 $lang->bug->featureBar['browse']['openedbyme']    = $lang->bug->openedByMe;
 $lang->bug->featureBar['browse']['resolvedbyme']  = $lang->bug->resolvedByMe;
 
-$lang->bug->featureBar['browse']['unconfirmed']   = $lang->bug->confirmedList[0];
+$lang->bug->featureBar['browse']['unconfirmed']   = $lang->bug->unconfirmed;
 $lang->bug->featureBar['browse']['assigntonull']  = $lang->bug->assignToNull;
 $lang->bug->featureBar['browse']['unresolved']    = $lang->bug->unResolved;
 $lang->bug->featureBar['browse']['toclosed']      = $lang->bug->toClosed;

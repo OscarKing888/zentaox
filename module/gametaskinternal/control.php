@@ -238,7 +238,6 @@ class gametaskinternal extends control
         $this->setupCommonViewVars();
 
         $this->view->deptUsers = $this->user->getPairs('nodeleted|noclosed');
-
         $this->display();
     }
 
@@ -373,6 +372,8 @@ class gametaskinternal extends control
         $allUsers = $this->user->getPairs('nodeleted|noclosed');
         $this->view->allUsers = $allUsers;
         $this->view->users = $this->user->getPairs('nodeleted|noclosed|noletter');
+        $this->dept->setupDeptUsers($this->view, $this->app->user->account, $this->app->user->dept);
+        /*
         $deptUsers = $this->dept->getDeptUserPairs($this->app->user->dept);
         $this->view->user = $this->app->user->account;
 
@@ -399,6 +400,7 @@ class gametaskinternal extends control
         }
 
         $this->view->deptUsers = $deptUsers;
+        //*/
 
         // versions
         $verDeadlines = $this->dao->select('id,deadline')->from(TABLE_GAMETASKINTERNALVERSION)

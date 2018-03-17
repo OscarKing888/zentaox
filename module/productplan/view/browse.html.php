@@ -13,6 +13,7 @@
 <?php include '../../common/view/header.html.php';?>
 <?php js::set('confirmDelete', $lang->productplan->confirmDelete)?>
 <?php js::set('browseType', $browseType);?>
+
 <div id='featurebar'>
   <ul class='nav'>
     <li>

@@ -27,6 +27,7 @@ class taskModel extends model
         $this->loadModel('file');
         $task = fixer::input('post')
             ->add('project', (int)$projectID)
+            ->setDefault('type')
             ->setDefault('estimate, left, story', 0)
             ->setDefault('status', 'wait')
             ->setIF($this->post->estimate != false, 'left', $this->post->estimate)
@@ -214,11 +215,22 @@ class taskModel extends model
         $storyIDs  = array();
         $taskNames = array();
         $preStory  = 0;
+
+        /*
+        for($i = 0; $i < $batchNum; $i++) {
+            error_log("batch create task[$i] name:" . $tasks->name[$i] . " dept:" . $tasks->dept[$i]);
+        }
+        //*/
+
+
         foreach($tasks->story as $key => $storyID)
         {
             if(empty($tasks->name[$key])) continue;
-            if($tasks->type[$key] == 'affair') continue;
-            if($tasks->type[$key] == 'ditto' && isset($tasks->type[$key - 1]) && $tasks->type[$key - 1] == 'affair') continue;
+
+            //oscar:if($tasks->type[$key] == 'affair') continue;
+            //oscar:if($tasks->type[$key] == 'ditto' && isset($tasks->type[$key - 1]) && $tasks->type[$key - 1] == 'affair') continue;
+
+            if($tasks->dept[$key] == 'ditto') continue; //oscar:
 
             if($storyID == 'ditto') $storyID = $preStory;
             $preStory = $storyID;
@@ -232,7 +244,7 @@ class taskModel extends model
             else
             {
                 dao::$errors['message'][] = sprintf($this->lang->duplicate, $this->lang->task->common);
-                die(js::error(dao::getError()));
+                die(js::error("duplicate error:" . dao::getError()));
             }
         }
 
@@ -246,12 +258,15 @@ class taskModel extends model
             {
                 die(js::alert($this->lang->task->error->estimateNumber));
             }
-            if(!empty($tasks->name[$i]) and empty($tasks->type[$i])) die(js::alert(sprintf($this->lang->error->notempty, $this->lang->task->type)));
+            //oscar:if(!empty($tasks->name[$i]) and empty($tasks->type[$i])) die(js::alert(sprintf($this->lang->error->notempty . "_OSCAR", $this->lang->task->type)));
+            if(!empty($tasks->name[$i]) and empty($tasks->dept[0])){
+                die(js::alert(sprintf("批量检查：" . $tasks->dept[$i] . $this->lang->error->notempty, $this->lang->dept)));
+            }
         }
 
         $story      = 0;
         $module     = 0;
-        $type       = '';
+        $type       = 'devel'; //oscar:
         $dept       = 0; //oscar:
         $assignedTo = '';
 
@@ -260,10 +275,14 @@ class taskModel extends model
             $story      = !isset($tasks->story[$i]) || $tasks->story[$i]           == 'ditto' ? $story     : $tasks->story[$i];
             $module     = !isset($tasks->module[$i]) || $tasks->module[$i]         == 'ditto' ? $module    : $tasks->module[$i];
             $type       = !isset($tasks->type[$i]) || $tasks->type[$i]             == 'ditto' ? $type      : $tasks->type[$i];
-            $dept       = !isset($tasks->dept[$i]) || $tasks->dept[$i]             == 'ditto' ? $dept      : $tasks->dept[$i]; //oscar:
+            $dept       = !isset($tasks->dept[$i]) || $tasks->dept[$i] == 'ditto' ? $dept : $tasks->dept[$i]; //oscar:
             $assignedTo = !isset($tasks->assignedTo[$i]) || $tasks->assignedTo[$i] == 'ditto' ? $assignedTo: $tasks->assignedTo[$i];
 
             if(empty($tasks->name[$i])) continue;
+
+            /*
+            error_log("*** batch create [$i] name:" . $tasks->name[$i] . " dept:" . $dept);
+            //*/
 
             $data[$i]             = new stdclass();
             $data[$i]->story      = (int)$story;
@@ -284,7 +303,7 @@ class taskModel extends model
             $data[$i]->openedDate = $now;
             $data[$i]->parent     = $tasks->parent[$i];
 
-            $data[$i]->dept     = $tasks->dept[$i]; //oscar:
+            $data[$i]->dept     = $dept; //oscar:
 
             if($story) $data[$i]->storyVersion = $this->loadModel('story')->getVersion($data[$i]->story);
             if($assignedTo) $data[$i]->assignedDate = $now;
@@ -682,6 +701,26 @@ class taskModel extends model
         return $allChanges;
     }
 
+    public function batchAssignToDept($taskIDList, $dept)
+    {
+        $now        = helper::now();
+        $allChanges = array();
+        $oldTasks   = $this->getByList($taskIDList);
+        foreach($taskIDList as $taskID)
+        {
+            $oldTask = $oldTasks[$taskID];
+            if($dept == $oldTask->dept) continue;
+
+            $task = new stdclass();
+            $task->lastEditedBy   = $this->app->user->account;
+            $task->lastEditedDate = $now;
+            $task->dept         = $dept;
+
+            $this->dao->update(TABLE_TASK)->data($task)->autoCheck()->where('id')->eq((int)$taskID)->exec();
+            if(!dao::isError()) $allChanges[$taskID] = common::createChanges($oldTask, $task);
+        }
+        return $allChanges;
+    }
     /**
      * Assign a task to a user again.
      *
@@ -699,7 +738,7 @@ class taskModel extends model
             ->setDefault('lastEditedBy', $this->app->user->account)
             ->setDefault('lastEditedDate', $now)
             ->setDefault('assignedDate', $now)
-            ->remove('comment,showModule')
+            ->remove('comment,showModule,assignedToDept,batchChangeModule') //oscar:
             ->get();
 
         $this->dao->update(TABLE_TASK)
@@ -1280,6 +1319,51 @@ class taskModel extends model
      */
     public function getProjectTasks($projectID, $productID = 0, $type = 'all', $modules = 0, $orderBy = 'status_asc, id_desc', $pager = null)
     {
+        //oscar:
+        $this->loadModel('dept');
+
+        $myDepts = $this->dept->setupDeptUsers($this->view, $this->app->user->account, $this->app->user->dept);
+
+        /*/
+        $myDepts = array($this->app->user->dept);
+        $deptUsers = $this->dept->getDeptUserPairs($this->app->user->dept);
+
+        $leaders = $this->dao->select('dept,username')->from('gamegroupleaders')
+            ->orderBy('dept asc')
+            ->fetchPairs();
+
+        //$depts = array('' => '') + $this->loadModel('dept')->getOptionMenu();
+
+        foreach ($leaders as $key => $leader) {
+            if($leader == $this->app->user->account)
+            {
+                array_push($myDepts, $key);
+                //error_log("#_#_# leader:$leader dept:" . $depts[$key]);
+                $deptUsers += $this->dept->getDeptUserPairs($key);
+            }
+        }
+
+        $deptUsers = array_unique($deptUsers);
+        $myDepts = array_unique($myDepts);
+        //*/
+
+        /*
+        error_log("### dept:" . $depts[$this->app->user->dept]);
+        foreach ($deptUsers as $deptUser) {
+            //error_log("### deptuser:$deptUser");
+        }
+
+        foreach($myDepts as $d)
+        {
+            error_log("### My Depts --- $d:" . $depts[$d]);
+        }
+        //*/
+
+        //oscar:
+
+
+        //baseDAO::dumpsql(true);
+
         if(is_string($type)) $type = strtolower($type);
         $tasks = $this->dao->select('t1.*, t2.id AS storyID, t2.title AS storyTitle, t2.product, t2.branch, t2.version AS latestStoryVersion, t2.status AS storyStatus, t3.realname AS assignedToRealName')
             ->from(TABLE_TASK)->alias('t1')
@@ -1289,18 +1373,26 @@ class taskModel extends model
             ->leftJoin(TABLE_MODULE)->alias('t5')->on('t1.module = t5.id')
             ->where('t1.project')->eq((int)$projectID)
             ->beginIF(!in_array($type, array('assignedtome', 'myinvolved')))->andWhere('t1.parent')->eq(0)->fi()
+
+            // oscar:
+            ->beginIF($type == 'mydept')
+                ->andWhere('t1.dept')->in(array_values($myDepts))
+            ->fi()
+            // oscar:
+
             ->beginIF($type == 'myinvolved')
             ->andWhere('t4.account', true)->eq($this->app->user->account)
             ->orWhere('t1.assignedTo')->eq($this->app->user->account)
             ->orWhere('t1.finishedby')->eq($this->app->user->account)
             ->markRight(1)->fi()
+
             ->beginIF($productID)->andWhere("((t5.root=" . (int)$productID . " and t5.type='story') OR t2.product=" . (int)$productID . ")")->fi()
             ->beginIF($type == 'undone')->andWhere("(t1.status = 'wait' or t1.status ='doing')")->fi()
             ->beginIF($type == 'needconfirm')->andWhere('t2.version > t1.storyVersion')->andWhere("t2.status = 'active'")->fi()
             ->beginIF($type == 'assignedtome')->andWhere('t1.assignedTo')->eq($this->app->user->account)->fi()
             ->beginIF($type == 'finishedbyme')->andWhere('t1.finishedby')->eq($this->app->user->account)->fi()
             ->beginIF($type == 'delayed')->andWhere('t1.deadline')->gt('1970-1-1')->andWhere('t1.deadline')->lt(date(DT_DATE1))->andWhere('t1.status')->in('wait,doing')->fi()
-            ->beginIF(is_array($type) or strpos(',all,undone,needconfirm,assignedtome,delayed,finishedbyme,myinvolved,', ",$type,") === false)->andWhere('t1.status')->in($type)->fi()
+            ->beginIF($type != 'mydept' and (is_array($type) or strpos(',all,undone,needconfirm,assignedtome,delayed,finishedbyme,myinvolved,', ",$type,") === false))->andWhere('t1.status')->in($type)->fi()
             ->beginIF($modules)->andWhere('t1.module')->in($modules)->fi()
             ->andWhere('t1.deleted')->eq(0)
             ->orderBy('t1.`parent`,' . $orderBy)
@@ -1309,7 +1401,16 @@ class taskModel extends model
 
         $this->loadModel('common')->saveQueryCondition($this->dao->get(), 'task', ($productID or in_array($type, array('assignedtome', 'myinvolved', 'needconfirm'))) ? false : true);
 
-        if(empty($tasks)) return array();
+        if(empty($tasks))
+        {
+            $tasks = array();
+            $tasks->deptUsers = $deptUsers;
+            return $tasks;
+        }
+
+        $tasks->deptUsers = $deptUsers;
+
+
 
         $taskList = array_keys($tasks);
         $taskTeam = $this->dao->select('*')->from(TABLE_TEAM)->where('task')->in($taskList)->fetchGroup('task');
@@ -2096,7 +2197,7 @@ class taskModel extends model
      * @access public
      * @return void
      */
-    public function printCell($col, $task, $users, $browseType, $branchGroups, $modulePairs = array(), $mode = 'datatable', $child = false)
+    public function printCell($col, $task, $users, $browseType, $branchGroups, $modulePairs = array(), $mode = 'datatable', $child = false, $depts = array())
     {
         $canView  = common::hasPriv('task', 'view');
         $taskLink = helper::createLink('task', 'view', "taskID=$task->id");
@@ -2141,6 +2242,14 @@ class taskModel extends model
                 case 'type':
                     echo $this->lang->task->typeList[$task->type];
                     break;
+
+                //oscar:
+                case 'dept':
+                    echo $depts[$task->dept];
+                    //echo $task->dept;
+                    break;
+                //oscar:
+
                 case 'status':
                     $storyChanged = (!empty($task->storyStatus) and $task->storyStatus == 'active' and $task->latestStoryVersion > $task->storyVersion);
                     $storyChanged ? print("<span class='warning'>{$this->lang->story->changed}</span> ") : print($this->lang->task->statusList[$task->status]);

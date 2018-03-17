@@ -40,7 +40,7 @@
                 <td></td>
             </tr>
             <tr>
-                <th><?php echo $lang->task->type; ?></th>
+                <th><?php echo $lang->task->dept; ?></th>
                 <td><?php echo html::select('dept', $depts, $task->dept, 'class=form-control onchange="setOwners(this.value)"'); ?></td>
                 <td></td>
             </tr>

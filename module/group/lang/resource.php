@@ -400,6 +400,8 @@ $lang->resource->task->editEstimate       = 'editEstimate';
 $lang->resource->task->deleteEstimate     = 'deleteEstimate';
 $lang->resource->task->report             = 'reportChart';
 
+$lang->resource->task->batchAssignToDept = 'assignedToDept';
+
 $lang->task->methodOrder[5]   = 'create';
 $lang->task->methodOrder[10]  = 'batchCreate';
 $lang->task->methodOrder[15]  = 'batchEdit';
@@ -423,6 +425,7 @@ $lang->task->methodOrder[100] = 'editEstimate';
 $lang->task->methodOrder[105] = 'deleteEstimate';
 $lang->task->methodOrder[110] = 'report';
 $lang->task->methodOrder[115] = 'batchChangeModule';
+$lang->task->methodOrder[120] = 'batchAssignToDept';
 
 /* Build. */
 $lang->resource->build = new stdclass();
