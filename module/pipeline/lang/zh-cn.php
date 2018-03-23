@@ -28,6 +28,6 @@ $lang->pipeline->content = '内容';
 $lang->pipeline->pic = '图片';
 $lang->pipeline->action  = '操作';
 
-$lang->project->manageProducts = '产品';
+$lang->project->manageProducts = '策划';
 
 $lang->pipeline->methodOrder[5] = 'index';

@@ -142,6 +142,7 @@ $lang->project->storySort        = '需求排序';
 $lang->project->allTasks     = '所有';
 $lang->project->assignedToMe = '指派给我';
 $lang->project->myInvolved   = '由我参与';
+$lang->project->mydept   = '我的部门';
 
 $lang->project->statusSelects['']             = '更多';
 $lang->project->statusSelects['wait']         = '未开始';
@@ -274,10 +275,12 @@ $lang->printKanban->taskStatus = '状态';
 $lang->printKanban->typeList['all']       = '全部';
 $lang->printKanban->typeList['increment'] = '增量';
 
-$lang->project->featureBar['task']['unclosed']     = $lang->project->unclosed;
-$lang->project->featureBar['task']['all']          = $lang->project->allTasks;
+$lang->project->featureBar['task']['mydept']   = $lang->project->mydept;
 $lang->project->featureBar['task']['assignedtome'] = $lang->project->assignedToMe;
 $lang->project->featureBar['task']['myinvolved']   = $lang->project->myInvolved;
+
+$lang->project->featureBar['task']['unclosed']     = $lang->project->unclosed;
+$lang->project->featureBar['task']['all']          = $lang->project->allTasks;
 $lang->project->featureBar['task']['delayed']      = '已延期';
 $lang->project->featureBar['task']['needconfirm']  = '需求变动';
 $lang->project->featureBar['task']['status']       = $lang->project->statusSelects[''];

@@ -53,11 +53,11 @@ include '../../common/view/datepicker.html.php';
                                         <?php echo html::select("steps[]", $depts, 0, 'class=form-control chosen'); ?>
                                         <span class="input-group-addon step-type-toggle">
                                           <input type='hiddsen' name='stepType[]' value='item' class='step-type'>
-                                          <label class="checkbox-inline"><input tabindex='-1' type="checkbox" class='step-group-toggle'> <?php echo "子流程" ?></label>
+                                          <label class="checkbox-inline"><input tabindex='-1' type="checkbox" class='step-group-toggle'> <?php echo "子阶段" ?></label>
                                         </span>
                                     </div>
                                 </td>
-                                <td><textarea rows='1' class='form-control autosize step-expects' name='expects[]'></textarea></td>
+                                <td><input name='expects[]' value='4' class='form-control autosize step-expects'></td>
                                 <td class='step-actions'>
                                     <div class='btn-group'>
                                         <button type='button' class='btn btn-step-add' tabindex='-1'><i class='icon icon-plus'></i></button>
@@ -79,17 +79,16 @@ include '../../common/view/datepicker.html.php';
                                             <?php echo html::select("steps[]", $depts, 0, 'class=form-control chosen'); ?>
                                             <span class='input-group-addon step-type-toggle'>
                                                 <?php if(!isset($step->type)) $step->type = 'step';?>
-                                                <input type='hidsden' name='stepType[]' value='<?php echo $step->type;?>' class='step-type'>
+                                                <input type='hidden' name='stepType[]' value='<?php echo $step->type;?>' class='step-type'>
 
-                                                <label class="checkbox-inline"><input tabindex='-1' type="checkbox" class='step-group-toggle'> <?php echo "子流程" ?></label>
                                                 <label class="checkbox-inline">
-                                                    <input tabindex='-1' type="checkbox" class='step-group-toggle'<?php if($step->type === 'group') echo ' checked' ?>
-                                                    <?php echo "子流程" ?>
+                                                    <input tabindex='-1' type="checkbox" class='step-group-toggle'<?php if($step->type === 'group') echo ' checked' ?>>
+                                                    <?php echo "子阶段" ?>
                                                 </label>
                                             </span>
                                         </div>
                                     </td>
-                                    <td><?php echo html::textarea('expects[]', $step->expect, "rows='1' class='form-control autosize step-expects'") ?></td>
+                                    <td><input name='expects[]' value='4' class='form-control autosize step-expects'></td>
                                     <td class='step-actions'>
                                         <div class='btn-group'>
                                             <button type='button' class='btn btn-step-add' tabindex='-1'><i class='icon icon-plus'></i></button>

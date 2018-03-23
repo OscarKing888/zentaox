@@ -122,12 +122,11 @@ js::set('browseType', $browseType);
                         }
 
                         $memberPairs = $deptUsers;
-                        $canBatchEdit = common::hasPriv('task', 'batchEdit', !empty($task) ? $task : null);
-                        $canBatchClose = (common::hasPriv('task', 'batchClose', !empty($task) ? $task : null) && strtolower($browseType) != 'closedBy');
-                        $canBatchCancel = common::hasPriv('task', 'batchCancel', !empty($task) ? $task : null);
-                        $canBatchChangeModule = common::hasPriv('task', 'batchChangeModule', !empty($task) ? $task : null);
-                        $canBatchAssignTo = common::hasPriv('task', 'batchAssignTo', !empty($task) ? $task : null);
-
+                        $canBatchEdit = true;//common::hasPriv('task', 'batchEdit', !empty($task) ? $task : null);
+                        $canBatchClose = true;//(common::hasPriv('task', 'batchClose', !empty($task) ? $task : null) && strtolower($browseType) != 'closedBy');
+                        $canBatchCancel = true;//common::hasPriv('task', 'batchCancel', !empty($task) ? $task : null);
+                        $canBatchChangeModule = true;//common::hasPriv('task', 'batchChangeModule', !empty($task) ? $task : null);
+                        $canBatchAssignTo = true;//common::hasPriv('task', 'batchAssignTo', !empty($task) ? $task : null);
                         if (count($tasks)) {
                             echo html::selectButton();
 
@@ -154,15 +153,7 @@ js::set('browseType', $browseType);
                                 //echo html::a('#', $lang->close, '', $misc);
                                 echo html::linkButton($lang->task->close, '#', 'self', $misc);
                                 //echo html::commonButton($lang->close, $misc);
-
-
-                                $actionLink = $this->createLink('task', 'batchCancel');
-                                $misc = $canBatchClose ? "onclick=\"setFormAction('$actionLink', 'hiddenwin', '#moreAction')\"" : "class='disabled'";
-                                //echo "<li>" . html::a('#', $lang->close, '', $misc) . "</li>";
-                                //echo html::a('#', $lang->close, '', $misc);
-                                echo html::linkButton($lang->task->cancel, '#', 'self', $misc);
                             }
-
 
                             if ($tools['batchComplete']) {
                                 $actionLink = $this->createLink('task', 'batchComplete');
@@ -173,17 +164,13 @@ js::set('browseType', $browseType);
                                 //echo html::commonButton($lang->task->cancel, $misc);
                             }
 
-
-
                             //echo "</ul>";
                             //echo "</ul>";
                             echo "</div>";
 
 
                             if ($tools['batchAssignTo']) {
-
-                                //$actionLink = $this->createLink('task', 'batchAssignTo', "");
-                                $actionLink = $this->createLink('task', 'batchAssignTo', "projectID=$projectID");
+                                $actionLink = $this->createLink('task', 'batchAssignTo', "");
 
                                 echo "<div class='btn-group dropup'>";
                                 echo "<button id='taskBatchAssignTo' type='button' class='btn dropdown-toggle' data-toggle='dropdown'>" . $lang->task->assignedTo . "<span class='caret'></span></button>";
@@ -194,39 +181,20 @@ js::set('browseType', $browseType);
                                 foreach ($memberPairs as $key => $value) {
                                     if (empty($key)) continue;
                                     //echo "<li class='option' data-key='$key'>" . html::a("javascript:$(\".table-actions #assignedTo\").val(\"$key\");setFormAction(\"$actionLink\", \"hiddenwin\", \"#moreAction\")", $value, '', '') . '</li>';
-                                    $actionLink = $this->createLink('task', 'batchAssignTo', "projectID=$projectID");
                                     echo "<li class='option' data-key='$key'>" . html::a("javascript:$(\"#assignedTo\").val(\"$key\");setFormAction(\"$actionLink\", \"hiddenwin\", \"#moreAction\")", $value, '', '') . '</li>';
                                 }
                                 echo "</ul>";
                                 if ($withSearch) echo "<div class='menu-search'><div class='input-group input-group-sm'><input type='text' class='form-control' placeholder=''><span class='input-group-addon'><i class='icon-search'></i></span></div></div>";
                                 echo "</div></li>";
                                 echo "</ul>";
-                                //echo "</div>";
-                            }
-
-
-                            //if ($tools['batchChangeModule'])
-                            {
-                                echo "<div class='btn-group dropup'>";
-                                echo "<button id='taskbatchChangeModule' type='button' class='btn dropdown-toggle' data-toggle='dropdown'>" . $lang->task->moduleAB . "<span class='caret'></span></button>";
-                                echo "<ul class='dropdown-menu' id='taskbatchChangeModuleMenu'>";
-                                echo html::select('batchChangeModule', $deptPairs, '', 'class="hidden"');
-
-                                echo '<ul class="dropdown-list">';
-                                foreach ($modules as $moduleId => $module) {
-                                    $actionLink = $this->createLink('task', 'batchChangeModule', "moduleID=$moduleId");
-                                    if (empty($moduleId)) continue;
-                                    echo "<li class='option' data-key='$moduleId'>" . html::a("javascript:$(\"#batchChangeModule\").val(\"$moduleId\");setFormAction(\"$actionLink\", \"hiddenwin\", \"#moreAction\")", $module, '', '') . '</li>';
-                                }
-                                echo "</ul>";
-                                echo "</div></li>";
-                                echo "</ul>";
-                                //echo "</div>";
+                                echo "</div>";
                             }
 
 
                             if ($tools['batchAssignToDept'])
                             {
+                                $actionLink = $this->createLink('task', 'batchAssignToDept', "");
+
                                 echo "<div class='btn-group dropup'>";
                                 echo "<button id='taskbatchAssignToDept' type='button' class='btn dropdown-toggle' data-toggle='dropdown'>" . $lang->task->assignedToDept . "<span class='caret'></span></button>";
                                 echo "<ul class='dropdown-menu' id='taskbatchAssignToDeptMenu'>";
@@ -235,13 +203,12 @@ js::set('browseType', $browseType);
                                 echo '<ul class="dropdown-list">';
                                 foreach ($deptPairs as $key => $value) {
                                     if (empty($key)) continue;
-                                    $actionLink = $this->createLink('task', 'batchAssignToDept', "dept=$key");
                                     echo "<li class='option' data-key='$key'>" . html::a("javascript:$(\"#assignedToDept\").val(\"$key\");setFormAction(\"$actionLink\", \"hiddenwin\", \"#moreAction\")", $value, '', '') . '</li>';
                                 }
                                 echo "</ul>";
                                 echo "</div></li>";
                                 echo "</ul>";
-                                //echo "</div>";
+                                echo "</div>";
                             }
 
 
@@ -261,7 +228,7 @@ js::set('browseType', $browseType);
                                 echo "</ul>";
                                 echo "</div></li>";
                                 echo "</ul>";
-                                //echo "</div>";
+                                echo "</div>";
                             }
 
 
@@ -284,7 +251,7 @@ js::set('browseType', $browseType);
                                 echo "</ul>";
                                 echo "</div></li>";
                                 echo "</ul>";
-                                //echo "</div>";
+                                echo "</div>";
                             }
 
 
@@ -298,9 +265,74 @@ js::set('browseType', $browseType);
                                 echo html::linkButton($lang->task->delete, '#', 'self', $misc);
                             }
                         }
+                        ?>
+                    </div>
+                    <div class='table-actions clearfix'>
+                        <?php
+                        $canBatchEdit = common::hasPriv('task', 'batchEdit', !empty($task) ? $task : null);
+                        $canBatchClose = (common::hasPriv('task', 'batchClose', !empty($task) ? $task : null) && strtolower($browseType) != 'closedBy');
+                        $canBatchCancel = common::hasPriv('task', 'batchCancel', !empty($task) ? $task : null);
+                        $canBatchChangeModule = common::hasPriv('task', 'batchChangeModule', !empty($task) ? $task : null);
+                        $canBatchAssignTo = common::hasPriv('task', 'batchAssignTo', !empty($task) ? $task : null);
+                        if (count($tasks)) {
+                            echo html::selectButton();
+
+                            $actionLink = $this->createLink('task', 'batchEdit', "projectID=$projectID");
+                            $misc = $canBatchEdit ? "onclick=\"setFormAction('$actionLink', '', '#projectTaskForm')\"" : "disabled='disabled'";
+
+                            echo "<div class='btn-group dropup'>";
+                            echo html::commonButton($lang->edit, $misc);
+                            echo "<button id='moreAction' type='button' class='btn dropdown-toggle' data-toggle='dropdown'><span class='caret'></span></button>";
+                            echo "<ul class='dropdown-menu' id='moreActionMenu'>";
+
+                            $actionLink = $this->createLink('task', 'batchClose');
+                            $misc = $canBatchClose ? "onclick=\"setFormAction('$actionLink', 'hiddenwin', '#moreAction')\"" : "class='disabled'";
+                            echo "<li>" . html::a('#', $lang->close, '', $misc) . "</li>";
+
+                            $actionLink = $this->createLink('task', 'batchCancel');
+                            $misc = $canBatchCancel ? "onclick=\"setFormAction('$actionLink', 'hiddenwin', '#moreAction')\"" : "class='disabled'";
+                            echo "<li>" . html::a('#', $lang->task->cancel, '', $misc) . "</li>";
+
+                            if ($canBatchChangeModule) {
+                                $withSearch = count($modules) > 10;
+                                echo "<li class='dropdown-submenu'>";
+                                echo html::a('javascript:;', $lang->task->moduleAB, '', "id='moduleItem'");
+                                echo "<div class='dropdown-menu" . ($withSearch ? ' with-search' : '') . "'>";
+                                echo '<ul class="dropdown-list">';
+                                foreach ($modules as $moduleId => $module) {
+                                    $actionLink = $this->createLink('task', 'batchChangeModule', "moduleID=$moduleId");
+                                    echo "<li class='option' data-key='$moduleID'>" . html::a('#', $module, '', "onclick=\"setFormAction('$actionLink', 'hiddenwin', '#moreAction')\"") . "</li>";
+                                }
+                                echo '</ul>';
+                                if ($withSearch) echo "<div class='menu-search'><div class='input-group input-group-sm'><input type='text' class='form-control' placeholder=''><span class='input-group-addon'><i class='icon-search'></i></span></div></div>";
+                                echo '</div></li>';
+                            } else {
+                                echo '<li>' . html::a('javascript:;', $lang->task->moduleAB, '', $misc) . '</li>';
+                            }
+
+                            /* Batch assign. */
+                            if ($canBatchAssignTo) {
+                                $withSearch = count($memberPairs) > 10;
+                                $actionLink = $this->createLink('task', 'batchAssignTo', "projectID=$projectID");
+                                echo html::select('assignedTo', $memberPairs, '', 'class="hidden"');
+                                echo "<li class='dropdown-submenu'>";
+                                echo html::a('javascript::', $lang->task->assignedTo, 'id="assignItem"');
+                                echo "<div class='dropdown-menu" . ($withSearch ? ' with-search' : '') . "'>";
+                                echo '<ul class="dropdown-list">';
+                                foreach ($memberPairs as $key => $value) {
+                                    if (empty($key)) continue;
+                                    echo "<li class='option' data-key='$key'>" . html::a("javascript:$(\".table-actions #assignedTo\").val(\"$key\");setFormAction(\"$actionLink\", \"hiddenwin\", \"#moreAction\")", $value, '', '') . '</li>';
+                                }
+                                echo "</ul>";
+                                if ($withSearch) echo "<div class='menu-search'><div class='input-group input-group-sm'><input type='text' class='form-control' placeholder=''><span class='input-group-addon'><i class='icon-search'></i></span></div></div>";
+                                echo "</div></li>";
+                            }
+                            echo "</ul></div>";
+                        }
                         echo "<div class='text'>" . $summary . "</div>";
                         ?>
                     </div>
+
                     <?php $pager->show(); ?>
                 </td>
             </tr>

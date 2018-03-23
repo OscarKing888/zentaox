@@ -47,7 +47,7 @@ if ($hiddenStory and isset($visibleFields['story'])) $colspan -= 1;
                 <th class='w-200px<?php echo zget($visibleFields, 'story', ' hidden');
                 echo $hiddenStory; ?>'><?php echo $lang->task->story; ?></th><?php endif; ?>
             <th><?php echo $lang->task->name; ?> <span class='required'></span></th>
-            <th class='w-80px'><?php echo $lang->typeAB; ?> <span class='required'></span></th>
+            <th class='w-80px'><?php echo $lang->task->dept; ?> <span class='required'></span></th>
             <th class='w-150px<?php echo zget($visibleFields, 'assignedTo', ' hidden') ?>'><?php echo $lang->task->assignedTo; ?></th>
             <th class='w-50px<?php echo zget($visibleFields, 'estimate', ' hidden') ?>'><?php echo $lang->task->estimateAB; ?></th>
             <th class='w-100px<?php echo zget($visibleFields, 'estStarted', ' hidden') ?>'><?php echo $lang->task->estStarted; ?></th>
@@ -103,7 +103,7 @@ if ($hiddenStory and isset($visibleFields['story'])) $colspan -= 1;
                         <?php echo html::input("name[$i]", '', "class='form-control' autocomplete='off'"); ?>
                     </div>
                 </td>
-                <td><?php echo html::select("$dept[$i]", $depts, $dept, 'class=form-control'); ?></td>
+                <td><?php echo html::select("dept[$i]", $depts, $dept, 'class=form-control chosen'); ?></td>
                 <td <?php echo zget($visibleFields, 'assignedTo', "class='hidden'") ?>
                         style='overflow:visible'><?php echo html::select("assignedTo[$i]", $members, $member, "class='form-control chosen'"); ?></td>
                 <td <?php echo zget($visibleFields, 'estimate', "class='hidden'") ?>><?php echo html::input("estimate[$i]", '', "class='form-control text-center' autocomplete='off'"); ?></td>

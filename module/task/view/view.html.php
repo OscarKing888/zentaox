@@ -176,10 +176,56 @@
                             <?php
                             $v = count($artstation->files);
                             $files = array_reverse($artstation->files);
-                            foreach ($files as $file): ?>
+                            foreach ($files as $file):
+                                if(stripos('jpg|jpeg|gif|png|bmp|psd', $file->extension) !== false)
+                                {
+                                    $imageSize  = getimagesize($file->realPath);
+                                    $imageWidth = $imageSize ? $imageSize[0] : 0;
+                                    $imageHeight = $imageSize ? $imageSize[1] : 0;
+                                    //error_log("oscar: getimagesize w:$imageWidth path:$file->realPath");
+
+                                    $szDispStr = "";
+                                    if($imageWidth == 7680 && $imageHeight == 4320)
+                                    {
+                                        $szDispStr = "($imageWidth x $imageHeight) - 8K";
+                                    }
+                                    else if($imageWidth == 4320 && $imageHeight == 7680)
+                                    {
+                                        $szDispStr = "($imageWidth x $imageHeight) - 8K 竖版";
+                                    }
+                                    else if($imageWidth == 3840 && $imageHeight == 2160)
+                                    {
+                                        $szDispStr = "($imageWidth x $imageHeight) - 4K";
+                                    }
+                                    else if($imageWidth == 2160 && $imageHeight == 3840 )
+                                    {
+                                        $szDispStr = "($imageWidth x $imageHeight) - 4K 竖版";
+                                    }
+                                    else if($imageWidth == 2560 && $imageHeight == 1440 )
+                                    {
+                                        $szDispStr = "($imageWidth x $imageHeight) - 2K";
+                                    }
+                                    else if($imageWidth == 1440 && $imageHeight == 2560 )
+                                    {
+                                        $szDispStr = "($imageWidth x $imageHeight) - 2K 竖版";
+                                    }
+                                    else if($imageWidth == 1920 && $imageHeight == 1080 )
+                                    {
+                                        $szDispStr = "($imageWidth x $imageHeight) - 1K";
+                                    }
+                                    else if($imageWidth == 1080 && $imageHeight == 1920 )
+                                    {
+                                        $szDispStr = "($imageWidth x $imageHeight) - 1K 竖版";
+                                    }
+                                    else
+                                    {
+                                        $szDispStr = "($imageWidth x $imageHeight) - 不规范的尺寸";
+                                    }
+                                }
+                                ?>
 
                                 <?php
-                                echo " 版本 - V." . ($v) . "&nbsp;&nbsp;&nbsp;&nbsp;" . $lang->file->uploadDate . substr($file->addedDate, 0, 10);
+                                echo " 版本 - V." . ($v) . "&nbsp;&nbsp;&nbsp;&nbsp;" . $lang->file->uploadDate . substr($file->addedDate, 0, 10) . "    $szDispStr";
                                 $v--;
                                 ?>
 

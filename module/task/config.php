@@ -39,14 +39,15 @@ $config->task->exportFields = '
 if($config->global->flow == 'onlyTask') $config->task->exportFields = str_replace(array(' story,'), '', $config->task->exportFields);
 
 //oscar: $config->task->customCreateFields      = 'story,estStarted,deadline,mailto,pri,estimate';
-$config->task->customCreateFields      = 'story,pri';
+$config->task->customCreateFields      = 'story,pri,files';
 //oscar: $config->task->customBatchCreateFields = 'module,story,assignedTo,estimate,estStarted,deadline,desc,pri';
-$config->task->customBatchCreateFields = 'module,story,assignedTo,desc,pri';
+$config->task->customBatchCreateFields = 'module,story,dept,desc,pri';
 $config->task->customBatchEditFields   = 'module,assignedTo,status,pri,estimate,record,left,estStarted,deadline,finishedBy,canceledBy,closedBy,closedReason';
 
 $config->task->custom = new stdclass();
 $config->task->custom->createFields      = $config->task->customCreateFields;
-$config->task->custom->batchCreateFields = 'module,story,assignedTo,estimate,desc,pri';
+//oscar:$config->task->custom->batchCreateFields = 'module,story,assignedTo,estimate,desc,pri';
+$config->task->custom->batchCreateFields = 'module,story,desc,pri';
 $config->task->custom->batchEditFields   = 'module,assignedTo,status,pri,estimate,record,left,finishedBy,closedBy,closedReason';
 
 if($config->global->flow == 'onlyTask')
@@ -57,7 +58,7 @@ if($config->global->flow == 'onlyTask')
 }
 
 $config->task->datatable = new stdclass();
-$config->task->datatable->defaultField = array('id', 'pri', 'name', 'status', 'deadline', 'openedDate', 'assignedTo', 'finishedBy', 'estimate', 'consumed', 'left', 'actions');
+$config->task->datatable->defaultField = array('id', 'pri', 'name', 'dept', 'status', 'deadline', 'openedDate', 'assignedTo', 'finishedBy', 'estimate', 'consumed', 'left', 'actions');
 
 $config->task->datatable->fieldList['id']['title']    = 'idAB';
 $config->task->datatable->fieldList['id']['fixed']    = 'left';
@@ -78,6 +79,11 @@ $config->task->datatable->fieldList['type']['title']    = 'type';
 $config->task->datatable->fieldList['type']['fixed']    = 'no';
 $config->task->datatable->fieldList['type']['width']    = '80';
 $config->task->datatable->fieldList['type']['required'] = 'no';
+
+$config->task->datatable->fieldList['dept']['title']    = 'dept';
+$config->task->datatable->fieldList['dept']['fixed']    = 'no';
+$config->task->datatable->fieldList['dept']['width']    = 'auto';
+$config->task->datatable->fieldList['dept']['required'] = 'no';
 
 $config->task->datatable->fieldList['status']['title']    = 'statusAB';
 $config->task->datatable->fieldList['status']['fixed']    = 'no';

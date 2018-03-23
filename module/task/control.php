@@ -230,6 +230,7 @@ class task extends control
 
         $this->view->depts = $this->dept->getOptionMenu(); //oscar:
 
+
         $this->display();
     }
 
@@ -492,6 +493,27 @@ class task extends control
         die(js::reload('parent'));
     }
 
+    public function batchAssignToDept($dept)
+    {
+        if($this->post->taskIDList)
+        {
+            $taskIDList = $this->post->taskIDList;
+            $taskIDList = array_unique($taskIDList);
+            unset($_POST['taskIDList']);
+            $allChanges = $this->task->batchAssignToDept($taskIDList, $dept);
+            if(dao::isError()) die(js::error(dao::getError()));
+            foreach($allChanges as $taskID => $changes)
+            {
+                $this->loadModel('action');
+                $actionID = $this->action->create('task', $taskID, 'Edited');
+                $this->action->logHistory($actionID, $changes);
+                $this->task->sendmail($taskID, $actionID);
+            }
+            if(!dao::isError()) $this->loadModel('score')->create('ajax', 'batchOther');
+        }
+        die(js::reload('parent'));
+    }
+
     /**
      * Batch update assign of task.
      *
@@ -503,6 +525,12 @@ class task extends control
     {
         if(!empty($_POST))
         {
+            foreach ($_POST as $k => $v)
+            {
+                error_log("==== k:$k v:$v");
+            }
+
+
             $taskIDList = $this->post->taskIDList;
             $taskIDList = array_unique($taskIDList);
             unset($_POST['taskIDList']);
@@ -548,10 +576,13 @@ class task extends control
         else
         {
             $story = $this->story->getById($task->story);
-            $task->story = $story; //oscar:
+            error_log("task story:$task->story title:$story->title");
+            //$task->story = $story; //oscar:
             $task->storySpec     = empty($story) ? '' : $this->loadModel('file')->setImgSize($story->spec);
             $task->storyVerify   = empty($story) ? '' : $this->loadModel('file')->setImgSize($story->verify);
             $task->storyFiles    = $this->loadModel('file')->getByObject('story', $task->story);
+
+            $task->story = $story; //oscar:
         }
 
         if($task->team) $this->lang->task->assign = $this->lang->task->transfer;
