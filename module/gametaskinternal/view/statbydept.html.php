@@ -28,7 +28,10 @@ $verTasksCompleted = array();
 $verTasksIncompleted = array();
 $verTasksClosed = array();
 $verTasksTotalWorkHours = array();
-$worksHoursByMonty = array();
+$worksHoursByMonth = array();
+
+$personalTasks = array();
+$worksHoursPersionalByMonth = array();
 
 foreach ($gameTasks as $t) {
     if (!array_key_exists($t->dept, $deptTasks)) {
@@ -40,7 +43,14 @@ foreach ($gameTasks as $t) {
         $verTasksTotalWorkHours[$t->dept] = 0;
     }
 
+    if (!array_key_exists($t->assignedTo, $personalTasks)) {
+        $personalTasks[$t->assignedTo] = array();
+    }
+
     $deptTasks[$t->dept][$t->id] = $t;
+    $personalTasks[$t->assignedTo][$t->id] = $t;
+
+    //echo "$t->assignedTo $t->title $t->dept <br>";
 
     $verTasksCompleted[$t->dept] += $t->completed ? 1 : 0;
     $verTasksIncompleted[$t->dept] += $t->completed ? 0 : 1;
@@ -49,13 +59,20 @@ foreach ($gameTasks as $t) {
 
     $completeInMonth = date("m", $t->completeDate);
 
-    if(!array_key_exists($completeInMonth, $worksHoursByMonty))
+    if(!array_key_exists($completeInMonth, $worksHoursByMonth))
     {
-        $worksHoursByMonty[$completeInMonth] = array();
-        $worksHoursByMonty[$completeInMonth][$t->dept] = 0;
+        $worksHoursByMonth[$completeInMonth] = array();
+        $worksHoursByMonth[$completeInMonth][$t->dept] = 0;
     }
 
-    $worksHoursByMonty[$completeInMonth][$t->dept] += $t->workhour;
+    if(!array_key_exists($completeInMonth, $worksHoursPersionalByMonth))
+    {
+        $worksHoursPersionalByMonth[$completeInMonth] = array();
+        $worksHoursPersionalByMonth[$completeInMonth][$t->owner] = 0;
+    }
+
+    $worksHoursByMonth[$completeInMonth][$t->dept] += $t->workhour;
+    $worksHoursPersionalByMonth[$completeInMonth][$t->assignedTo] += $t->workhour;
 }
 
 ?>
@@ -105,7 +122,7 @@ foreach ($gameTasks as $t) {
     <thead>
     <tr class='text-center'>
         <th class='text-left'><?php echo $lang->gametaskinternal->dept; ?> > 工时</th>
-        <?php foreach ($worksHoursByMonty as $m => $tasks): ?>
+        <?php foreach ($worksHoursByMonth as $m => $tasks): ?>
             <th  width='50'><?php echo $m; ?>月(H)</th>
         <?php endforeach; ?>
     </tr>
@@ -116,12 +133,39 @@ foreach ($gameTasks as $t) {
         <td class='text-left'>
             <?php echo $depts[$d]; ?>
         </td>
-        <?php foreach ($worksHoursByMonty as $m => $tasks): ?>
+        <?php foreach ($worksHoursByMonth as $m => $tasks): ?>
             <td  width='50' class='text-center'>
                 <?php echo $tasks[$d]; ?>
             </td>
         <?php endforeach; ?>
     </tr>
+    <?php endforeach; ?>
+
+    </tbody>
+</table>
+
+<br>
+<table class='table tablesorter table-data table-hover table-striped table-fixed block-project'>
+    <thead>
+    <tr class='text-center'>
+        <th class='text-left'>个人 > 工时比</th>
+        <?php foreach ($worksHoursPersionalByMonth as $m => $tasks): ?>
+            <th  width='100'><?php echo $m; ?>月(%)</th>
+        <?php endforeach; ?>
+    </tr>
+    </thead>
+    <tbody>
+    <?php foreach ($personalTasks as $d => $tasks): ?>
+        <tr>
+            <td class='text-left'>
+                <?php echo $allUsers[$d]; ?>
+            </td>
+            <?php foreach ($worksHoursPersionalByMonth as $m => $tasks): ?>
+                <td  width='100' class='text-center'>
+                    <?php echo "" . round($tasks[$d] / (22 * 8) * 100) . "%" ; ?>
+                </td>
+            <?php endforeach; ?>
+        </tr>
     <?php endforeach; ?>
 
     </tbody>
