@@ -58,16 +58,6 @@ class task extends control
         $task->deadline    = '';
         $task->mailto      = '';
         $task->color       = '';
-        $task->dept        = 3; // 默认是原画组
-
-        $story = $this->story->getByID($storyID);
-
-        if($story)
-        {
-            $task->name = $story->title;
-            $task->desc = $story->spec;
-        }
-
         if($taskID > 0)
         {
             $task      = $this->task->getByID($taskID);
@@ -238,17 +228,10 @@ class task extends control
         $this->view->storyTasks = $this->task->getStoryTaskCounts(array_keys($stories), $projectID);
         $this->view->members    = $members;
 
-        //oscar:
-        $this->loadModel('dept');
-        $this->dept->setupDeptUsers($this->view, $this->app->user->account, $this->app->user->dept);
-        //oscar:
+        $this->view->depts = $this->dept->getOptionMenu(); //oscar:
+
 
         $this->display();
-    }
-
-    public function batchCreateRoot($projectID = 0, $storyID = 0, $iframe = 0, $taskID = 0)
-    {
-        $this->batchCreate($projectID, $storyID, $iframe, $taskID);
     }
 
     /**
@@ -510,62 +493,6 @@ class task extends control
         die(js::reload('parent'));
     }
 
-    public function batchSetWorkhour()
-    {
-        //*
-        $msg = " count:" . count($_POST). "  ";
-        $msg .= " workHour:" . $this->post->workHour . "  ";
-
-        foreach ($_POST as $p)
-        {
-            if(is_array($p))
-            {
-                foreach ($p as $pp)
-                {$msg .= "<br> _P:" . $pp;}
-            }
-            else
-            {
-                $msg .= "<br>   _PP:" . $p;
-            }
-        }
-        //*/
-
-        if(!empty($_POST))
-        {
-            //error_log( var_export($_POST));
-
-            $assignedTo  = $this->post->workHour;
-            $taskIDList = $this->post->taskIDList;
-            $taskIDList = array_unique($taskIDList);
-            //unset($_POST['taskIDList']);
-            if(!is_array($taskIDList)) die(js::locate($this->createLink('project', 'task', ""), 'parent'));
-
-            //foreach ($taskIDList as $item) {$msg .= $item . "  ";}
-
-            echo js::alert("batchSetWorkhour: $msg");
-            //echo $msg;
-
-            foreach($taskIDList as $taskID)
-            {
-                $this->dao->update(TABLE_TASK)
-                    ->set('estimate')->eq($assignedTo)
-                    ->where('id')->eq($taskID)->exec();
-
-                //$this->loadModel('action');
-                //$changes = $this->task->assign($taskID);
-                if(dao::isError()) die(js::error(dao::getError()));
-                //$actionID = $this->action->create('task', $taskID, 'Assigned', $this->post->comment, $this->post->assignedTo);
-                //$this->action->logHistory($actionID, $changes);
-                //$this->task->sendmail($taskID, $actionID);
-            }
-            //if(!dao::isError()) $this->loadModel('score')->create('ajax', 'batchOther');
-            die(js::reload('parent'));
-            //$this->locate(inlink('details'));
-            //$this->display();
-            //echo js::alert("assignTo: $assignedTo");
-        }
-    }
-
     public function batchAssignToDept($dept)
     {
         if($this->post->taskIDList)
@@ -649,13 +576,10 @@ class task extends control
         else
         {
             $story = $this->story->getById($task->story);
-            error_log("task story:$task->story title:$story->title");
-            //$task->story = $story; //oscar:
+            $task->story = $story; //oscar:
             $task->storySpec     = empty($story) ? '' : $this->loadModel('file')->setImgSize($story->spec);
             $task->storyVerify   = empty($story) ? '' : $this->loadModel('file')->setImgSize($story->verify);
             $task->storyFiles    = $this->loadModel('file')->getByObject('story', $task->story);
-
-            $task->story = $story; //oscar:
         }
 
         if($task->team) $this->lang->task->assign = $this->lang->task->transfer;
