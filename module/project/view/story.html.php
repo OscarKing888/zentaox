@@ -148,6 +148,11 @@
             $hasDBPriv = common::hasDBPriv($project, 'project');
             $param = "projectID={$project->id}&story={$story->id}&moduleID={$story->module}";
 
+            //oscar:
+            $lang->task->batchCreate = $lang->project->batchWBSRoot;
+            common::printIcon('task', 'batchCreateRoot', "projectID={$project->id}&story={$story->id}", '', 'list', 'flag');
+            //oscar:
+
             $lang->task->create = $lang->project->wbs;
             if(commonModel::isTutorialMode())
             {
@@ -160,7 +165,10 @@
             }
 
             $lang->task->batchCreate = $lang->project->batchWBS;
-            if($hasDBPriv) common::printIcon('task', 'batchCreate', "projectID={$project->id}&story={$story->id}", '', 'list', 'plus-sign');
+            if($hasDBPriv)
+            {
+                common::printIcon('task', 'batchCreate', "projectID={$project->id}&story={$story->id}", '', 'list', 'plus-sign');
+            }
 
             $lang->testcase->batchCreate = $lang->testcase->create;
             if($productID && $hasDBPriv) common::printIcon('testcase', 'batchCreate', "productID=$story->product&branch=$story->branch&moduleID=$story->module&storyID=$story->id", '', 'list', 'sitemap');

@@ -8,7 +8,8 @@ $config->task->start    = new stdclass();
 $config->task->finish   = new stdclass();
 $config->task->activate = new stdclass();
 
-$config->task->create->requiredFields      = 'name,dept';
+$config->task->create->requiredFields      = 'name,deadline,dept';
+$config->task->batchCreate->requiredFields      = 'name,assignedTo';
 $config->task->edit->requiredFields        = $config->task->create->requiredFields;
 $config->task->finish->requiredFields      = 'consumed';
 $config->task->activate->requiredFields    = 'left';
@@ -39,9 +40,9 @@ $config->task->exportFields = '
 if($config->global->flow == 'onlyTask') $config->task->exportFields = str_replace(array(' story,'), '', $config->task->exportFields);
 
 //oscar: $config->task->customCreateFields      = 'story,estStarted,deadline,mailto,pri,estimate';
-$config->task->customCreateFields      = 'story,pri,files';
+$config->task->customCreateFields      = 'story,pri,files,deadline';
 //oscar: $config->task->customBatchCreateFields = 'module,story,assignedTo,estimate,estStarted,deadline,desc,pri';
-$config->task->customBatchCreateFields = 'module,story,dept,desc,pri';
+$config->task->customBatchCreateFields = 'module,story,dept,desc,pri,deadline';
 $config->task->customBatchEditFields   = 'module,assignedTo,status,pri,estimate,record,left,estStarted,deadline,finishedBy,canceledBy,closedBy,closedReason';
 
 $config->task->custom = new stdclass();
@@ -114,7 +115,7 @@ $config->task->datatable->fieldList['progress']['sort']     = 'no';
 $config->task->datatable->fieldList['deadline']['title']    = 'deadlineAB';
 $config->task->datatable->fieldList['deadline']['fixed']    = 'no';
 $config->task->datatable->fieldList['deadline']['width']    = '70';
-$config->task->datatable->fieldList['deadline']['required'] = 'no';
+$config->task->datatable->fieldList['deadline']['required'] = 'yes';
 
 $config->task->datatable->fieldList['openedBy']['title']    = 'openedByAB';
 $config->task->datatable->fieldList['openedBy']['fixed']    = 'no';

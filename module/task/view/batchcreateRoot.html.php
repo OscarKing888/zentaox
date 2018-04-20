@@ -102,7 +102,7 @@ if ($hiddenStory and isset($visibleFields['story'])) $colspan -= 1;
                         <?php echo html::input("name[$i]", '', "class='form-control' autocomplete='off'"); ?>
                     </div>
                 </td>
-                <td><?php $userList = $deptUsers; if(!empty($batchCreateRoot)) $userList = $leaders; echo html::select("assignedTo[$i]", $userList, $assignedTo, 'class=form-control chosen'); ?></td>
+                <td><?php $userList = $leaders; echo html::select("assignedTo[$i]", $userList, $assignedTo, 'class=form-control chosen'); ?></td>
                 <td <?php echo zget($visibleFields, 'estimate', "class='hidden'") ?>><?php echo html::input("estimate[$i]", '', "class='form-control text-center' autocomplete='off'"); ?></td>
                 <td <?php echo zget($visibleFields, 'estStarted', "class='hidden'") ?>><?php echo html::input("estStarted[$i]", '', "class='form-control text-center form-date'"); ?></td>
                 <td <?php echo zget($visibleFields, 'deadline', "class='hidden'") ?>><?php echo html::input("deadline[$i]", '', "class='form-control text-center form-date'"); ?></td>
@@ -138,7 +138,7 @@ if ($hiddenStory and isset($visibleFields['story'])) $colspan -= 1;
                 <?php echo html::input("name[%s]", '', "class='form-control' autocomplete='off'"); ?>
             </div>
         </td>
-        <td><?php $userList = $deptUsers; if(!empty($batchCreateRoot)) $userList = $leaders; echo html::select("assignedTo[%s]", $userList, $assignedTo, 'class=form-control'); ?></td>
+        <td><?php $userList = $leaders; echo html::select("assignedTo[%s]", $userList, $assignedTo, 'class=form-control'); ?></td>
         <td <?php echo zget($visibleFields, 'estimate', "class='hidden'") ?>><?php echo html::input("estimate[%s]", '', "class='form-control text-center' autocomplete='off'"); ?></td>
         <td <?php echo zget($visibleFields, 'estStarted', "class='hidden'") ?>><?php echo html::input("estStarted[%s]", '', "class='form-control text-center form-date'"); ?></td>
         <td <?php echo zget($visibleFields, 'deadline', "class='hidden'") ?>><?php echo html::input("deadline[%s]", '', "class='form-control text-center form-date'"); ?></td>

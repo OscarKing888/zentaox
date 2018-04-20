@@ -169,7 +169,7 @@
                                             <span class='input-group-addon fix-border'>~</span>
                                         <?php endif; ?>
                                         <?php if (!$hiddenDeadline): ?>
-                                            <?php echo html::input('deadline', $task->deadline, "class='form-control form-date' placeholder='{$lang->task->deadline}'"); ?>
+                                            <?php echo html::input('deadline', $task->deadline, "class='form-control form-date' placeholder='{$lang->task->deadline}'"); ?><span class="required"></span>
                                         <?php endif; ?>
                                     </div>
                                 </div>
@@ -199,7 +199,8 @@
 
             <tr <?php echo $this->config->global->flow == 'onlyTask' ? "class='hidden'" : ''; ?>>
                 <th><?php echo $lang->task->afterSubmit; ?></th>
-                <td colspan='5'><?php echo html::radio('after', $lang->task->afterChoices, $this->config->global->flow == 'onlyTask' || !empty($task->id) ? 'toTaskList' : 'continueAdding'); ?></td>
+                <td colspan='5'><?php echo html::radio('after', $lang->task->afterChoices, $this->config->global->flow == 'onlyTask' || !empty($task->id) ? 'toTaskList' : 'toStoryList'); ?></td>
+
             </tr>
             <tr>
                 <td></td>

@@ -153,6 +153,8 @@ function setStories(moduleID, projectID)
         setPreview();
         $('#story_chosen').remove();
         $("#story").chosen(defaultChosenOptions);
+
+
     });
 }
 

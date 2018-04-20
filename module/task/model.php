@@ -33,7 +33,7 @@ class taskModel extends model
             ->setIF($this->post->estimate != false, 'left', $this->post->estimate)
             ->setIF($this->post->story != false, 'storyVersion', $this->loadModel('story')->getVersion($this->post->story))
             ->setDefault('estStarted', '0000-00-00')
-            ->setDefault('deadline', '0000-00-00')
+            //->setDefault('deadline', '0000-00-00')
             ->setIF(strpos($this->config->task->create->requiredFields, 'estStarted') !== false, 'estStarted', $this->post->estStarted)
             ->setIF(strpos($this->config->task->create->requiredFields, 'deadline') !== false, 'deadline', $this->post->deadline)
             ->setDefault('openedBy',   $this->app->user->account)
@@ -48,7 +48,8 @@ class taskModel extends model
             ->autoCheck()
             ->batchCheck($this->config->task->create->requiredFields, 'notempty')
             //->checkIF($task->estimate != '', 'estimate', 'float')
-            //->checkIF($task->deadline != '0000-00-00', 'deadline', 'ge', $task->estStarted)
+            ->checkIF($task->deadline != '0000-00-00', 'deadline', 'ge', $task->estStarted)
+            //->check($task->deadline != '0000-00-00', 'deadline')
             ->exec();
 
         if(dao::isError()) return false;
@@ -218,7 +219,7 @@ class taskModel extends model
 
         /*
         for($i = 0; $i < $batchNum; $i++) {
-            error_log("batch create task[$i] name:" . $tasks->name[$i] . " dept:" . $tasks->dept[$i]);
+            error_log("batch create task[$i] name:" . $tasks->name[$i] . " assignedTo[$i]:" . $tasks->assignedTo[$i]);
         }
         //*/
 
@@ -230,7 +231,7 @@ class taskModel extends model
             //oscar:if($tasks->type[$key] == 'affair') continue;
             //oscar:if($tasks->type[$key] == 'ditto' && isset($tasks->type[$key - 1]) && $tasks->type[$key - 1] == 'affair') continue;
 
-            if($tasks->dept[$key] == 'ditto') continue; //oscar:
+            if($tasks->assignedTo[$key] == 'ditto') continue; //oscar:
 
             if($storyID == 'ditto') $storyID = $preStory;
             $preStory = $storyID;
@@ -259,29 +260,29 @@ class taskModel extends model
                 die(js::alert($this->lang->task->error->estimateNumber));
             }
             //oscar:if(!empty($tasks->name[$i]) and empty($tasks->type[$i])) die(js::alert(sprintf($this->lang->error->notempty . "_OSCAR", $this->lang->task->type)));
-            if(!empty($tasks->name[$i]) and empty($tasks->dept[0])){
-                die(js::alert(sprintf("批量检查：" . $tasks->dept[$i] . $this->lang->error->notempty, $this->lang->dept)));
+            if(!empty($tasks->name[$i]) and empty($tasks->assignedTo[0])){
+                die(js::alert(sprintf("批量创建检查：" . $tasks->assignedTo[$i] . $this->lang->error->notempty, $this->lang->assignedTo)));
             }
         }
 
         $story      = 0;
         $module     = 0;
         $type       = 'devel'; //oscar:
-        $dept       = 0; //oscar:
-        $assignedTo = '';
+        $assignedTo       = 0; //oscar:
+        //$dept = '';
 
         for($i = 0; $i < $batchNum; $i++)
         {
             $story      = !isset($tasks->story[$i]) || $tasks->story[$i]           == 'ditto' ? $story     : $tasks->story[$i];
             $module     = !isset($tasks->module[$i]) || $tasks->module[$i]         == 'ditto' ? $module    : $tasks->module[$i];
             $type       = !isset($tasks->type[$i]) || $tasks->type[$i]             == 'ditto' ? $type      : $tasks->type[$i];
-            $dept       = !isset($tasks->dept[$i]) || $tasks->dept[$i] == 'ditto' ? $dept : $tasks->dept[$i]; //oscar:
+            $assignedTo       = !isset($tasks->assignedTo[$i]) || $tasks->assignedTo[$i] == 'ditto' ? $assignedTo : $tasks->assignedTo[$i]; //oscar:
             $assignedTo = !isset($tasks->assignedTo[$i]) || $tasks->assignedTo[$i] == 'ditto' ? $assignedTo: $tasks->assignedTo[$i];
 
             if(empty($tasks->name[$i])) continue;
 
             /*
-            error_log("*** batch create [$i] name:" . $tasks->name[$i] . " dept:" . $dept);
+            error_log("*** batch create [$i] name:" . $tasks->name[$i] . " assignedTo:" . $assignedTo);
             //*/
 
             $data[$i]             = new stdclass();
@@ -303,14 +304,14 @@ class taskModel extends model
             $data[$i]->openedDate = $now;
             $data[$i]->parent     = $tasks->parent[$i];
 
-            $data[$i]->dept     = $dept; //oscar:
+            //$data[$i]->dept     = $dept; //oscar:
 
             if($story) $data[$i]->storyVersion = $this->loadModel('story')->getVersion($data[$i]->story);
             if($assignedTo) $data[$i]->assignedDate = $now;
 
             $this->dao->insert(TABLE_TASK)->data($data[$i])
                 ->autoCheck()
-                ->batchCheck($this->config->task->create->requiredFields, 'notempty')
+                ->batchCheck($this->config->task->batchCreate->requiredFields, 'notempty')
                 ->checkIF($data[$i]->estimate != '', 'estimate', 'float')
                 ->exec();
 
@@ -1324,7 +1325,7 @@ class taskModel extends model
 
         $myDepts = $this->dept->setupDeptUsers($this->view, $this->app->user->account, $this->app->user->dept);
 
-        /*/
+        //*/
         $myDepts = array($this->app->user->dept);
         $deptUsers = $this->dept->getDeptUserPairs($this->app->user->dept);
 

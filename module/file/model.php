@@ -163,16 +163,21 @@ class fileModel extends model
             //foreach($psdImg->getImageProperties("*") as $k => $v) print("$k: $v<br/>\n");
             if (!file_exists($thumbImgPath)) {
                 $psdImg = new Imagick($path);
+                $psdImg->setIteratorIndex(0);
                 $w = $psdImg->getImageWidth();
                 if($new_width > $w)
                 {
                     $new_width = $w;
                 }
+
+                //$new_width = max(256, $new_width);
+
                 //$psdImg = new Imagick($path);
                 //$psdImg->setImageIndex(0);
                 $psdImg->setIteratorIndex(0);
                 $psdImg->stripImage(); //去除图片信息
                 $psdImg->setImageCompressionQuality(80); //图片质量
+                error_log("======= imgW:$new_width");
                 $psdImg->thumbnailImage($new_width, 0);
                 $psdImg->writeImage($thumbImgPath);
                 $psdImg->destroy();
@@ -186,6 +191,7 @@ class fileModel extends model
 
             if (!file_exists($thumbImgHDPath)) {
                 $psdImg = new Imagick($path);
+                $psdImg->setIteratorIndex(0);
 
                 $imageSize  = getimagesize($file->realPath);
                 $imageWidth = $imageSize ? $imageSize[0] : 0;
@@ -212,7 +218,7 @@ class fileModel extends model
 
                 //error_log("oscar: w:$w h:$h newW:$new_width newH:$new_height");
 
-                $psdImg->setIteratorIndex(0);
+
                 //$psdImg->stripImage(); //去除图片信息
                 $psdImg->setImageCompressionQuality(100); //图片质量
 

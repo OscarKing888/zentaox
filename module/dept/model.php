@@ -415,8 +415,18 @@ class deptModel extends model
             ->orderBy('dept asc')
             ->fetchPairs();
 
+        $leadersPair = array();
+
+        $this->loadModel('user');
+        $allUsers = $this->user->getPairs('nodeleted|noclosed');
 
         foreach ($leaders as $key => $leader) {
+
+            if($leader != "admin")
+            {
+                $leadersPair[$leader] = $allUsers[$leader];
+            }
+
             if ($leader == $account) {
                 array_push($myDepts, $key);
                 $deptUsers += $this->getDeptUserPairs($key);
@@ -439,6 +449,7 @@ class deptModel extends model
         }
 
 
+        $view->leaders = $leadersPair;
         $view->dept = $dept;
         $view->user = $account;
         $view->deptUsers = $deptUsers;

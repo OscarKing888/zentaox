@@ -12,10 +12,13 @@
 $lang->task->index              = "任务一览";
 $lang->task->create             = "建任务";
 $lang->task->batchCreate        = "批量建任务";
+$lang->task->batchCreateRoot    = "批量建根任务";
 $lang->task->batchEdit          = "批量编辑";
 $lang->task->batchChangeModule  = "批量修改模块";
 $lang->task->batchClose         = "批量关闭";
+$lang->task->batchSetWorkhour        = "批量设置工时";
 $lang->task->batchCancel        = "批量取消";
+
 $lang->task->edit               = "编辑";
 $lang->task->delete             = "删除";
 $lang->task->deleted            = "已删除";
@@ -150,6 +153,8 @@ $lang->task->reasonList['cancel'] = '已取消';
 $lang->task->afterChoices['continueAdding'] = '继续为该需求添加任务';
 $lang->task->afterChoices['toTaskList']     = '返回任务列表';
 $lang->task->afterChoices['toStoryList']    = '返回需求列表';
+
+$lang->task->changeWorkHour = "设置工时";
 
 $lang->task->legendBasic  = '基本信息';
 $lang->task->legendEffort = '工时信息';
