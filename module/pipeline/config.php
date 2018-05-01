@@ -19,7 +19,10 @@ $config->pipeline->editor->edit     = array('id' => 'contentimages', 'tools' => 
 
 $config->pipeline->defaultStages = 2;
 
-$config->pipeline->dbname = 'gamepipeline';
+define('TABLE_PIPELINE',                   'gamepipeline');
+define('TABLE_PIPELINE_STAGES',           'gamepipelinestages');
 $config->pipeline->fields = 'product,content,contentimages,date';
+
+$config->pipeline->create->requiredFields = 'pipename';
 $config->pipeline->imageContentFieldName = "contentimages";
 //$config->pipeline->imageContentFieldName = "content";

@@ -22,7 +22,7 @@ include '../../common/view/datepicker.html.php';
 
 <div class='container'>
     <div class='panel'>
-        <div class='panel-heading'><strong><?php echo $lang->pipeline->add; ?></strong></div>
+        <div class='panel-heading'><strong><?php echo $lang->pipeline->create; ?></strong></div>
         <form class='form-condensed' method='post' enctype='multipart/form-data' id='dataform' data-type='ajax'>
             <table class='table table-form'>
                 <tr>

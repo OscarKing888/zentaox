@@ -269,3 +269,5 @@ $lang->task->report->tasksPerClosedReason->graph->xAxisName = '关闭原因';
 
 $lang->task->report->finishedTasksPerDay->type             = 'bar';
 $lang->task->report->finishedTasksPerDay->graph->xAxisName = '日期';
+
+$lang->task->batchCreateChildTask = '🚅‍';

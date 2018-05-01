@@ -13,8 +13,8 @@
 $lang->pipeline->common           = 'Pipeline';
 
 $lang->pipeline->index   = '首页';
-$lang->pipeline->view    = '详情';
-$lang->pipeline->add     = '添加流水线';
+$lang->pipeline->view    = '流水线详情';
+$lang->pipeline->create     = '添加流水线';
 $lang->pipeline->edit    = '编辑';
 $lang->pipeline->delete  = '删除';
 $lang->pipeline->restore  = '恢复';
@@ -27,7 +27,8 @@ $lang->pipeline->date    = '日期';
 $lang->pipeline->content = '内容';
 $lang->pipeline->pic = '图片';
 $lang->pipeline->action  = '操作';
+$lang->pipeline->batchCreateRootTask = '批量创建主任务';
 
-$lang->project->manageProducts = '策划';
+$lang->project->manageProducts = '产品';
 
 $lang->pipeline->methodOrder[5] = 'index';

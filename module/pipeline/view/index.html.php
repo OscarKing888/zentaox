@@ -19,7 +19,7 @@
 
         <?php
         $lnk = html::a(inlink('create'),
-            "<i class='icon icon-plus'></i>" . $lang->pipeline->add,
+            "<i class='icon icon-plus'></i>" . $lang->pipeline->create,
             "", "class='btn'");
         echo $lnk;
         ?>
@@ -32,32 +32,23 @@
             <?php foreach ($articles as $article): ?>
 
                 <fieldset>
-                    <legend><?php echo formatTime("YYYY-MM-DD", $article->date) . "&nbsp;&nbsp;" . $products[$article->product]; ?></legend>
+                    <legend><?php echo $article->id . " - " . $article->pipename; ?></legend>
 
-                    <div class='content'>
+                        <table class='table table-form'>
+                            <thead>
+                            <tr class='text-center'>
+                                <th>ID</th><th>部门</th><th>预估工时（H）</th>
+                            </tr>
+                            </thead>
+
                         <?php
-                        echo $article->content;
-                        echo "<br>";
-                        echo $article->contentimages;
-                        //$steps = $article->contentimages;
-                        //$steps = str_replace('<p></p>', '', $article->content);
-                        //$test = $this->loadModel('file')->replaceImgURL($steps, 'contentimages');
-                        //echo $test;
-                        //echo "<br><br>";
-
-                        /*
-                        echo "<font color=blue><b>raw:</b></font><dd>"; echo ($steps);
-                        echo "<br><br>";
-                        echo "<font color=blue><b>htmlspecialchars:</b></font><dd>"; echo htmlspecialchars($steps);
-                        echo "<br><br>";
-                        echo "<font color=blue><b>html_entity_decode:</b></font><dd>"; echo html_entity_decode($steps);
-                        echo "<br><br>";
-                        echo "<font color=blue><b>htmlentities:</b></font><dd>"; echo htmlentities($steps);
-                        echo "<br><br>";
-                        echo "<font color=blue><b>htmlspecialchars_decode:</b></font><dd>"; echo htmlspecialchars_decode($steps);
-                        //*/
+                        foreach($article->steps as $k => $val)
+                        {
+                            echo "<tr  class='text-center'><td>$val->desc </td><td>" . $depts[$val->dept] . "</td><td>" . $val->estimate . "(H)</td></tr>";
+                        }
                         ?>
-                    </div>
+
+                    </table>
 
                     <div align="right" class='content'>
                         <br>

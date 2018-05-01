@@ -22,8 +22,8 @@ include '../../common/view/datepicker.html.php';
 
 <div class='container'>
     <div class='panel'>
-        <div class='panel-heading'><strong><?php echo $lang->pipeline->add; ?></strong></div>
-        <form class='form-condensed' method='post' enctype='multipart/form-data' id='dataform' data-type='ajax'>
+        <div class='panel-heading'><strong><?php echo $lang->pipeline->create; ?></strong></div>
+        <form class='form-condensed' method='post' enctype='multipart/form-data' id='dataform'>
             <table class='table table-form'>
                 <tr>
                     <th><?php echo $lang->pipeline->name; ?><span class="required"></span></th>
@@ -52,12 +52,12 @@ include '../../common/view/datepicker.html.php';
                                         <span class='input-group-addon step-item-id'></span>
                                         <?php echo html::select("steps[]", $depts, 0, 'class=form-control chosen'); ?>
                                         <span class="input-group-addon step-type-toggle">
-                                          <input type='hiddsen' name='stepType[]' value='item' class='step-type'>
+                                          <input type='hidden' name='stepType[]' value='item' class='step-type'>
                                           <label class="checkbox-inline"><input tabindex='-1' type="checkbox" class='step-group-toggle'> <?php echo "子阶段" ?></label>
                                         </span>
                                     </div>
                                 </td>
-                                <td><input name='expects[]' value='4' class='form-control autosize step-expects'></td>
+                                <td><input name='expects[]' value='0' class='form-control autosize step-expects'></td>
                                 <td class='step-actions'>
                                     <div class='btn-group'>
                                         <button type='button' class='btn btn-step-add' tabindex='-1'><i class='icon icon-plus'></i></button>
@@ -88,7 +88,7 @@ include '../../common/view/datepicker.html.php';
                                             </span>
                                         </div>
                                     </td>
-                                    <td><input name='expects[]' value='4' class='form-control autosize step-expects'></td>
+                                    <td><input name='expects[]' value='0' class='form-control autosize step-expects'></td>
                                     <td class='step-actions'>
                                         <div class='btn-group'>
                                             <button type='button' class='btn btn-step-add' tabindex='-1'><i class='icon icon-plus'></i></button>

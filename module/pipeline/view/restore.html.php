@@ -23,28 +23,31 @@
         </div>
         <table class='table table-list table-hover'>
             <thead>
-            <tr>
-                <td class='text-center' width='150'><?php echo $lang->pipeline->date; ?></td>
-                <td width='50'><?php echo $lang->project->manageProducts; ?></td>
-                <td><?php echo $lang->pipeline->content; ?></td>
-                <td class='text-center' width='120'><?php echo $lang->pipeline->action; ?></td>
+            <tr class='text-center'>
+                <td><strong> <?php echo $lang->pipeline->common; ?></strong></td>
+                <td><strong> <?php echo $lang->pipeline->steps; ?></strong></td>
+                <td class='text-center' width='120'><strong> <?php echo $lang->pipeline->action; ?></strong></td>
             </tr>
             </thead>
             <tbody>
             <?php foreach ($articles as $article): ?>
-                <tr>
-                    <td><?php echo formatTime("YYYY-MM-DD",$article->date); ?></td>
-                    <td class='text-center'><?php echo $products[$article->product]; ?></td>
+                <tr class='text-center'>
+                    <td class='text-center'><?php echo $article->pipename; ?></td>
                     <td>
-                        <fieldset>
-                            <div class='content'>
-                                <?php
-                                echo $article->content;
-                                echo "<br>";
-                                echo  $article->contentimages;
-                                ?>
-                            </div>
-                        </fieldset>
+                        <table class='table table-form'>
+                            <thead>
+                            <tr class='text-center'>
+                                <th>ID</th><th>部门</th><th>预估工时（H）</th>
+                            </tr>
+                            </thead>
+
+                            <?php
+                            foreach($article->steps as $k => $val)
+                            {
+                                echo "<tr  class='text-center'><td>$val->desc </td><td>" . $depts[$val->dept] . "</td><td>" . $val->estimate . "(H)</td></tr>";
+                            }
+                            ?>
+                        </table>
                     </td>
                     <td>
                         <?php

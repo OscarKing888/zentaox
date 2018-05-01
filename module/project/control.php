@@ -220,6 +220,9 @@ class project extends control
         //oscar:
         $this->loadModel('dept');
         $this->dept->setupDeptUsers($this->view, $this->app->user->account, $this->app->user->dept);
+
+        $this->loadModel('pipeline');
+        $this->pipeline->setupOptionMenu($this->view);
         //oscar:
 
         $this->display();
@@ -583,6 +586,14 @@ class project extends control
         $this->view->users = $users;
         $this->view->pager = $pager;
         $this->view->branchGroups = $branchGroups;
+
+        //oscar:
+        $this->loadModel('dept');
+        $this->dept->setupDeptUsers($this->view, $this->app->user->account, $this->app->user->dept);
+
+        $this->loadModel('pipeline');
+        $this->pipeline->setupOptionMenu($this->view);
+        //oscar:
 
         $this->display();
     }

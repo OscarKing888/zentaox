@@ -11,3 +11,5 @@
 .table-striped>tbody>tr.table-children:nth-child(odd)>td, .table-striped>tbody>tr.table-children:nth-child(odd)>th{background-color:#fff;}
 
 .red {color: #b90000;font-weight:bold}
+
+.divmenu {z-index:99999;float:right}

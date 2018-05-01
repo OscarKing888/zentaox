@@ -50,6 +50,7 @@ class datatableModel extends model
         $method      = $this->app->getMethodName();
         $datatableId = $module . ucfirst($method);
 
+        //error_log("oscar: ==== getDatatable:$datatableId");
         $mode = isset($this->config->datatable->$datatableId->mode) ? $this->config->datatable->$datatableId->mode : 'table';
         $key  = $mode == 'datatable' ? 'cols' : 'tablecols';
 

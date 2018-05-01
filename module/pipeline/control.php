@@ -44,8 +44,14 @@ class pipeline extends control
         $this->view->products = $products;
         $this->view->allProducts   = array(0 => '') + $this->product->getPairs('noclosed|nocode');
         $this->view->title    = $this->lang->pipeline->index;
-        //$this->view->articles = $this->pipeline->getList($pager);
+        $this->view->articles = $this->pipeline->getList($pager);
         $this->view->pager    = $pager;
+        //oscar:
+        //$this->loadModel('dept');
+
+        $this->view->depts = $this->dept->getOptionMenu();
+        //$this->dept->setupDeptUsers($this->view, $this->app->user->account, $this->app->user->dept);
+        //oscar:
         $this->display();
     }
 
@@ -81,7 +87,7 @@ class pipeline extends control
         $products = $this->product->getPairs();
         $this->view->products = $products;
         $this->view->allProducts   = array(0 => '') + $this->product->getPairs('noclosed|nocode');
-        $this->view->title = $this->lang->pipeline->add;
+        $this->view->title = $this->lang->pipeline->create;
         $this->view->depts = $this->dept->getOptionMenu();
         $this->view->steps            = $steps;
 
@@ -99,6 +105,7 @@ class pipeline extends control
     {
         if(!empty($_POST))
         {
+            error_log("edit pipline:$id");
             $this->pipeline->update($id);
             $this->locate(inlink('index'));
         }
@@ -109,6 +116,7 @@ class pipeline extends control
             $this->view->allProducts   = array(0 => '') + $this->product->getPairs('noclosed|nocode');
             $this->view->title   = $this->lang->pipeline->edit;
             $this->view->article = $this->pipeline->getByID($id);
+            $this->view->depts = $this->dept->getOptionMenu();
             $this->display();
         }
     }
@@ -137,6 +145,7 @@ class pipeline extends control
         $this->view->title    = $this->lang->pipeline->index;
         $this->view->articles = $this->pipeline->getDeletedList($pager);
         $this->view->pager    = $pager;
+        $this->view->depts = $this->dept->getOptionMenu();
         $this->display();
     }
 
@@ -144,6 +153,80 @@ class pipeline extends control
     {
         $this->pipeline->restore($id);
         $this->locate(inlink('restore'));
+    }
+
+    public function batchCreateRootTask()
+    {
+        $projectID = 0;
+        $pipelineID = 0;
+        $storyID = 0;
+        $productID = 0;
+
+        if(!empty($_POST)) {
+            $postVals = fixer::input('post')
+                ->get();
+            $projectID = $postVals->projectID;
+            $pipelineID = $postVals->pipelineID;
+            $storyID = $postVals->storyID;
+            $productID = $postVals->productID;
+        }
+        else
+        {
+            return false;
+        }
+
+
+        //error_log("oscar: batchCreateRootTask projectID:$projectID pipelineID:$pipelineID storyID:$storyID");
+
+        $pipeline = $this->pipeline->getById($pipelineID);
+
+        //$view = new stdClass();
+        //$this->dept->setupDeptUsers($view, $this->app->user->account, $this->app->user->dept);
+
+        $leaders = $this->dao->select('dept,username')->from(TABLE_GAMEGROUPLEADERS)
+            ->orderBy('dept asc')
+            ->fetchPairs();
+
+
+        //$this->loadModel('task');
+        $this->loadModel('story');
+        $story = $this->story->getById($storyID);
+
+        foreach ($pipeline->steps as $step) {
+            //error_log("oscar: batchCreateRootTask step:$step $step->type dept:$step->dept");
+            if($step->type == 'step')
+            {
+                error_log("oscar: create root task step:$step dept:$step->dept est:$step->estimate");
+
+                $task = new stdClass();
+                $task->dept = $step->dept;
+                $task->estimate = (float)$step->estimate;
+                $task->name = "<span class=\"pri6\">P</span>" . $story->title;
+                $task->desc = $story->spec;
+                //$task->product = $productID;
+                $task->module = $story->module;
+                $task->project = $projectID;
+                $task->story = $storyID;
+                $task->storyVersion = $this->story->getVersion($storyID);
+                $task->type = "";
+                $task->left = 0;
+                //$task->build = 0;
+                $task->status = 'wait';
+                $task->estStarted = '0000-00-00';
+                $task->openedBy = $this->app->user->account;
+                $task->openedDate = helper::now();
+
+                $this->dao->insert(TABLE_TASK)->data($task)
+                    ->autoCheck()
+                    ->batchCheck($this->config->task->create->requiredFields, 'notempty')
+                    //->checkIF($task->estimate != '', 'estimate', 'float')
+                    ->checkIF($task->deadline != '0000-00-00', 'deadline', 'ge', $task->estStarted)
+                    //->check($task->deadline != '0000-00-00', 'deadline')
+                    ->exec();
+
+                if(dao::isError()) return false;
+            }
+        }
     }
 
 }

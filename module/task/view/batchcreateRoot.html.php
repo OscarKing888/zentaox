@@ -64,6 +64,14 @@ if ($hiddenStory and isset($visibleFields['story'])) $colspan -= 1;
 
         $deptUsers['ditto'] = $lang->task->ditto; //oscar:
 
+        // 显示姓名为部门
+        foreach ($deptLeaders as $dp => $dpld) {
+            if(array_key_exists($dpld, $leaders))
+            {
+                $leaders[$dpld] = $depts[$dp];
+            }
+        }
+
         if ($project->type == 'ops') $colspan = $colspan - 1;
         ?>
         <?php for ($i = 0; $i < $config->task->batchCreate; $i++): ?>

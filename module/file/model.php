@@ -92,7 +92,7 @@ class fileModel extends model
         $now = helper::today();
         $files = $this->getUpload($filesName, $labelsName);
 
-        error_log("oscar: saveUpload============");
+        //error_log("oscar: saveUpload============");
         foreach ($files as $id => $file) {
             error_log("oscar: objType:$objectType file:" . $file['pathname']);
             if ($file['size'] == 0) continue;

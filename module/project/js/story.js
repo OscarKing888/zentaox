@@ -62,3 +62,42 @@ function showCheckedSummary()
         $('tfoot .table-actions .text:last').html(taskSummary);
     }
 }
+
+
+
+function on_createRootTask(projectID, storyID, productID) {
+
+    //var pipelineID = document.getElementById('batchCreateRootTask[' + storyID + ']').val();
+    var pipelineID = $("#batchCreateRootTask_" + storyID).val();
+    if(pipelineID == -1)
+    {
+        //alert("不创建None");
+        return;
+    }
+
+    url = createLink('pipeline', 'batchCreateRootTask');
+    //alert("on_createRootTask productID:" + productID + " projectID:" + projectID + " pipelineID:" + pipelineID + " storyID:" + storyID + " url:" + url);
+
+    $.ajax(
+        {
+            type:     'POST',
+            url:      url,
+            dataType: 'json',
+            data: {"projectID": projectID, "pipelineID":pipelineID, "storyID":storyID, "productID":productID}
+            //*
+            ,success:  function()
+            {
+                alert("批量创建主任务成功！");
+            },
+            error: function(error){
+                alert("批量创建主任务成功出错：" + JSON.stringify(error));
+            },
+            complete:function()
+            {
+                //alert("批量创建主任务 完成！");
+            }
+            //*/
+        });
+
+    document.location.reload();
+}

@@ -32,54 +32,58 @@ class pipelineModel extends model
      */
     public function getList($pager = null)
     {
-        $articles = $this->dao->select('*')
-            ->from($this->config->pipeline->dbname)
+        $pipelines = $this->dao->select('id,pipename')
+            ->from(TABLE_PIPELINE)
             //->where('owner')->eq($this->app->user->account)
             ->where('deleted')->eq(0)
-            ->orderBy('id desc')->page($pager)->fetchAll();
+            ->orderBy('id asc')->page($pager)->fetchAll();
 
-        return $this->convertImageURL($articles);
-        //return getListByUser($this->app->user->account, $pager);
-    }
 
-    function convertImageURL($arr)
-    {
-        $artr = array();
-        $i = 0;
-        foreach ($arr as $art) {
-            //$art = html_entity_decode($art);
-            $art = $this->file->replaceImgURL($art, $this->config->pipeline->imageContentFieldName);
-            $art->contentimages = htmlspecialchars_decode($art->contentimages);
-            $artr[$i] = $art;
-            $i++;
+        foreach ($pipelines as $k => $val) {
+            //error_log("pipeline:$val->id val:$val->pipename");
+
+            $steps = $this->dao->select('*')
+                ->from(TABLE_PIPELINE_STAGES)
+                ->where('gamepipeline')->eq($val->id)
+                ->orderBy('id asc')->fetchAll();
+            $pipelines[$k]->steps = $steps;
+
+            /*
+            foreach ($steps as $step) {
+                error_log(" step:$step->desc");
+            }
+            //*/
         }
-        return $artr;
+
+        return $pipelines;
     }
+
 
     public function getDeletedList($pager = null)
     {
-        $articles = $this->dao->select('*')
-            ->from($this->config->pipeline->dbname)
+        $pipelines = $this->dao->select('*')
+            ->from(TABLE_PIPELINE)
             //->where('owner')->eq($this->app->user->account)
             ->where('deleted')->eq(1)
             ->orderBy('id desc')->page($pager)->fetchAll();
 
-        return $this->convertImageURL($articles);
-    }
+        foreach ($pipelines as $k => $val) {
+            //error_log("pipeline:$val->id val:$val->pipename");
 
-    /**
-     * Get article lists.
-     * @access public
-     * @return array
-     */
-    public function getListByUser($userid, $pager = null)
-    {
-        $articles = $this->dao->select('*')
-            ->from($this->config->pipeline->dbname)
-            //->where('owner')->eq($userid)
-            ->orderBy('id desc')->page($pager)->fetchAll();
+            $steps = $this->dao->select('*')
+                ->from(TABLE_PIPELINE_STAGES)
+                ->where('gamepipeline')->eq($val->id)
+                ->orderBy('id asc')->fetchAll();
+            $pipelines[$k]->steps = $steps;
 
-        return convertImageURL($articles);
+            /*
+            foreach ($steps as $step) {
+                error_log(" step:$step->desc");
+            }
+            //*/
+        }
+
+        return $pipelines;
     }
 
     /**
@@ -91,13 +95,21 @@ class pipelineModel extends model
      */
     public function getById($id)
     {
-        $content = $this->dao->findById($id)->from($this->config->pipeline->dbname)->fetch();
+        $pipeline = $this->dao->select('id,pipename')
+            ->from(TABLE_PIPELINE)
+            ->where('id')->eq($id)->fetch();
 
-        $art = ($content);
-        $art = $this->file->replaceImgURL($art, $this->config->pipeline->imageContentFieldName);
-        $art->contentimages = htmlspecialchars_decode($art->contentimages);
-
-        return $art;
+        $steps = $this->dao->select('*')
+            ->from(TABLE_PIPELINE_STAGES)
+            ->where('gamepipeline')->eq($pipeline->id)
+            ->orderBy('id asc')->fetchAll();
+        $pipeline->steps = $steps;
+        return $pipeline;
+        /*
+        foreach ($steps as $step) {
+            error_log(" edit pipeline step:$step->desc");
+        }
+        //*/
     }
 
     public function logpipeline($log)
@@ -124,25 +136,45 @@ class pipelineModel extends model
      */
     public function create()
     {
-        $article = fixer::input('post')->specialchars($this->config->pipeline->fields)
-            //->add('date', date('Y-m-d H:i:s'))
-            ->add('owner', $this->app->user->account)
-            ->stripTags($this->config->pipeline->editor->create['id'], $this->config->allowedTags)
+        $pst = fixer::input('post')
             ->get();
 
-        $article2 = htmlspecialchars_decode($article);
+        $pipeline = new stdClass();
+        $pipeline->pipename = $pst->pipename;
 
-        $articleProced = $this->file->processImgURL($article, $this->config->pipeline->editor->create['id'], $this->post->uid);
+        $r = $this->dao->select()->from(TABLE_PIPELINE)->where('pipename')->eq($pst->pipename);
+        if (!empty($r)) {
+            error_log("oscar: pipename already exist:$pst->pipename");
+            //return;
+        }
 
+        $this->dao->insert(TABLE_PIPELINE)->data($pipeline)->autoCheck()->batchCheck($this->config->pipeline->create->requiredFields, 'notempty')->exec();
+        if (!$this->dao->isError()) {
+            $pipeId = $this->dao->lastInsertID();
 
-        $this->logpipeline("\n====id:" . $this->post->uid . "\nraw:" . $article->contentimages . "\nbefore:" . $article2->contentimages . " \n after:"
-            . $articleProced->contentimages . "\ntools:" . $this->config->pipeline->editor->create['id']);
+            $parentStepID = 0;
 
-        $this->dao->insert($this->config->pipeline->dbname)->data($articleProced)
-            ->autoCheck()->batchCheck('owner,content', 'notempty')->exec();
+            foreach ($pst->steps as $stepID => $dept) {
+                if ($dept == 0) continue;
+                $stepType = $this->post->stepType;
+                $step = new stdClass();
+                $step->type = ($stepType[$stepID] == 'item' and $parentStepID == 0) ? 'step' : $stepType[$stepID];
+                $step->parent = ($step->type == 'item') ? $parentStepID : 0;
+                $step->gamepipeline = $pipeId;
+                $step->desc = $stepID;
+                $step->dept = $dept;
+                $step->estimate = (int)$pst->expects[$stepID];
 
-        return $this->dao->lastInsertID();
+                //error_log("oscaar: ======= stepID:$stepID -> dept:$dept type:$step->type parent:$step->parent pipeId:$step->gamepipeline workhour:$step->estimate");
+
+                $this->dao->insert(TABLE_PIPELINE_STAGES)->data($step)->autoCheck()->exec();
+                if ($step->type == 'group') $parentStepID = $this->dao->lastInsertID();
+                if ($step->type == 'step') $parentStepID = 0;
+            }
+            //return array('status' => 'created', 'id' => $pipeId);
+        }
     }
+
 
     /**
      * Update an article.
@@ -151,14 +183,42 @@ class pipelineModel extends model
      * @access public
      * @return void
      */
-    public function update($articleID)
+    public function update($pipelineId)
     {
-        $article = fixer::input('post')->specialchars($this->config->pipeline->fields)
-            ->stripTags($this->config->pipeline->editor->edit['id'], $this->config->allowedTags)
+        $pst = fixer::input('post')
             ->get();
 
-        $this->dao->update($this->config->pipeline->dbname)
-            ->data($article)->where('id')->eq($articleID)->exec();
+        $this->dao->update(TABLE_PIPELINE)
+            ->set('pipename')->eq($pst->pipename)
+            ->where('id')->eq($pipelineId)
+            ->autoCheck()->batchCheck($this->config->pipeline->create->requiredFields, 'notempty')->exec();
+
+        if (!$this->dao->isError()) {
+
+            $this->dao->delete()->from(TABLE_PIPELINE_STAGES)
+                ->where('gamepipeline')->eq($pipelineId)
+                ->exec();
+
+            $parentStepID = 0;
+            foreach ($pst->steps as $stepID => $dept) {
+                if ($dept == 0) continue;
+                $stepType = $this->post->stepType;
+                $step = new stdClass();
+                $step->type = ($stepType[$stepID] == 'item' and $parentStepID == 0) ? 'step' : $stepType[$stepID];
+                $step->parent = ($step->type == 'item') ? $parentStepID : 0;
+                $step->gamepipeline = $pipelineId;
+                $step->desc = $stepID;
+                $step->dept = $dept;
+                $step->estimate = (int)$pst->expects[$stepID];
+
+                //error_log("oscar: ======= update stepID:$stepID -> dept:$dept type:$step->type parent:$step->parent pipeId:$step->gamepipeline workhour:$step->estimate");
+
+                $this->dao->insert(TABLE_PIPELINE_STAGES)->data($step)->autoCheck()->exec();
+                if ($step->type == 'group') $parentStepID = $this->dao->lastInsertID();
+                if ($step->type == 'step') $parentStepID = 0;
+            }
+            //return array('status' => 'created', 'id' => $pipeId);
+        }
     }
 
     /**
@@ -171,121 +231,35 @@ class pipelineModel extends model
      */
     public function delete($id)
     {
-        //delete($this->config->pipeline->dbname, $id);
-        $this->dao->update($this->config->pipeline->dbname)
+        $this->dao->update(TABLE_PIPELINE)
             ->set('deleted')->eq(1)->where('id')->eq($id)->exec();
-        //$this->dao->delete()->from($this->dbname)->where('id')->eq($id)->exec();
     }
 
     public function restore($id, $table = null)
     {
-        $this->dao->update($this->config->pipeline->dbname)
+        $this->dao->update(TABLE_PIPELINE)
             ->set('deleted')->eq(0)->where('id')->eq($id)->exec();
     }
 
-    public function getGroupReport($day)
+
+    public function getOptionMenu()
     {
-        //var_dump(debug_backtrace());
-        //debug_print_backtrace();
-        //trigger_error("select * from zt_group");
-        //return array('www', 'qqq');
+        $pipelines = $this->dao->select()
+            ->from(TABLE_PIPELINE)
+            ->where('deleted')->eq(0)
+            ->orderBy('id asc')->fetchAll();
 
-        //$dbg = debug_backtrace();
-        //$dbg = str_replace("[\"", "<br>\r\n[\"", $dbg);
-        //$dbg = str_replace("{", "<br>\r\n{", $dbg);
-        //var_dump($dbg);
+        $menu = array();
 
-        //$sql = "SELECT * FROM gamepipeline WHERE owner IN (SELECT zt_user.account FROM zt_user WHERE zt_user.dept =". $this->app->user->dept .") AND gamepipeline.deleted <> '1'";
-        //$sql = "SELECT * FROM gamepipeline WHERE owner IN (SELECT zt_user.account FROM zt_user WHERE zt_user.dept ='". $this->app->user->dept ."')";
-        //$sql = "SELECT * FROM gamepipeline";
-        //$deptUsers = $this->dao->exec($sql);
-
-        /*
-        $deptUsers = $this->dao->select("t1.id")
-            ->from($this->config->pipeline->dbname)->alias("t1")
-            ->fetchAll();
-        //*/
-
-        //*
-        $deptUsers = $this->dao->select('account')->from(TABLE_USER)
-            ->where('dept')->eq((int)$this->app->user->dept)
-            //->fetchAll();
-            ->fetchAll('account');
-
-        //foreach ($deptUsers as $depu){ error_log('=====>depu:' . $depu->id);        }
-
-        $dptus = array_keys($deptUsers);
-        //foreach ($dptus as $depu)        {  error_log('=====depu:' . $depu);        }
-
-        error_log("=== [getGroupReport]" . $day);
-        $articles = $this->dao->select('*')
-            ->from($this->config->pipeline->dbname)
-            ->where('owner')->in($dptus)
-            //->andWhere('date')->between()
-            //->andWhere('date')->between(date('Y-m-d 00:00:00', strtotime('-'.$day.' day')), date('Y-m-d 23:59:59', strtotime('-'.$day.' day')))
-                ->andWhere('date')->between(date('Y-m-d 00:00:00', strtotime($day)), date('Y-m-d 23:59:59', strtotime($day)))
-            ->orderBy('date desc')
-            ->fetchAll();
-
-        //->where('time')->between(date('Y-m-d 00:00:00', strtotime('-1 day')), date('Y-m-d 23:59:59', strtotime('-1 day')))
-        //*/
-
-        //$deptUsers = $this->dao->select('*')->from(TABLE_USER)->fetchAll();
-        //$deptUsers = $this->user->getCommiters();
-
-
-
-        /*
-        $articles = $this->dao->select('t1.*')
-            ->from($this->config->pipeline->dbname)->alias('t1')
-            ->where('t1.deleted')->eq(0)
-            ->orderBy('date desc')
-            ->fetchAll();
-        //*/
-        //return $articles;
-        //return array($this->app->user->dept);
-
-        //error_log("=== [getGroupReport] test:select * from zt_group");
-        //$deptUsers = $this->dao->select('name')->from('zt_dept')->fetchAll();
-        //foreach ($deptUsers as $depu)     {
-            //error_log('=====depu:' . $depu->name);        }
-        //error_log(debug_backtrace());
-        //debug_print_backtrace();
-        //return $deptUsers;
-        //if (!$articles) return array('error from model.getGroupReport', array_keys($deptUsers));
-        //if (!$articles) return array($this->app->user->dept);
-
-        /*
-        $articles = $this->dao->select('*')
-            ->from($this->config->pipeline->dbname)
-            ->orderBy('date desc')
-            ->fetchAll();
-        //*/
-
-        $articles = $this->convertImageURL($articles);
-        /*
-        foreach ($articles as $art) {
-            $art->contentimages = $this->file->setImgSize($art->contentimages, 512);
+        foreach ($pipelines as $k => $val) {
+            $menu[$val->id] = $val->pipename;
         }
-        //*/
-        return $articles;
+
+        return $menu;
     }
 
-    public function getProjectReport($day)
+    public function setupOptionMenu($view)
     {
-        error_log("=== [getProjectReport]" . $day);
-        $articles = $this->dao->select('*')
-            ->from($this->config->pipeline->dbname)
-            ->where('date')->between(date('Y-m-d 00:00:00', strtotime($day)), date('Y-m-d 23:59:59', strtotime($day)))
-            ->orderBy('date desc')
-            ->fetchAll();
-
-        $articles = $this->convertImageURL($articles);
-        /*
-        foreach ($articles as $art) {
-            $art->contentimages = $this->file->setImgSize($art->contentimages, 512);
-        }
-        //*/
-        return $articles;
+        $view->pipeline = $this->getOptionMenu();
     }
 }

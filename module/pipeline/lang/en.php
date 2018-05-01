@@ -14,7 +14,7 @@ $lang->pipeline->common           = 'Pipeline';
 
 $lang->pipeline->index   = 'Index';
 $lang->pipeline->view    = 'View';
-$lang->pipeline->add     = 'Add pipeline';
+$lang->pipeline->create     = 'Add pipeline';
 $lang->pipeline->edit    = 'Edit';
 $lang->pipeline->delete  = 'Delete';
 $lang->pipeline->restore  = 'Restore';

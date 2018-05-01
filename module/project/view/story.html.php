@@ -153,6 +153,53 @@
             common::printIcon('task', 'batchCreateRoot', "projectID={$project->id}&story={$story->id}", '', 'list', 'flag');
             //oscar:
 
+            // oscar:=======================
+            //echo "<table><tr><td>";
+            //echo "<div class='btn-group dropup'>";
+            //echo html::select("batchCreateRootTask[$story->id]", $pipeline, 0, 'class="hiddens"');
+
+            $pipeline[-1] = "无";
+            echo html::select("batchCreateRootTask_$story->id", $pipeline, -1, "onchange=\"on_createRootTask('$story->project', '$story->id', '$productID')\"" );
+
+            /*
+            echo "<div class='btn-group'>";
+            echo "<button type='button' class='btn dropdown-toggle' data-toggle='dropdown'>"
+                . $this->lang->task->batchCreateChildTask . "<span class='caret'></span></button>";
+
+            echo "<ul class='dropdown-menu pull-right'>";
+            //echo html::select("batchCreateRootTask[$story->id]", $pipeline, 0, "class='hidden' onclick=\"setFormAction('$actionLink','hiddenwin')\"" );
+
+            //echo '<ul class="dropdown-list">';
+            foreach ($pipeline as $key => $value) {
+                //error_log("oscar: pipeline $key -> $value");
+                //if (empty($key)) continue;
+                $actionLink = helper::createLink('pipeline', 'batchCreateRootTask', "projectID=$story->project&pipelineId=$key&storyID=$story->id");
+                //echo "<li class='option' data-key='$key'>" . html::a("javascript:$(\"#batchCreateChildTask[$task->id]\").val(\"$key\");setFormAction(\"$actionLink\", \"hiddenwin\")", $value, '', '') . '</li>';
+                echo "<li>" . html::a($actionLink, $value, '', "") . '</li>';
+                echo "<li>" . html::a('#', $value, '', "onclick=\"setFormAction('$actionLink','hiddenwin')\"") . "</li>";
+                //echo "<li>" . $value . '</li>';
+            }
+            //echo "</ul>";
+
+            echo "</ul>";
+            //echo "</div>";
+            echo "</div>";
+            //*/
+
+            /*
+            echo "<div class='btn-group dropup clearfix'>";
+            echo "<ul>";
+            foreach ($pipeline as $key => $value) {
+                $actionLink = helper::createLink('pipeline', 'batchCreateChildTask', "projectID=$task->project&pipelineId=$key&rootTaskID=$task->id");
+                echo "<li>" . html::a($actionLink, $value, '') . '</li>';
+            }
+            echo "</ul>";
+            echo "</div>";
+            //*/
+            //echo "</td></tr></table>";
+            // oscar:=======================
+
+            /* oscar:
             $lang->task->create = $lang->project->wbs;
             if(commonModel::isTutorialMode())
             {
@@ -163,11 +210,12 @@
             {
                 if($hasDBPriv) common::printIcon('task', 'create', $param, '', 'list', 'plus-border', '', 'btn-task-create');
             }
+            //*/
 
-            $lang->task->batchCreate = $lang->project->batchWBS;
+            //oscar: $lang->task->batchCreate = $lang->project->batchWBS;
             if($hasDBPriv)
             {
-                common::printIcon('task', 'batchCreate', "projectID={$project->id}&story={$story->id}", '', 'list', 'plus-sign');
+                //oscar: common::printIcon('task', 'batchCreate', "projectID={$project->id}&story={$story->id}", '', 'list', 'plus-sign');
             }
 
             $lang->testcase->batchCreate = $lang->testcase->create;

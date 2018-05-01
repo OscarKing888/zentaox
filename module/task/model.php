@@ -33,7 +33,7 @@ class taskModel extends model
             ->setIF($this->post->estimate != false, 'left', $this->post->estimate)
             ->setIF($this->post->story != false, 'storyVersion', $this->loadModel('story')->getVersion($this->post->story))
             ->setDefault('estStarted', '0000-00-00')
-            ->setDefault('deadline', '0000-00-00')
+            //->setDefault('deadline', '0000-00-00')
             ->setIF(strpos($this->config->task->create->requiredFields, 'estStarted') !== false, 'estStarted', $this->post->estStarted)
             ->setIF(strpos($this->config->task->create->requiredFields, 'deadline') !== false, 'deadline', $this->post->deadline)
             ->setDefault('openedBy',   $this->app->user->account)
@@ -48,7 +48,8 @@ class taskModel extends model
             ->autoCheck()
             ->batchCheck($this->config->task->create->requiredFields, 'notempty')
             //->checkIF($task->estimate != '', 'estimate', 'float')
-            //->checkIF($task->deadline != '0000-00-00', 'deadline', 'ge', $task->estStarted)
+            ->checkIF($task->deadline != '0000-00-00', 'deadline', 'ge', $task->estStarted)
+            //->check($task->deadline != '0000-00-00', 'deadline')
             ->exec();
 
         if(dao::isError()) return false;
@@ -218,7 +219,7 @@ class taskModel extends model
 
         /*
         for($i = 0; $i < $batchNum; $i++) {
-            error_log("batch create task[$i] name:" . $tasks->name[$i] . " dept:" . $tasks->dept[$i]);
+            error_log("batch create task[$i] name:" . $tasks->name[$i] . " assignedTo[$i]:" . $tasks->assignedTo[$i]);
         }
         //*/
 
@@ -230,7 +231,7 @@ class taskModel extends model
             //oscar:if($tasks->type[$key] == 'affair') continue;
             //oscar:if($tasks->type[$key] == 'ditto' && isset($tasks->type[$key - 1]) && $tasks->type[$key - 1] == 'affair') continue;
 
-            if($tasks->dept[$key] == 'ditto') continue; //oscar:
+            if($tasks->assignedTo[$key] == 'ditto') continue; //oscar:
 
             if($storyID == 'ditto') $storyID = $preStory;
             $preStory = $storyID;
@@ -259,29 +260,29 @@ class taskModel extends model
                 die(js::alert($this->lang->task->error->estimateNumber));
             }
             //oscar:if(!empty($tasks->name[$i]) and empty($tasks->type[$i])) die(js::alert(sprintf($this->lang->error->notempty . "_OSCAR", $this->lang->task->type)));
-            if(!empty($tasks->name[$i]) and empty($tasks->dept[0])){
-                die(js::alert(sprintf("批量检查：" . $tasks->dept[$i] . $this->lang->error->notempty, $this->lang->dept)));
+            if(!empty($tasks->name[$i]) and empty($tasks->assignedTo[0])){
+                die(js::alert(sprintf("批量创建检查：" . $tasks->assignedTo[$i] . $this->lang->error->notempty, $this->lang->assignedTo)));
             }
         }
 
         $story      = 0;
         $module     = 0;
         $type       = 'devel'; //oscar:
-        $dept       = 0; //oscar:
-        $assignedTo = '';
+        $assignedTo       = 0; //oscar:
+        //$dept = '';
 
         for($i = 0; $i < $batchNum; $i++)
         {
             $story      = !isset($tasks->story[$i]) || $tasks->story[$i]           == 'ditto' ? $story     : $tasks->story[$i];
             $module     = !isset($tasks->module[$i]) || $tasks->module[$i]         == 'ditto' ? $module    : $tasks->module[$i];
             $type       = !isset($tasks->type[$i]) || $tasks->type[$i]             == 'ditto' ? $type      : $tasks->type[$i];
-            $dept       = !isset($tasks->dept[$i]) || $tasks->dept[$i] == 'ditto' ? $dept : $tasks->dept[$i]; //oscar:
+            $assignedTo       = !isset($tasks->assignedTo[$i]) || $tasks->assignedTo[$i] == 'ditto' ? $assignedTo : $tasks->assignedTo[$i]; //oscar:
             $assignedTo = !isset($tasks->assignedTo[$i]) || $tasks->assignedTo[$i] == 'ditto' ? $assignedTo: $tasks->assignedTo[$i];
 
             if(empty($tasks->name[$i])) continue;
 
             /*
-            error_log("*** batch create [$i] name:" . $tasks->name[$i] . " dept:" . $dept);
+            error_log("*** batch create [$i] name:" . $tasks->name[$i] . " assignedTo:" . $assignedTo);
             //*/
 
             $data[$i]             = new stdclass();
@@ -303,14 +304,14 @@ class taskModel extends model
             $data[$i]->openedDate = $now;
             $data[$i]->parent     = $tasks->parent[$i];
 
-            $data[$i]->dept     = $dept; //oscar:
+            //$data[$i]->dept     = $dept; //oscar:
 
             if($story) $data[$i]->storyVersion = $this->loadModel('story')->getVersion($data[$i]->story);
             if($assignedTo) $data[$i]->assignedDate = $now;
 
             $this->dao->insert(TABLE_TASK)->data($data[$i])
                 ->autoCheck()
-                ->batchCheck($this->config->task->create->requiredFields, 'notempty')
+                ->batchCheck($this->config->task->batchCreate->requiredFields, 'notempty')
                 ->checkIF($data[$i]->estimate != '', 'estimate', 'float')
                 ->exec();
 
@@ -738,8 +739,14 @@ class taskModel extends model
             ->setDefault('lastEditedBy', $this->app->user->account)
             ->setDefault('lastEditedDate', $now)
             ->setDefault('assignedDate', $now)
-            ->remove('comment,showModule,assignedToDept,batchChangeModule') //oscar:
+            ->remove('comment,showModule,assignedToDept,batchChangeModule,workHour') //oscar:
             ->get();
+
+        error_log("task::assign taskID:$taskID");
+        foreach ($task as $k => $v)
+        {
+            error_log("==== tk:$k tv:$v");
+        }
 
         $this->dao->update(TABLE_TASK)
             ->data($task)
@@ -1324,7 +1331,7 @@ class taskModel extends model
 
         $myDepts = $this->dept->setupDeptUsers($this->view, $this->app->user->account, $this->app->user->dept);
 
-        /*/
+        //*/
         $myDepts = array($this->app->user->dept);
         $deptUsers = $this->dept->getDeptUserPairs($this->app->user->dept);
 
@@ -2197,7 +2204,7 @@ class taskModel extends model
      * @access public
      * @return void
      */
-    public function printCell($col, $task, $users, $browseType, $branchGroups, $modulePairs = array(), $mode = 'datatable', $child = false, $depts = array())
+    public function printCell($col, $task, $users, $browseType, $branchGroups, $modulePairs = array(), $mode = 'datatable', $child = false, $depts = array(), $pipeline=array())
     {
         $canView  = common::hasPriv('task', 'view');
         $taskLink = helper::createLink('task', 'view', "taskID=$task->id");
@@ -2349,10 +2356,53 @@ class taskModel extends model
                     common::printIcon('task', 'finish', "taskID=$task->id", $task, 'list', '', '', 'iframe', true);
                     common::printIcon('task', 'close',  "taskID=$task->id", $task, 'list', '', '', 'iframe', true);
                     common::printIcon('task', 'edit',   "taskID=$task->id", $task, 'list');
-                    if(empty($task->team) or empty($task->children))
-                    {
-                        common::printIcon('task', 'batchCreate', "project=$task->project&storyID=$task->story&moduleID=$task->module&taskID=$task->id", $task, 'list', 'plus', '', '', '', '', $this->lang->task->children);
+                    if(empty($task->team) or empty($task->children)) {
+                        //common::printIcon('task', 'batchCreate', "project=$task->project&storyID=$task->story&moduleID=$task->module&taskID=$task->id", $task, 'list', 'plus', '', '', '', '', $this->lang->task->children);
+                        common::printIcon('task', 'batchCreate', "project=$task->project&storyID=$task->story&moduleID=$task->module&taskID=$task->id", $task, 'list', 'plus-sign', '', '', '', '', $this->lang->project->batchWBS);
                     }
+
+                    /*// oscar:=======================
+                    //$actionLink = helper::createLink('task', 'batchCreateChildTask', "project=$task->project");
+
+                    //echo "<div class='btn-group dropup'>";
+                    echo "<div class='btn-group dropup'>";
+                    echo "<button type='button' class='btn dropdown-toggle' data-toggle='dropdown'>"
+                        . $this->lang->task->batchCreateChildTask . "<span class='caret'></span></button>";
+
+                    echo "<ul class='dropdown-menu pull-right'>";
+                    //echo html::select("batchCreateChildTask[$task->id]", $pipeline, 0, 'class="hiddens"');
+
+                    //echo '<ul class="dropdown-list">';
+                    foreach ($pipeline as $key => $value) {
+                        //error_log("oscar: pipeline $key -> $value");
+                        //if (empty($key)) continue;
+                        $actionLink = helper::createLink('pipeline', 'batchCreateChildTask', "projectID=$task->project&pipelineId=$key&rootTaskID=$task->id");
+                        //echo "<li class='option' data-key='$key'>" . html::a("javascript:$(\"#batchCreateChildTask[$task->id]\").val(\"$key\");setFormAction(\"$actionLink\", \"hiddenwin\")", $value, '', '') . '</li>';
+                        echo "<li>" . html::a($actionLink, $value, '') . '</li>';
+                        //echo "<li>" . $value . '</li>';
+                    }
+                    //echo "</ul>";
+
+                    echo "</ul>";
+                    //echo "</div>";
+                    echo "</div>";
+
+
+                    echo "<div class='btn-group dropup'>";
+                    echo "<ul>";
+                    foreach ($pipeline as $key => $value) {
+                        $actionLink = helper::createLink('pipeline', 'batchCreateChildTask', "projectID=$task->project&pipelineId=$key&rootTaskID=$task->id");
+                        echo "<li>" . html::a($actionLink, $value, '') . '</li>';
+                    }
+                    echo "</ul>";
+                    echo "</div>";
+
+                    // oscar:=======================
+                    //*/
+
+                    //oscar: $lang->task->batchCreate = $lang->project->batchWBS;
+                    //common::printIcon('task', 'batchCreate', "projectID=$task->project&story={$story->id}", '', 'list', 'plus-sign');
+
                     break;
             }
             echo '</td>';

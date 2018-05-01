@@ -290,10 +290,11 @@
 
                 if(common::hasPriv('story', 'batchAssignTo'))
                 {
+                    /*
                       $withSearch = count($users) > 10;
                       $actionLink = $this->createLink('story', 'batchAssignTo', "productID=$productID");
                       echo "<li class='dropdown-submenu'>";
-                      echo html::select('assignedTo', $users, 'admin', 'class="hidden"');
+                      echo html::select('assignedTo2', $users, 'admin', 'class="hidden"');
                       echo html::a('javascript::', $lang->story->assignedTo, '', 'id="assignItem"');
                       echo "<div class='dropdown-menu" . ($withSearch ? ' with-search':'') . "'>";
                       echo '<ul class="dropdown-list">';
@@ -305,6 +306,7 @@
                       echo "</ul>";
                       if($withSearch) echo "<div class='menu-search'><div class='input-group input-group-sm'><input type='text' class='form-control'><span class='input-group-addon'><i class='icon-search'></i></span></div></div>";
                       echo "</div></li>";
+                    //*/
                 }
                 else
                 {
@@ -313,6 +315,52 @@
                 ?>
               </ul>
             </div>
+
+                <?php
+                //if ($tools['batchAssignTo'])
+                //{
+
+                $memberPairs = $leaders;
+                $memberPairs += $deptUsers;
+                $memberPairs = array_unique($memberPairs);
+                ksort($memberPairs);
+
+                // 显示姓名为部门
+                foreach ($deptLeaders as $dp => $dpld) {
+                    if(array_key_exists($dpld, $memberPairs))
+                    {
+                        $memberPairs[$dpld] = $depts[$dp];
+                        //error_log("oscar: dept:$depts[$dp] dpid:$dp");
+                    }
+                }
+
+                /*
+                echo "$title==============";
+                foreach ($memberPairs as $key => $val) {
+                    echo "$key --- $val";
+                }
+                //*/
+
+
+                $actionLink = $this->createLink('story', 'batchAssignTo', "productID=$productID");
+
+                echo "<div class='btn-group dropup'>";
+                echo "<button id='taskBatchAssignTo' type='button' class='btn dropdown-toggle' data-toggle='dropdown'>" . $lang->story->assignedTo . "<span class='caret'></span></button>";
+                echo "<ul class='dropdown-menu' id='taskBatchAssignToMenu'>";
+                echo html::select('assignedTo', $memberPairs, '', 'class="hidden"');
+
+                echo '<ul class="dropdown-list">';
+                foreach ($memberPairs as $key => $value) {
+                    if (empty($key)) continue;
+                    //$actionLink = $this->createLink('story', 'batchAssignTo', "productID=$productID");
+                    echo "<li class='option' data-key='$key'>" . html::a("javascript:$(\"#assignedTo\").val(\"$key\");setFormAction(\"$actionLink\", \"hiddenwin\" )", $value, '', '') . '</li>';
+                }
+                echo "</ul>";
+                if ($withSearch) echo "<div class='menu-search'><div class='input-group input-group-sm'><input type='text' class='form-control' placeholder=''><span class='input-group-addon'><i class='icon-search'></i></span></div></div>";
+                echo "</div></li>";
+                echo "</ul>";
+                //}
+                ?>
             <?php endif; ?>
             <div class='text'><?php echo $summary;?></div>
           </div>

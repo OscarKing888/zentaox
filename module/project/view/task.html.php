@@ -88,7 +88,8 @@ js::set('browseType', $browseType);
                             data-id='<?php echo $child->id ?>' data-status='<?php echo $child->status ?>'
                             data-estimate='<?php echo $child->estimate ?>'
                             data-consumed='<?php echo $child->consumed ?>' data-left='<?php echo $child->left ?>'>
-                            <?php foreach ($customFields as $field) $this->task->printCell($field, $child, $users, $browseType, $branchGroups, $modulePairs, $useDatatable ? 'datatable' : 'table', true, $depts); ?>
+                            <?php //echo html::select('batchCreateChildTask', $pipeline, '', 'class="hidden"');?>
+                            <?php foreach ($customFields as $field) $this->task->printCell($field, $child, $users, $browseType, $branchGroups, $modulePairs, $useDatatable ? 'datatable' : 'table', true, $depts, $pipeline); ?>
                         </tr>
                     <?php endforeach; ?>
                 <?php endif; ?>
@@ -101,7 +102,7 @@ js::set('browseType', $browseType);
                     <div class='table-actions clearfix'>
                         <?php
 
-                        $tools = array('batchAssignTo' => true, 'batchAssignToDept' => true, 'batchClose' => true, 'batchComplete' => true, 'batchComplete' => true,);
+                        $tools = array('batchAssignTo' => true, 'batchAssignToDept' => true, 'batchClose' => true, 'batchComplete' => true, 'batchComplete' => true, 'batchSetWorkhour' => true, );
 
                         $memberPairs = array();
                         foreach ($deptUsers as $key => $member) {
@@ -179,6 +180,28 @@ js::set('browseType', $browseType);
                             //echo "</ul>";
                             echo "</div>";
 
+                            if ($tools['batchSetWorkhour']) {
+                                $actionLink = $this->createLink('task', 'batchSetWorkhour', "");
+
+                                echo "<div class='btn-group dropup'>";
+                                echo "<button id='taskbatchSetWorkhour' type='button' class='btn dropdown-toggle' data-toggle='dropdown'>" . $lang->task->changeWorkHour . "<span class='caret'></span></button>";
+                                echo "<ul class='dropdown-menu' id='taskbatchSetWorkhourMenu'>";
+
+                                $workhourPairs = array(1 => '1 H', 2 => '2 H', 4 => '4 H', 8 => '1 Day', 12 => '1.5 Day', 16 => '2 Day', 24 => '3 Day', 32 => '4 Day', 40 => '5 Day');
+
+                                echo html::select('workHour', $workhourPairs, '', 'class="hidden"');
+
+                                echo '<ul class="dropdown-list">';
+                                foreach ($workhourPairs as $key => $value) {
+                                    if (empty($key)) continue;
+                                    echo "<li class='option' data-key='$key'>" . html::a("javascript:$(\"#workHour\").val(\"$key\");setFormAction(\"$actionLink\", \"hiddenwin\", \"#moreAction\")", $value, '', '') . '</li>';
+                                }
+                                echo "</ul>";
+                                echo "</div></li>";
+                                echo "</ul>";
+                                //echo "</div>";
+                            }
+
 
                             if ($tools['batchAssignTo']) {
 
@@ -195,7 +218,7 @@ js::set('browseType', $browseType);
                                     if (empty($key)) continue;
                                     //echo "<li class='option' data-key='$key'>" . html::a("javascript:$(\".table-actions #assignedTo\").val(\"$key\");setFormAction(\"$actionLink\", \"hiddenwin\", \"#moreAction\")", $value, '', '') . '</li>';
                                     $actionLink = $this->createLink('task', 'batchAssignTo', "projectID=$projectID");
-                                    echo "<li class='option' data-key='$key'>" . html::a("javascript:$(\"#assignedTo\").val(\"$key\");setFormAction(\"$actionLink\", \"hiddenwin\", \"#moreAction\")", $value, '', '') . '</li>';
+                                    echo "<li class='option' data-key='$key'>" . html::a("javascript:$(\"#assignedTo\").val(\"$key\");setFormAction(\"$actionLink\", \"hiddenwin\")", $value, '', '') . '</li>';
                                 }
                                 echo "</ul>";
                                 if ($withSearch) echo "<div class='menu-search'><div class='input-group input-group-sm'><input type='text' class='form-control' placeholder=''><span class='input-group-addon'><i class='icon-search'></i></span></div></div>";
@@ -263,30 +286,6 @@ js::set('browseType', $browseType);
                                 echo "</ul>";
                                 //echo "</div>";
                             }
-
-
-                            if ($tools['batchSetWorkhour']) {
-                                $actionLink = $this->createLink('task', 'batchSetWorkhour', "");
-
-                                echo "<div class='btn-group dropup'>";
-                                echo "<button id='taskbatchSetWorkhour' type='button' class='btn dropdown-toggle' data-toggle='dropdown'>" . $lang->task->changeWorkHour . "<span class='caret'></span></button>";
-                                echo "<ul class='dropdown-menu' id='taskbatchSetWorkhourMenu'>";
-
-                                $workhourPairs = array(1 => '1 H', 2 => '2 H', 4 => '4 H', 8 => '1 Day', 12 => '1.5 Day', 16 => '2 Day', 24 => '3 Day', 32 => '4 Day', 40 => '5 Day');
-
-                                echo html::select('workHour', $workhourPairs, '', 'class="hidden"');
-
-                                echo '<ul class="dropdown-list">';
-                                foreach ($workhourPairs as $key => $value) {
-                                    if (empty($key)) continue;
-                                    echo "<li class='option' data-key='$key'>" . html::a("javascript:$(\"#workHour\").val(\"$key\");setFormAction(\"$actionLink\", \"hiddenwin\", \"#moreAction\")", $value, '', '') . '</li>';
-                                }
-                                echo "</ul>";
-                                echo "</div></li>";
-                                echo "</ul>";
-                                //echo "</div>";
-                            }
-
 
                             //echo "<button id='test_dpt' onclick='on_test_dpt()'>Test Dpt</button>";
                             //echo "<button id='test_dpt' onclick='on_test_setdpt()'>Test Set Dpt</button>";
