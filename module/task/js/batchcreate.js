@@ -41,7 +41,7 @@ function copyStoryTitle(num)
     storyTitle     = storyTitle.substr(startPosition, endPosition - startPosition);
 
     $('#name\\[' + num + '\\]').val(storyTitle);
-    $('#estimate\\[' + num + '\\]').val($('#storyEstimate' + num).val());
+    //$('#estimate\\[' + num + '\\]').val($('#storyEstimate' + num).val());
     $('#desc\\[' + num + '\\]').val(($('#storyDesc' + num).val()).replace(/<[^>]+>/g,''));
 
     var storyPri = $('#storyPri' + num).val();

@@ -117,9 +117,9 @@ if ($hiddenStory and isset($visibleFields['story'])) $colspan -= 1;
                     </div>
                 </td>
                 <td><?php $userList = $deptUsers; if(!empty($batchCreateRoot)) $userList = $leaders; echo html::select("assignedTo[$i]", $userList, $assignedTo, 'class=form-control chosen'); ?></td>
-                <td <?php echo zget($visibleFields, 'estimate', "class='hidden'") ?>><?php echo html::input("estimate[$i]", '', "class='form-control text-center' autocomplete='off'"); ?></td>
+                <td <?php echo zget($visibleFields, 'estimate', "class='hidden'") ?>><?php echo html::input("estimate[$i]", '24', "class='form-control text-center' autocomplete='off'"); ?></td>
                 <td <?php echo zget($visibleFields, 'estStarted', "class='hidden'") ?>><?php echo html::input("estStarted[$i]", '', "class='form-control text-center form-date'"); ?></td>
-                <td <?php echo zget($visibleFields, 'deadline', "class='hidden'") ?>><?php echo html::input("deadline[$i]", '', "class='form-control text-center form-date'"); ?></td>
+                <td <?php echo zget($visibleFields, 'deadline', "class='hidden'") ?>><?php echo html::input("deadline[$i]", helper::nowafter(5), "class='form-control text-center form-date'");?></td>
                 <td <?php echo zget($visibleFields, 'desc', "class='hidden'") ?>><?php echo html::textarea("desc[$i]", '', "rows='1' class='form-control autosize'"); ?></td>
                 <td <?php echo zget($visibleFields, 'pri', "class='hidden'") ?>><?php echo html::select("pri[$i]", (array)$lang->task->priList, $pri, 'class=form-control'); ?></td>
             </tr>

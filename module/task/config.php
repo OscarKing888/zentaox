@@ -42,13 +42,13 @@ if($config->global->flow == 'onlyTask') $config->task->exportFields = str_replac
 //oscar: $config->task->customCreateFields      = 'story,estStarted,deadline,mailto,pri,estimate';
 $config->task->customCreateFields      = 'story,pri,files,deadline';
 //oscar: $config->task->customBatchCreateFields = 'module,story,assignedTo,estimate,estStarted,deadline,desc,pri';
-$config->task->customBatchCreateFields = 'module,story,dept,desc,pri,deadline';
+$config->task->customBatchCreateFields = 'module,story,estimate,pri,deadline';
 $config->task->customBatchEditFields   = 'module,assignedTo,status,pri,estimate,record,left,estStarted,deadline,finishedBy,canceledBy,closedBy,closedReason';
 
 $config->task->custom = new stdclass();
 $config->task->custom->createFields      = $config->task->customCreateFields;
 //oscar:$config->task->custom->batchCreateFields = 'module,story,assignedTo,estimate,desc,pri';
-$config->task->custom->batchCreateFields = 'module,story,desc,pri';
+$config->task->custom->batchCreateFields = 'module,story,estimate,pri,deadline';
 $config->task->custom->batchEditFields   = 'module,assignedTo,status,pri,estimate,record,left,finishedBy,closedBy,closedReason';
 
 if($config->global->flow == 'onlyTask')
@@ -59,7 +59,8 @@ if($config->global->flow == 'onlyTask')
 }
 
 $config->task->datatable = new stdclass();
-$config->task->datatable->defaultField = array('id', 'pri', 'name', 'dept', 'status', 'deadline', 'openedDate', 'openedBy', 'assignedTo', 'finishedBy', 'estimate', 'consumed', 'left', 'actions');
+//$config->task->datatable->defaultField = array('id', 'pri', 'name', 'dept', 'status', 'deadline', 'openedDate', 'openedBy', 'assignedTo', 'finishedBy', 'estimate', 'consumed', 'left', 'actions');
+$config->task->datatable->defaultField = array('id', 'pri', 'name', 'dept', 'status', 'deadline', 'openedDate', 'openedBy', 'assignedTo', 'finishedBy', 'estimate', 'actions');
 
 $config->task->datatable->fieldList['id']['title']    = 'idAB';
 $config->task->datatable->fieldList['id']['fixed']    = 'left';

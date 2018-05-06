@@ -47,8 +47,7 @@ function initBurnChar()
             color: "#CCC",
             showTooltips: false,
             data: <?php echo $chartData['baseLine']?>
-        },
-        {
+        },{
             label: "<?php echo $lang->project->Left?>",
             color: "#0033CC",
             pointStrokeColor: '#0033CC',

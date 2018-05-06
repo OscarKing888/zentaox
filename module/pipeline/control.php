@@ -25,6 +25,7 @@ class pipeline extends control
         $this->loadModel('dept');
         $this->loadModel('file');
         $this->loadModel('product');
+        $this->loadModel('user');
     }
 
     /**
@@ -201,7 +202,7 @@ class pipeline extends control
                 $task = new stdClass();
                 $task->dept = $step->dept;
                 $task->estimate = (float)$step->estimate;
-                $task->name = "<span class=\"pri6\">P</span>" . $story->title;
+                $task->name = $story->title;
                 $task->desc = $story->spec;
                 //$task->product = $productID;
                 $task->module = $story->module;
@@ -215,6 +216,7 @@ class pipeline extends control
                 $task->estStarted = '0000-00-00';
                 $task->openedBy = $this->app->user->account;
                 $task->openedDate = helper::now();
+                $task->pipeline = $pipelineID;
 
                 $this->dao->insert(TABLE_TASK)->data($task)
                     ->autoCheck()
@@ -227,6 +229,81 @@ class pipeline extends control
                 if(dao::isError()) return false;
             }
         }
+    }
+
+
+    public function groupleaders()
+    {
+        //error_log("oscar: view groupleaders");
+
+        //$depts = $this->dao->select('id,name')->from(TABLE_DEPT)->fetchPairs();
+        $depts = $this->dept->getOptionMenu();
+        $this->view->depts = $depts;
+
+        if (!empty($_POST)) {
+
+            //error_log("oscar: view groupleaders  1");
+
+            $leader = fixer::input('post')->get();
+            $batchNum = count($depts);
+            //error_log("oscar: groupleaders batchNum $batchNum count:" . count($leader));
+
+            //var_dump($leader);
+
+            for ($i = 0; $i < $batchNum; $i++) {
+                //error_log("oscar: groupleaders $i dept;$depts[$i]  username:$leader->username[$i]");
+
+                if (empty($leader->username[$i])) {
+                    continue;
+                }
+
+                $dat = new stdclass();
+                $dat->dept = $i;
+                $dat->username = $leader->username[$i];
+
+                $c = $this->dao->select()->from(TABLE_GAMEGROUPLEADERS)
+                    ->where('dept')->eq($dat->dept)
+                    ->count();
+
+                //error_log("oscar: groupleaders  select count:$c $dat->dept $dat->username" );
+
+                if ($c == 0) {
+                    //error_log("oscar: groupleaders  insert count:$c $dat->dept $dat->username");
+                    $this->dao->insert(TABLE_GAMEGROUPLEADERS)->data($dat)
+                        //->autoCheck()
+                        //->batchCheck('dept,username', 'notempty')
+                        ->exec();
+                } else {
+                    //error_log("oscar: groupleaders  update count:$c $dat->dept $dat->username");
+                    $this->dao->update(TABLE_GAMEGROUPLEADERS)->data($dat)
+                        ->where('dept')->eq($dat->dept)
+                        //->autoCheck()
+                        //->batchCheck('dept,username', 'notempty')
+                        ->exec();
+                }
+
+                if (dao::isError()) {
+                    die(js::error(dao::getError()));
+                }
+            }
+
+        }
+
+        //error_log("oscar: view groupleaders  2");
+
+
+        //error_log("oscar: view groupleaders  3");
+        $allUsers = $this->user->getPairs('nodeleted|noclosed');
+        $this->view->allUsers = $allUsers;
+
+        $leaders = $this->dao->select('dept,username')->from(TABLE_GAMEGROUPLEADERS)
+            ->orderBy('dept asc')
+            ->fetchPairs();
+
+        //error_log("oscar: view groupleaders  count:" . count($leaders));
+        $this->view->leaders = $leaders;
+
+        $this->display();
     }
 
 }

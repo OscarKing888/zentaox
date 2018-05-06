@@ -7,7 +7,7 @@ function copyStoryTitle()
     storyTitle = storyTitle.substr(startPosition, endPosition - startPosition);
 
     $('#name').attr('value', storyTitle);
-    $('#estimate').val($('#storyEstimate').val());
+    //$('#estimate').val($('#storyEstimate').val());
     $('#desc').val($('#storyDesc').val());
 
     $('.pri-text span:first').removeClass().addClass('pri' + $('#storyPri').val()).text($('#storyPri').val());

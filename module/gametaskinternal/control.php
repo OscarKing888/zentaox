@@ -634,79 +634,6 @@ class gametaskinternal extends control
         }
     }
 
-    public function groupleaders()
-    {
-        //error_log("oscar: view groupleaders");
-
-        //$depts = $this->dao->select('id,name')->from(TABLE_DEPT)->fetchPairs();
-        $depts = $this->dept->getOptionMenu();
-        $this->view->depts = $depts;
-
-        if (!empty($_POST)) {
-
-            //error_log("oscar: view groupleaders  1");
-
-            $leader = fixer::input('post')->get();
-            $batchNum = count($depts);
-            //error_log("oscar: groupleaders batchNum $batchNum count:" . count($leader));
-
-            //var_dump($leader);
-
-            for ($i = 0; $i < $batchNum; $i++) {
-                //error_log("oscar: groupleaders $i dept;$depts[$i]  username:$leader->username[$i]");
-
-                if (empty($leader->username[$i])) {
-                    continue;
-                }
-
-                $dat = new stdclass();
-                $dat->dept = $i;
-                $dat->username = $leader->username[$i];
-
-                $c = $this->dao->select()->from(TABLE_GAMEGROUPLEADERS)
-                    ->where('dept')->eq($dat->dept)
-                    ->count();
-
-                //error_log("oscar: groupleaders  select count:$c $dat->dept $dat->username" );
-
-                if ($c == 0) {
-                    //error_log("oscar: groupleaders  insert count:$c $dat->dept $dat->username");
-                    $this->dao->insert(TABLE_GAMEGROUPLEADERS)->data($dat)
-                        //->autoCheck()
-                        //->batchCheck('dept,username', 'notempty')
-                        ->exec();
-                } else {
-                    //error_log("oscar: groupleaders  update count:$c $dat->dept $dat->username");
-                    $this->dao->update(TABLE_GAMEGROUPLEADERS)->data($dat)
-                        ->where('dept')->eq($dat->dept)
-                        //->autoCheck()
-                        //->batchCheck('dept,username', 'notempty')
-                        ->exec();
-                }
-
-                if (dao::isError()) {
-                    die(js::error(dao::getError()));
-                }
-            }
-
-        }
-
-        //error_log("oscar: view groupleaders  2");
-
-
-        //error_log("oscar: view groupleaders  3");
-        $allUsers = $this->user->getPairs('nodeleted|noclosed');
-        $this->view->allUsers = $allUsers;
-
-        $leaders = $this->dao->select('dept,username')->from(TABLE_GAMEGROUPLEADERS)
-            ->orderBy('dept asc')
-            ->fetchPairs();
-
-        //error_log("oscar: view groupleaders  count:" . count($leaders));
-        $this->view->leaders = $leaders;
-
-        $this->display();
-    }
 
     public function delete($id)
     {
@@ -901,7 +828,7 @@ class gametaskinternal extends control
 
             //foreach ($taskIDList as $item) {$msg .= $item . "  ";}
 
-            echo js::alert("batchSetWorkhour: $msg");
+            //echo js::alert("batchSetWorkhour: $msg");
             //echo $msg;
 
             foreach($taskIDList as $taskID)

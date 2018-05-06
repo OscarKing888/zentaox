@@ -30,6 +30,7 @@ $config->project->editor->start    = array('id' => 'comment', 'tools' => 'simple
 $config->project->editor->suspend  = array('id' => 'comment', 'tools' => 'simpleTools');
 
 $config->project->search['module']                   = 'task';
+$config->project->search['fields']['dept']           = $lang->task->dept; // oscar
 $config->project->search['fields']['name']           = $lang->task->name;
 $config->project->search['fields']['id']             = $lang->task->id;
 $config->project->search['fields']['status']         = $lang->task->status;
@@ -64,6 +65,7 @@ $config->project->search['fields']['closedDate']     = $lang->task->closedDate;
 $config->project->search['fields']['canceledDate']   = $lang->task->canceledDate;
 $config->project->search['fields']['lastEditedDate'] = $lang->task->lastEditedDate;
 
+$config->project->search['params']['dept']           = array('operator' => '=', 'control' => 'select',  'values' => $lang->task->deptList); // oscar
 $config->project->search['params']['name']           = array('operator' => 'include', 'control' => 'input',  'values' => '');
 $config->project->search['params']['status']         = array('operator' => '=',       'control' => 'select', 'values' => $lang->task->statusList);
 $config->project->search['params']['desc']           = array('operator' => 'include', 'control' => 'input',  'values' => '');

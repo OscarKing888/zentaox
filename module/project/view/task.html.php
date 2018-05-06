@@ -102,7 +102,7 @@ js::set('browseType', $browseType);
                     <div class='table-actions clearfix'>
                         <?php
 
-                        $tools = array('batchAssignTo' => true, 'batchAssignToDept' => true, 'batchClose' => true, 'batchComplete' => true, 'batchComplete' => true, 'batchSetWorkhour' => true, );
+                        $tools = array('batchAssignTo' => true, 'batchAssignToDept' => true, 'batchClose' => true, 'batchComplete' => true, 'batchComplete' => true, 'batchSetWorkhour' => true, 'batchDelete' => true);
 
                         $memberPairs = array();
                         foreach ($deptUsers as $key => $member) {
