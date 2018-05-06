@@ -320,12 +320,13 @@
                 //if ($tools['batchAssignTo'])
                 //{
 
-                $memberPairs = $leaders;
-                $memberPairs += $deptUsers;
-                $memberPairs = array_unique($memberPairs);
-                ksort($memberPairs);
+                //$memberPairs = $leaders;
+                $memberPairs = $deptUsers;
+                //$memberPairs = array_unique($memberPairs);
+                //ksort($memberPairs);
 
                 // 显示姓名为部门
+                /*
                 foreach ($deptLeaders as $dp => $dpld) {
                     if(array_key_exists($dpld, $memberPairs))
                     {
@@ -333,6 +334,7 @@
                         //error_log("oscar: dept:$depts[$dp] dpid:$dp");
                     }
                 }
+                //*/
 
                 /*
                 echo "$title==============";

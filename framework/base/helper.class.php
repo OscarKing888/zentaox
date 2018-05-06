@@ -450,6 +450,17 @@ class baseHelper
         return date(DT_DATETIME1);
     }
 
+    // oscar
+    static public function nowafter($days)
+    {
+        $now = date(DT_DATE1);
+        $d = "$days days";
+        $date = date_create($now);
+        date_add($date,date_interval_create_from_date_string($d));
+        return date_format($date,"Y-m-d");
+    }
+    // oscar
+
     /**
      *  获取当前日期，使用common语言文件定义的DT_DATE1常量。
      *  Get today according to the  DT_DATE1 constant defined in the lang file.

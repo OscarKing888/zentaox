@@ -12,7 +12,7 @@
 $lang->task->index              = "任务一览";
 $lang->task->create             = "建任务";
 $lang->task->batchCreate        = "批量建任务";
-$lang->task->batchCreateRoot    = "批量建根任务";
+$lang->task->batchCreateRoot    = "批量建主任务";
 $lang->task->batchEdit          = "批量编辑";
 $lang->task->batchChangeModule  = "批量修改模块";
 $lang->task->batchClose         = "批量关闭";
@@ -121,6 +121,26 @@ $lang->task->noStory       = '无需求';
 $lang->task->noAssigned    = '未指派';
 $lang->task->noFinished    = '未完成';
 $lang->task->noClosed      = '未关闭';
+
+// oscar[
+$lang->task->deptList['']       = '';
+$lang->task->deptList['1']   = '策划';
+$lang->task->deptList['2']  = '程序-引擎';
+$lang->task->deptList['3']   = '美术-原画';
+$lang->task->deptList['4']  = '美术-LA';
+$lang->task->deptList['5'] = '美术-特效';
+$lang->task->deptList['6'] = '美术-音效';
+$lang->task->deptList['7']  = '美术-动画';
+$lang->task->deptList['8']   = '美术-3D';
+$lang->task->deptList['9']  = '程序-客户端';
+$lang->task->deptList['10'] = '程序-服务器';
+$lang->task->deptList['11'] = '美术-UI';
+$lang->task->deptList['12']  = '美术';
+$lang->task->deptList['13']   = 'PM';
+$lang->task->deptList['18'] = '孵化部';
+// oscar]
+
+
 
 $lang->task->statusList['']       = '';
 $lang->task->statusList['wait']   = '未开始';

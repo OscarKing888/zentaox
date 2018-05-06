@@ -28,7 +28,7 @@ $lang->pipeline->content = '内容';
 $lang->pipeline->pic = '图片';
 $lang->pipeline->action  = '操作';
 $lang->pipeline->batchCreateRootTask = '批量创建主任务';
-
+$lang->pipeline->groupleaders     = '设置组长';
 $lang->project->manageProducts = '产品';
 
 $lang->pipeline->methodOrder[5] = 'index';

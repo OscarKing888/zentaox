@@ -19,7 +19,7 @@ $lang->gametaskinternal->assignedtome    = '指派给我';
 $lang->gametaskinternal->mydept    = '我的部门';
 $lang->gametaskinternal->completedlist    = '已完成';
 $lang->gametaskinternal->incompletelist    = '未完成';
-$lang->gametaskinternal->groupleaders     = '设置组长';
+//$lang->gametaskinternal->groupleaders     = '设置组长';
 $lang->gametaskinternal->restorepage    = '恢复';
 
 

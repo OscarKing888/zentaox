@@ -12,7 +12,7 @@ $lang->resource->pipeline->view = 'view';
 $lang->resource->pipeline->edit       = 'edit';
 $lang->resource->pipeline->batchCreateRootTask       = 'batchCreateRootTask';
 
-
+$lang->resource->pipeline->groupleaders = 'groupleaders';
 
 
 

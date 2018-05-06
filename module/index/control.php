@@ -32,7 +32,7 @@ class index extends control
      */
     public function index()
     {
-        $this->locate($this->createLink('blog', 'index'));
+        $this->locate($this->createLink('pmshelp', 'index'));
     }
 
     /**

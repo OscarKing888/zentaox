@@ -69,12 +69,12 @@
       <td class='task-<?php echo $task->status;?>'><?php echo $lang->task->statusList[$task->status];?></td>
       <td class='text-right'>
         <?php
-        common::printIcon('task', 'assignTo', "projectID=$task->project&taskID=$task->id", $task, 'list', 'hand-right', '', 'iframe', true);
+        //common::printIcon('task', 'assignTo', "projectID=$task->project&taskID=$task->id", $task, 'list', 'hand-right', '', 'iframe', true);
         common::printIcon('task', 'start',    "taskID=$task->id", $task, 'list', 'play', '', 'iframe', true);
-        common::printIcon('task', 'recordEstimate', "taskID=$task->id", $task, 'list', 'time', '', 'iframe', true);
+        //common::printIcon('task', 'recordEstimate', "taskID=$task->id", $task, 'list', 'time', '', 'iframe', true);
         common::printIcon('task', 'finish',   "taskID=$task->id", $task, 'list', 'ok-sign', '', 'iframe', true);
-        common::printIcon('task', 'close',    "taskID=$task->id", $task, 'list', 'off', '', 'iframe', true);
-        common::printIcon('task', 'edit', "taskID=$task->id", '', 'list', 'pencil');
+        //common::printIcon('task', 'close',    "taskID=$task->id", $task, 'list', 'off', '', 'iframe', true);
+        //common::printIcon('task', 'edit', "taskID=$task->id", '', 'list', 'pencil');
         ?>
       </td>
     </tr>

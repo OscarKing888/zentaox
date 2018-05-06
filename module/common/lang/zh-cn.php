@@ -218,6 +218,7 @@ $lang->project->menu = new stdclass();
 
 $lang->project->menu->list      = array('link' => '%s', 'fixed' => true);
 $lang->project->menu->task      = array('link' => '任务|project|task|projectID=%s', 'subModule' => 'task,tree', 'alias' => 'grouptask,importtask,burn,importbug,kanban,printkanban,tree');
+$lang->project->menu->projectBlueprint      = '项目蓝图|project|projectBlueprint|projectID=%s';
 $lang->project->menu->story     = array('link' => '需求|project|story|projectID=%s', 'subModule' => 'story', 'alias' => 'linkstory,storykanban');
 $lang->project->menu->bug       = 'Bug|project|bug|projectID=%s';
 $lang->project->menu->dynamic   = '动态|project|dynamic|projectID=%s';
