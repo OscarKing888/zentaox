@@ -188,6 +188,11 @@ class story extends control
         $this->view->mailto           = $mailto;
         $this->view->needReview       = ($this->app->user->account == $product->PO || $projectID > 0 || $this->config->story->needReview == 0) ? "checked='checked'" : "";
 
+        //oscar:
+        $this->loadModel('dept');
+        $this->dept->setupDeptUsers($this->view, $this->app->user->account, $this->app->user->dept);
+        //oscar:
+
         $this->display();
     }
 
@@ -308,6 +313,11 @@ class story extends control
         $this->view->branch           = $branch;
         $this->view->branches         = $this->loadModel('branch')->getPairs($productID);
         $this->view->needReview       = ($this->app->user->account == $product->PO || $this->config->story->needReview == 0) ? 0 : 1;
+
+        //oscar:
+        $this->loadModel('dept');
+        $this->dept->setupDeptUsers($this->view, $this->app->user->account, $this->app->user->dept);
+        //oscar:
 
         $this->display();
     }
@@ -657,6 +667,12 @@ class story extends control
         $this->view->preAndNext = $this->loadModel('common')->getPreAndNextObject('story', $storyID);
         $this->view->from       = $from;
         $this->view->param      = $param;
+
+        //oscar:
+        $this->loadModel('dept');
+        $this->dept->setupDeptUsers($this->view, $this->app->user->account, $this->app->user->dept);
+        //oscar:
+
         $this->display();
     }
 
@@ -999,6 +1015,25 @@ class story extends control
         if(!dao::isError()) $this->loadModel('score')->create('ajax', 'batchOther');
         die(js::locate($this->session->storyList, 'parent'));
     }
+
+    public function batchChangePriority()
+    {
+        if(!empty($_POST) && isset($_POST['storyIDList']))
+        {
+            $allChanges  = $this->story->batchChangePriority();
+            if(dao::isError()) die(js::error(dao::getError()));
+            foreach($allChanges as $storyID => $changes)
+            {
+                $actionID = $this->action->create('story', $storyID, 'Edited');
+                $this->action->logHistory($actionID, $changes);
+                $this->story->sendmail($storyID, $actionID);
+            }
+        }
+        if(!dao::isError()) $this->loadModel('score')->create('ajax', 'batchOther');
+        die(js::locate($this->session->storyList, 'parent'));
+    }
+
+
 
     /**
      * Tasks of a story.

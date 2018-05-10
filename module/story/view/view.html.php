@@ -165,9 +165,25 @@
 
                     <div class='content'>
                         <?php
-                        $v = count($artstation->files);
-                        $files = array_reverse($artstation->files);
-                        foreach ($files as $file):
+                        $v = 0;//count($artstation->files);
+
+                        $file = end($artstation->files);
+                        $imgAttr = "";
+                        $imgConfirmed = "<span class='red'>请联系主美确认设计后再开始制作</span>";
+
+                        foreach ($artstation->files as $f) {
+                            $v++;
+                            if ($artstation->confirmdesign == $f->id) {
+                                $file = $f;
+                                $imgAttr = " class='confirmed'";
+                                $confirmTime = substr($artstation->confirmdate, 0, 10);
+                                $imgConfirmed = "<span class='confirmedtext'>当前确认可制作的设计稿 确认时间：$confirmTime</span>";
+                                break;
+                            }
+                        }
+
+                        //$files = array_reverse($artstation->files);
+                        //foreach ($files as $file):
 
                             if(stripos('jpg|jpeg|gif|png|bmp|psd', $file->extension) !== false)
                             {
@@ -217,7 +233,7 @@
                             ?>
 
                             <?php
-                            echo " 版本 - V." . ($v) . "&nbsp;&nbsp;&nbsp;&nbsp;" . $lang->file->uploadDate . substr($file->addedDate, 0, 10) . "    $szDispStr";
+                            echo " $imgConfirmed 版本 - V." . ($v) . "&nbsp;&nbsp;&nbsp;&nbsp;" . $lang->file->uploadDate . substr($file->addedDate, 0, 10) . "    $szDispStr";
                             $v--;
                             ?>
 
@@ -239,7 +255,7 @@
 
                             echo "</div>";
                             ?>
-                        <?php endforeach; ?>
+
                     </div>
 
                     </fieldset>
@@ -432,8 +448,9 @@
                                     foreach ($projectTasks as $task) {
                                         if (!isset($projects[$task->project])) continue;
                                         $projectName = $projects[$task->project];
-                                        echo "<li title='$task->name'>" . html::a($this->createLink('task', 'view', "taskID=$task->id", '', true), "#$task->id $task->name", '', "class='iframe' data-width='80%'");
-                                        echo html::a($this->createLink('project', 'browse', "projectID=$task->project"), $projectName, '', "class='text-muted'") . '</li>';
+                                        $deptStr = "<span class='confirmedtext'>" . $depts[$task->dept] . "</span>";
+                                        echo "<li title='$task->name'>" . html::a($this->createLink('task', 'view', "taskID=$task->id", '', true), "$deptStr #$task->id $task->name", '', "class='iframe' data-width='80%'");
+                                        //echo html::a($this->createLink('project', 'browse', "projectID=$task->project"), $projectName, '', "class='text-muted'") . '</li>';
                                     }
                                 }
                                 if (count($story->tasks) == 0) {

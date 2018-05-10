@@ -40,7 +40,7 @@ class taskModel extends model
             ->setDefault('openedDate', helper::now())
             ->stripTags($this->config->task->editor->create['id'], $this->config->allowedTags)
             ->join('mailto', ',')
-            ->remove('after,files,labels,assignedTo,uid,storyEstimate,storyDesc,qq,team,teamEstimate,teamMember,multiple,teams')
+            ->remove('after,files,labels,assignedTo,uid,storyEstimate,storyDesc,storyPri,qq,team,teamEstimate,teamMember,multiple,teams')
             ->get();
 
         $task = $this->file->processImgURL($task, $this->config->task->editor->create['id'], $this->post->uid);
@@ -194,7 +194,7 @@ class taskModel extends model
             $taskIdList[$assignedTo] = array('status' => 'created', 'id' => $taskID);
         }
 
-        error_log("oscar:___________ task create tasks:" . count($taskIdList));
+        //error_log("oscar:___________ task create tasks:" . count($taskIdList));
         return $taskIdList;
     }
 
@@ -205,7 +205,7 @@ class taskModel extends model
      * @access public
      * @return void
      */
-    public function batchCreate($projectID, $taskID = 0) // oscar
+    public function batchCreate($projectID, $storyID, $iframe = 0, $taskID = 0, $createType) // oscar
     {
         $this->loadModel('action');
         $now      = helper::now();
@@ -240,7 +240,7 @@ class taskModel extends model
             //oscar:if($tasks->type[$key] == 'affair') continue;
             //oscar:if($tasks->type[$key] == 'ditto' && isset($tasks->type[$key - 1]) && $tasks->type[$key - 1] == 'affair') continue;
 
-            if($tasks->assignedTo[$key] == 'ditto') continue; //oscar:
+            //if($tasks->assignedTo[$key] == 'ditto') continue; //oscar:
 
             if($storyID == 'ditto') $storyID = $preStory;
             $preStory = $storyID;
@@ -268,25 +268,25 @@ class taskModel extends model
             {
                 die(js::alert($this->lang->task->error->estimateNumber));
             }
-            //oscar:if(!empty($tasks->name[$i]) and empty($tasks->type[$i])) die(js::alert(sprintf($this->lang->error->notempty . "_OSCAR", $this->lang->task->type)));
-            if(!empty($tasks->name[$i]) and empty($tasks->assignedTo[0])){
-                die(js::alert(sprintf("批量创建检查：" . $tasks->assignedTo[$i] . $this->lang->error->notempty, $this->lang->assignedTo)));
-            }
+            //if(!empty($tasks->name[$i]) and empty($tasks->type[$i])) die(js::alert(sprintf($this->lang->error->notempty . "_OSCAR", $this->lang->task->type)));
+            //if(!empty($tasks->name[$i]) and empty($tasks->assignedTo[0])){
+            //    die(js::alert(sprintf("批量创建检查：" . $tasks->assignedTo[$i] . $this->lang->error->notempty, $this->lang->assignedTo)));
+            //}
         }
 
         $story      = 0;
         $module     = 0;
         $type       = 'devel'; //oscar:
         $assignedTo       = 0; //oscar:
-        //$dept = '';
+        //$dept = 0;
 
         for($i = 0; $i < $batchNum; $i++)
         {
             $story      = !isset($tasks->story[$i]) || $tasks->story[$i]           == 'ditto' ? $story     : $tasks->story[$i];
             $module     = !isset($tasks->module[$i]) || $tasks->module[$i]         == 'ditto' ? $module    : $tasks->module[$i];
             $type       = !isset($tasks->type[$i]) || $tasks->type[$i]             == 'ditto' ? $type      : $tasks->type[$i];
-            $assignedTo       = !isset($tasks->assignedTo[$i]) || $tasks->assignedTo[$i] == 'ditto' ? $assignedTo : $tasks->assignedTo[$i]; //oscar:
             $assignedTo = !isset($tasks->assignedTo[$i]) || $tasks->assignedTo[$i] == 'ditto' ? $assignedTo: $tasks->assignedTo[$i];
+            $dept       = !isset($tasks->dept[$i]) || $tasks->dept[$i] == 'ditto' ? $dept : $tasks->dept[$i]; //oscar:
 
             if(empty($tasks->name[$i])) continue;
 
@@ -314,6 +314,7 @@ class taskModel extends model
             $data[$i]->parent     = $tasks->parent[$i];
 
             $data[$i]->dept     = $dept; //oscar:
+            $data[$i]->createtype = $createType; //oscar
 
             if($story) $data[$i]->storyVersion = $this->loadModel('story')->getVersion($data[$i]->story);
             if($assignedTo) $data[$i]->assignedDate = $now;
@@ -725,12 +726,35 @@ class taskModel extends model
             $task->lastEditedBy   = $this->app->user->account;
             $task->lastEditedDate = $now;
             $task->dept         = $dept;
+            $task->assignedTo = '';
 
             $this->dao->update(TABLE_TASK)->data($task)->autoCheck()->where('id')->eq((int)$taskID)->exec();
             if(!dao::isError()) $allChanges[$taskID] = common::createChanges($oldTask, $task);
         }
         return $allChanges;
     }
+
+    public function batchChangePriority($taskIDList, $pri)
+    {
+        $now        = helper::now();
+        $allChanges = array();
+        $oldTasks   = $this->getByList($taskIDList);
+        foreach($taskIDList as $taskID)
+        {
+            $oldTask = $oldTasks[$taskID];
+            if($pri == $oldTask->pri) continue;
+
+            $task = new stdclass();
+            $task->lastEditedBy   = $this->app->user->account;
+            $task->lastEditedDate = $now;
+            $task->pri         = $pri;
+
+            $this->dao->update(TABLE_TASK)->data($task)->autoCheck()->where('id')->eq((int)$taskID)->exec();
+            if(!dao::isError()) $allChanges[$taskID] = common::createChanges($oldTask, $task);
+        }
+        return $allChanges;
+    }
+
     /**
      * Assign a task to a user again.
      *

@@ -197,7 +197,7 @@ class pipeline extends control
             //error_log("oscar: batchCreateRootTask step:$step $step->type dept:$step->dept");
             if($step->type == 'step')
             {
-                error_log("oscar: create root task step:$step dept:$step->dept est:$step->estimate");
+                //error_log("oscar: create root task step:$step dept:$step->dept est:$step->estimate");
 
                 $task = new stdClass();
                 $task->dept = $step->dept;
@@ -217,6 +217,8 @@ class pipeline extends control
                 $task->openedBy = $this->app->user->account;
                 $task->openedDate = helper::now();
                 $task->pipeline = $pipelineID;
+                $task->createtype = 'pipelineBatchCreate';
+                $task->pri = $story->pri;
 
                 $this->dao->insert(TABLE_TASK)->data($task)
                     ->autoCheck()

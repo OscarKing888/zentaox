@@ -178,7 +178,7 @@ class task extends control
      * @access public
      * @return void
      */
-    public function batchCreate($projectID = 0, $storyID = 0, $iframe = 0, $taskID = 0)
+    public function batchCreate($projectID = 0, $storyID = 0, $iframe = 0, $taskID = 0, $createType = 'manualBatchCreate')
     {
         $project = $this->project->getById($projectID);
         $taskLink = $this->createLink('project', 'browse', "projectID=$projectID&tab=task");
@@ -188,7 +188,7 @@ class task extends control
         $this->project->setMenu($this->project->getPairs(), $project->id);
 
         if (!empty($_POST)) {
-            $mails = $this->task->batchCreate($projectID, $taskID); // oscar
+            $mails = $this->task->batchCreate($projectID, $storyID, $iframe, $taskID, $createType); // oscar
             if (dao::isError()) die(js::error(dao::getError()));
 
             foreach ($mails as $mail) $this->task->sendmail($mail->taskID, $mail->actionID);
@@ -217,6 +217,7 @@ class task extends control
         $this->view->stories = $stories;
         $this->view->modules = $modules;
         $this->view->parent = $taskID;
+        $this->view->parentTask = $this->task->getByID($taskID); // oscar
         $this->view->storyID = $storyID;
         $this->view->story = $this->story->getByID($storyID);
         $this->view->storyTasks = $this->task->getStoryTaskCounts(array_keys($stories), $projectID);
@@ -232,7 +233,7 @@ class task extends control
 
     public function batchCreateRoot($projectID = 0, $storyID = 0, $iframe = 0, $taskID = 0)
     {
-        $this->batchCreate($projectID, $storyID, $iframe, $taskID);
+        $this->batchCreate($projectID, $storyID, $iframe, $taskID, 'batchCreateRoot');
     }
 
     /**
@@ -534,6 +535,25 @@ class task extends control
             unset($_POST['taskIDList']);
             $allChanges = $this->task->batchAssignToDept($taskIDList, $dept);
             if (dao::isError()) die(js::error(dao::getError()));
+            foreach ($allChanges as $taskID => $changes) {
+                $this->loadModel('action');
+                $actionID = $this->action->create('task', $taskID, 'Edited');
+                $this->action->logHistory($actionID, $changes);
+                $this->task->sendmail($taskID, $actionID);
+            }
+            if (!dao::isError()) $this->loadModel('score')->create('ajax', 'batchOther');
+        }
+        die(js::reload('parent'));
+    }
+
+    public function batchChangePriority()
+    {
+        if ($this->post->taskIDList) {
+            $taskIDList = $this->post->taskIDList;
+            unset($_POST['taskIDList']);
+
+            $allChanges  = $this->task->batchChangePriority($taskIDList, $this->post->pri);
+            if(dao::isError()) die(js::error(dao::getError()));
             foreach ($allChanges as $taskID => $changes) {
                 $this->loadModel('action');
                 $actionID = $this->action->create('task', $taskID, 'Edited');
@@ -1213,7 +1233,7 @@ class task extends control
             $taskIDList = $this->post->taskIDList;
 
             foreach ($taskIDList as $taskID) {
-                error_log("oscar: batchdeleteTask:$taskID");
+                //error_log("oscar: batchdeleteTask:$taskID");
             }
 
             //$taskIDList = array_unique($taskIDList);
@@ -1221,7 +1241,7 @@ class task extends control
             if (!is_array($taskIDList)) die(js::locate($this->createLink('task', 'index', ""), 'parent'));
 
             foreach ($taskIDList as $taskID) {
-                error_log("oscar: batchdeleteTask:$taskID");
+                //error_log("oscar: batchdeleteTask:$taskID");
                 $task = $this->task->getById($taskID);
                 $story = $this->dao->select('story')->from(TABLE_TASK)->where('id')->eq($taskID)->fetch('story');
                 $this->task->delete(TABLE_TASK, $taskID);

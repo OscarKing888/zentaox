@@ -52,7 +52,7 @@
 
 <div class='canvas-wrapper'>
     <div class='chart-canvas'>
-        <canvas id="projectCanvas" width="1024" height="600"></canvas>
+        <canvas id="projectCanvas" width="1024" height="8192"></canvas>
     </div>
 </div>
 

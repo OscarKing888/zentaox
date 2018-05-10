@@ -32,7 +32,7 @@ js::set('browseType', $browseType);
                 <?php echo $moduleTree; ?>
                 <div class='text-right'>
                     <?php common::printLink('project', 'edit', "projectID=$projectID", $lang->edit); ?>
-                    <?php common::printLink('project', 'delete', "projectID=$projectID&confirm=no", $lang->delete, 'hiddenwin'); ?>
+
                     <?php common::printLink('tree', 'browsetask', "rootID=$projectID&productID=0", $lang->tree->manage); ?>
                 </div>
             </div>
@@ -265,6 +265,26 @@ js::set('browseType', $browseType);
                                 echo "</div></li>";
                                 echo "</ul>";
                                 //echo "</div>";
+                            }
+
+                            {
+                                $actionLink = $this->createLink('task', 'batchChangePriority', "productID=$productID");
+                                $priList = (array)$this->lang->task->priList;
+                                echo "<div class='btn-group dropup'>";
+                                echo "<button id='storyBatchChangePriority' type='button' class='btn dropdown-toggle' data-toggle='dropdown'>" . $lang->story->batchChangePriorityAB . "<span class='caret'></span></button>";
+                                echo "<ul class='dropdown-menu' id='storyBatchChangePriorityMenu'>";
+                                echo html::select('pri', $priList, '', 'class="hidden"');
+
+                                echo '<ul class="dropdown-list">';
+                                foreach ($priList as $key => $value) {
+                                    if (empty($key)) continue;
+                                    //$actionLink = $this->createLink('story', 'batchAssignTo', "productID=$productID");
+                                    echo "<li class='option' data-key='$key'>" . html::a("javascript:$(\"#pri\").val(\"$key\");setFormAction(\"$actionLink\", \"hiddenwin\" )", $value, '', '') . '</li>';
+                                }
+                                echo "</ul>";
+                                //if ($withSearch) echo "<div class='menu-search'><div class='input-group input-group-sm'><input type='text' class='form-control' placeholder=''><span class='input-group-addon'><i class='icon-search'></i></span></div></div>";
+                                echo "</div></li>";
+                                echo "</ul>";
                             }
 
 

@@ -195,7 +195,7 @@ class treeModel extends model
         $products       = $this->loadModel('product')->getProductsByProject($rootID);
         $branchGroups   = $this->loadModel('branch')->getByProducts(array_keys($products));
 
-        if(!$this->isMergeModule($rootID, 'task') or !$products) return $this->getOptionMenu($rootID, 'task', $startModule); 
+        if(!$this->isMergeModule($rootID, 'task') or !$products) return $this->getOptionMenu($rootID, 'task', $startModule);
 
         /* createdVersion > 4.1. */
         $startModulePath = '';

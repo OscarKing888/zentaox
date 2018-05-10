@@ -92,7 +92,7 @@ if ($hiddenStory and isset($visibleFields['story'])) $colspan -= 1;
                 $assignedTo = $currentStory = $type = $member = $module = 'ditto';
             }
             ?>
-            <?php $pri = 3; ?>
+            <?php $pri = $parentTask->pri; ?>
             <tr>
                 <td class='text-center'><?php echo $i + 1; ?><?php echo html::hidden("parent[]", $parent); ?></td>
                 <td <?php echo zget($visibleFields, 'module', "class='hidden'") ?>

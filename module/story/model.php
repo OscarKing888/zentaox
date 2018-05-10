@@ -50,7 +50,7 @@ class storyModel extends model
             ->where('t1.story')->eq($storyID)
             ->orderBy('t1.`order` DESC')
             ->fetchAll('project');
-        $story->tasks  = $this->dao->select('id, name, assignedTo, project, status, consumed, `left`')->from(TABLE_TASK)->where('story')->eq($storyID)->andWhere('deleted')->eq(0)->orderBy('id DESC')->fetchGroup('project');
+        $story->tasks  = $this->dao->select('id, name, dept, assignedTo, project, status, consumed, `left`')->from(TABLE_TASK)->where('story')->eq($storyID)->andWhere('deleted')->eq(0)->orderBy('id DESC')->fetchGroup('project');
         $story->stages = $this->dao->select('*')->from(TABLE_STORYSTAGE)->where('story')->eq($storyID)->fetchPairs('branch', 'stage');
         //$story->bugCount  = $this->dao->select('COUNT(*)')->alias('count')->from(TABLE_BUG)->where('story')->eq($storyID)->fetch('count');
         //$story->caseCount = $this->dao->select('COUNT(*)')->alias('count')->from(TABLE_CASE)->where('story')->eq($storyID)->fetch('count');
@@ -177,8 +177,11 @@ class storyModel extends model
         $result = $this->loadModel('common')->removeDuplicate('story', $story, "product={$story->product}");
         if($result['stop']) return array('status' => 'exists', 'id' => $result['duplicate']);
 
-        if($this->checkForceReview()) $story->status = 'draft';
-        if($story->status == 'draft') $story->stage   = $this->post->plan > 0 ? 'planned' : 'wait';
+        $story->status = 'active'; // oscar: skip review
+
+        //if($this->checkForceReview()) $story->status = 'draft';
+        //if($story->status == 'draft') $story->stage   = $this->post->plan > 0 ? 'planned' : 'wait';
+
         $story = $this->loadModel('file')->processImgURL($story, $this->config->story->editor->create['id'], $this->post->uid);
         $this->dao->insert(TABLE_STORY)->data($story, 'spec,verify')->autoCheck()->batchCheck($this->config->story->create->requiredFields, 'notempty')->exec();
         if(!dao::isError())
@@ -269,6 +272,7 @@ class storyModel extends model
         $plan   = 0;
         $pri    = 0;
         $source = '';
+        $assignedTo = '';
 
         for($i = 0; $i < $batchNum; $i++)
         {
@@ -276,6 +280,7 @@ class storyModel extends model
             $plan   = $stories->plan[$i]   == 'ditto' ? $plan   : $stories->plan[$i];
             $pri    = $stories->pri[$i]    == 'ditto' ? $pri    : $stories->pri[$i];
             $source = $stories->source[$i] == 'ditto' ? $source : $stories->source[$i];
+
             $stories->module[$i] = (int)$module;
             $stories->plan[$i]   = $plan;
             $stories->pri[$i]    = (int)$pri;
@@ -291,6 +296,8 @@ class storyModel extends model
         {
             if(!empty($stories->title[$i]))
             {
+                $assignedTo = $stories->assignedTo[$i] == 'ditto' ? $assignedTo : $stories->assignedTo[$i]; // oscar
+
                 $data = new stdclass();
                 $data->branch     = $stories->branch[$i];
                 $data->module     = $stories->module[$i];
@@ -306,6 +313,7 @@ class storyModel extends model
                 $data->openedBy   = $this->app->user->account;
                 $data->openedDate = $now;
                 $data->version    = 1;
+                $data->assignedTo = $assignedTo; // oscar
 
                 $this->dao->insert(TABLE_STORY)->data($data)->autoCheck()
                     ->batchCheck($this->config->story->create->requiredFields, 'notempty')
@@ -1058,6 +1066,31 @@ class storyModel extends model
         }
         return $allChanges;
     }
+
+    public function batchChangePriority()
+    {
+        $now         = helper::now();
+        $allChanges  = array();
+        $storyIDList = $this->post->storyIDList;
+        $pri  = $this->post->pri;
+        $oldStories  = $this->getByList($storyIDList);
+        foreach($storyIDList as $storyID)
+        {
+            $oldStory = $oldStories[$storyID];
+            if($pri == $oldStory->pri) continue;
+
+            $story = new stdclass();
+            $story->lastEditedBy   = $this->app->user->account;
+            $story->lastEditedDate = $now;
+            $story->pri     = $pri;
+            $story->assignedDate   = $now;
+
+            $this->dao->update(TABLE_STORY)->data($story)->autoCheck()->where('id')->eq((int)$storyID)->exec();
+            if(!dao::isError()) $allChanges[$storyID] = common::createChanges($oldStory, $story);
+        }
+        return $allChanges;
+    }
+
 
     /**
      * Activate a story.

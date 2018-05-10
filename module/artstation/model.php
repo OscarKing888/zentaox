@@ -222,6 +222,14 @@ class artstationModel extends model
         $this->file->saveUpload('artstation', $articleID);
     }
 
+    public function confirmtomodeling($articleID, $confirmToModelingFileID)
+    {
+        $this->dao->update(TABLE_ARTSTATION)
+            ->set('confirmdesign')->eq($confirmToModelingFileID)
+            ->set('confirmdate')->eq(helper::now())
+            ->where('id')->eq($articleID)->exec();
+    }
+
     /**
      * Delete an article.
      *

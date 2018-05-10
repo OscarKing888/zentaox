@@ -13,6 +13,7 @@ $lang->resource->artstation->edit       = 'edit';
 $lang->resource->artstation->delete       = 'delete';
 $lang->resource->artstation->restoreartstation       = 'restore';
 $lang->resource->artstation->like       = 'like';
+$lang->resource->artstation->confirmtomodeling       = 'confirmtomodeling';
 
 $lang->artstation->methodOrder[0]  = 'index';
 $lang->artstation->methodOrder[1]  = 'my';

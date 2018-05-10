@@ -256,5 +256,11 @@ class artstation extends control
         return $newarticles;
     }
 
+    public function confirmtomodeling($id, $confirmToModelingFileID)
+    {
+        error_log("oscar: confirmtomodeling by:" . $this->app->user->account . " date:" . helper::now());
+        $this->artstation->confirmtomodeling($id, $confirmToModelingFileID);
+        $this->locate(inlink('view', "id=$id"));
+    }
 }
 

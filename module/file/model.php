@@ -94,7 +94,7 @@ class fileModel extends model
 
         //error_log("oscar: saveUpload============");
         foreach ($files as $id => $file) {
-            error_log("oscar: objType:$objectType file:" . $file['pathname']);
+            //error_log("oscar: objType:$objectType file:" . $file['pathname']);
             if ($file['size'] == 0) continue;
             if (!move_uploaded_file($file['tmpname'], $this->savePath . $this->getSaveName($file['pathname']))) return false;
 

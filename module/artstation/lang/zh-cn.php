@@ -31,6 +31,9 @@ $lang->artstation->type  = '作品类型';
 $lang->artstation->owner  = '作者';
 $lang->artstation->requirement  = '关联需求';
 
+$lang->artstation->confirmtomodeling  = '确认制作';
+
+
 $lang->artstation->typeList[-1] = '无';
 $lang->artstation->typeList[0] = '角色';
 $lang->artstation->typeList[1] = '场景';

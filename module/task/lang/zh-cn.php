@@ -142,6 +142,11 @@ $lang->task->deptList['18'] = '孵化部';
 
 
 
+$lang->task->batchChangePriority = '批量修改优先级';
+$lang->task->batchDelete = '批量删除';
+$lang->task->batchCreateRootTask = '批量创建主任务';
+
+
 $lang->task->statusList['']       = '';
 $lang->task->statusList['wait']   = '未开始';
 $lang->task->statusList['doing']  = '进行中';

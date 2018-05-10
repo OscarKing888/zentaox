@@ -85,15 +85,12 @@
                 <?php endif; ?>
             </tr>
 
-            <?php if (strpos(",$showFields,", ',reviewedBy,') !== false): ?>
+            <?php if (strpos(",$showFields,", ',assignedTo,') !== false): ?>
             <tr>
-                <th><?php echo $lang->story->reviewedBy; ?></th>
+                <th><?php echo $lang->story->assignedTo; ?></th>
                 <td>
                     <div class='input-group'>
-                        <?php echo html::select('assignedTo', $users, empty($needReview) ? $product->PO : '', "class='form-control chosen'"); ?>
-                        <?php if (!$this->story->checkForceReview()): ?>
-                            <span class='input-group-addon'><?php echo html::checkbox('needNotReview', $lang->story->needNotReview, '', "id='needNotReview' {$needReview}"); ?></span>
-                        <?php endif; ?>
+                        <?php echo html::select('assignedTo', $deptUsers, empty($needReview) ? $product->PO : '', "class='form-control chosen'"); ?>
                     </div>
                 </td>
             </tr>

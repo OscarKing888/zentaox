@@ -63,6 +63,10 @@ class tree extends control
             $this->product->setMenu($this->product->getPairs(), $rootID, $branch, 'story', '', 'story');
             $this->lang->tree->menu      = $this->lang->product->menu;
             $this->lang->tree->menuOrder = $this->lang->product->menuOrder;
+            // oscar[
+            //$this->lang->tree->menu      = $this->lang->project->menu;
+            //$this->lang->tree->menuOrder = $this->lang->project->menuOrder;
+            // oscar]
 
             $products = $this->product->getPairs();
             unset($products[$rootID]);

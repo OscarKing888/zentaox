@@ -174,80 +174,97 @@
 
                         <div class='content'>
                             <?php
-                            $v = count($artstation->files);
-                            $files = array_reverse($artstation->files);
-                            foreach ($files as $file):
-                                if(stripos('jpg|jpeg|gif|png|bmp|psd', $file->extension) !== false)
+                            $v = 0;//count($artstation->files);
+
+                            $file = end($artstation->files);
+                            $imgAttr = "";
+                            $imgConfirmed = "<span class='red'>请联系主美确认设计后再开始制作</span>";
+
+                            foreach ($artstation->files as $f) {
+                                $v++;
+                                if ($artstation->confirmdesign == $f->id) {
+                                    $file = $f;
+                                    $imgAttr = " class='confirmed'";
+                                    $confirmTime = substr($artstation->confirmdate, 0, 10);
+                                    $imgConfirmed = "<span class='confirmedtext'>当前确认可制作的设计稿 确认时间：$confirmTime</span>";
+                                    break;
+                                }
+                            }
+
+                            //$files = array_reverse($artstation->files);
+                            //foreach ($files as $file):
+
+                            if(stripos('jpg|jpeg|gif|png|bmp|psd', $file->extension) !== false)
+                            {
+                                $imageSize  = getimagesize($file->realPath);
+                                $imageWidth = $imageSize ? $imageSize[0] : 0;
+                                $imageHeight = $imageSize ? $imageSize[1] : 0;
+                                //error_log("oscar: getimagesize w:$imageWidth path:$file->realPath");
+
+                                $szDispStr = "";
+                                if($imageWidth == 7680 && $imageHeight == 4320)
                                 {
-                                    $imageSize  = getimagesize($file->realPath);
-                                    $imageWidth = $imageSize ? $imageSize[0] : 0;
-                                    $imageHeight = $imageSize ? $imageSize[1] : 0;
-                                    //error_log("oscar: getimagesize w:$imageWidth path:$file->realPath");
-
-                                    $szDispStr = "";
-                                    if($imageWidth == 7680 && $imageHeight == 4320)
-                                    {
-                                        $szDispStr = "($imageWidth x $imageHeight) - 8K";
-                                    }
-                                    else if($imageWidth == 4320 && $imageHeight == 7680)
-                                    {
-                                        $szDispStr = "($imageWidth x $imageHeight) - 8K 竖版";
-                                    }
-                                    else if($imageWidth == 3840 && $imageHeight == 2160)
-                                    {
-                                        $szDispStr = "($imageWidth x $imageHeight) - 4K";
-                                    }
-                                    else if($imageWidth == 2160 && $imageHeight == 3840 )
-                                    {
-                                        $szDispStr = "($imageWidth x $imageHeight) - 4K 竖版";
-                                    }
-                                    else if($imageWidth == 2560 && $imageHeight == 1440 )
-                                    {
-                                        $szDispStr = "($imageWidth x $imageHeight) - 2K";
-                                    }
-                                    else if($imageWidth == 1440 && $imageHeight == 2560 )
-                                    {
-                                        $szDispStr = "($imageWidth x $imageHeight) - 2K 竖版";
-                                    }
-                                    else if($imageWidth == 1920 && $imageHeight == 1080 )
-                                    {
-                                        $szDispStr = "($imageWidth x $imageHeight) - 1K";
-                                    }
-                                    else if($imageWidth == 1080 && $imageHeight == 1920 )
-                                    {
-                                        $szDispStr = "($imageWidth x $imageHeight) - 1K 竖版";
-                                    }
-                                    else
-                                    {
-                                        $szDispStr = "($imageWidth x $imageHeight) - 不规范的尺寸";
-                                    }
+                                    $szDispStr = "($imageWidth x $imageHeight) - 8K";
                                 }
-                                ?>
-
-                                <?php
-                                echo " 版本 - V." . ($v) . "&nbsp;&nbsp;&nbsp;&nbsp;" . $lang->file->uploadDate . substr($file->addedDate, 0, 10) . "    $szDispStr";
-                                $v--;
-                                ?>
-
-                                <?php
-                                $img = html::image($this->createLink('file', 'read', "fileID=$file->id"), "$imgAttr title='$file->title'");
-                                if (stripos('jpg|jpeg|gif|png|bmp|psd', $file->extension) !== false) {
-                                    $imageSize = getimagesize($file->realPath);
-                                    $imageWidth = $imageSize ? $imageSize[0] : 0;
-                                    //error_log("oscar: getimagesize w:$imageWidth path:$file->realPath");
+                                else if($imageWidth == 4320 && $imageHeight == 7680)
+                                {
+                                    $szDispStr = "($imageWidth x $imageHeight) - 8K 竖版";
                                 }
+                                else if($imageWidth == 3840 && $imageHeight == 2160)
+                                {
+                                    $szDispStr = "($imageWidth x $imageHeight) - 4K";
+                                }
+                                else if($imageWidth == 2160 && $imageHeight == 3840 )
+                                {
+                                    $szDispStr = "($imageWidth x $imageHeight) - 4K 竖版";
+                                }
+                                else if($imageWidth == 2560 && $imageHeight == 1440 )
+                                {
+                                    $szDispStr = "($imageWidth x $imageHeight) - 2K";
+                                }
+                                else if($imageWidth == 1440 && $imageHeight == 2560 )
+                                {
+                                    $szDispStr = "($imageWidth x $imageHeight) - 2K 竖版";
+                                }
+                                else if($imageWidth == 1920 && $imageHeight == 1080 )
+                                {
+                                    $szDispStr = "($imageWidth x $imageHeight) - 1K";
+                                }
+                                else if($imageWidth == 1080 && $imageHeight == 1920 )
+                                {
+                                    $szDispStr = "($imageWidth x $imageHeight) - 1K 竖版";
+                                }
+                                else
+                                {
+                                    $szDispStr = "($imageWidth x $imageHeight) - 不规范的尺寸";
+                                }
+                            }
+                            ?>
 
-                                echo html::a($this->createLink('file', 'download', "fileID=$file->id") . $sessionString,
-                                    $img, '_blank', "onclick=\"return downloadFile($file->id, '$file->extension', $imageWidth)\"");
+                            <?php
+                            echo " $imgConfirmed 版本 - V." . ($v) . "&nbsp;&nbsp;&nbsp;&nbsp;" . $lang->file->uploadDate . substr($file->addedDate, 0, 10) . "    $szDispStr";
+                            $v--;
+                            ?>
 
-                                echo "<div align='right'>";
-                                echo html::a($this->createLink('file', 'downloadFileToDisk', "fileID=$file->id") . $sessionString,
-                                    "下载", '_blank',
-                                    "class='btn' onclick=\"return downloadFileToDisk($file->id)\"");
+                            <?php
+                            $img = html::image($this->createLink('file', 'read', "fileID=$file->id"), "$imgAttr title='$file->title'");
+                            if (stripos('jpg|jpeg|gif|png|bmp|psd', $file->extension) !== false) {
+                                $imageSize = getimagesize($file->realPath);
+                                $imageWidth = $imageSize ? $imageSize[0] : 0;
+                                //error_log("oscar: getimagesize w:$imageWidth path:$file->realPath");
+                            }
 
-                                echo "</div>";
-                                ?>
-                            <?php endforeach; ?>
+                            echo html::a($this->createLink('file', 'download', "fileID=$file->id") . $sessionString,
+                                $img, '_blank', "onclick=\"return downloadFile($file->id, '$file->extension', $imageWidth)\"");
+
+                            echo "<div align='right'>";
+                            echo html::a($this->createLink('file', 'downloadFileToDisk', "fileID=$file->id") . $sessionString,
+                                "下载", '_blank',
+                                "class='btn' onclick=\"return downloadFileToDisk($file->id)\"");
+
+                            echo "</div>";
+                            ?>
+
                         </div>
 
                     </fieldset>

@@ -1,20 +1,34 @@
 
-const C_TaskColor_Pending = "#00AAFF";
-const C_TaskColor_Completed = "#00AA00";
-const C_TaskColor_Warning = "#FFAA00";
+const C_TaskColor_Pending = "#0080c8";
+const C_TaskColor_Completed = "#64c800";
+const C_TaskColor_Warning = "#ff8000";
 const C_TaskColor_Delay = "#AA0000";
+const C_TaskColor_ErrorStart = "#FFEE00";
+const C_TaskColor_Closed = "#888888";
+const C_TaskColor_Pause = "#880088";
+const C_TaskColor_Cancel = "#440000";
 
 const C_TaskNameColor = "#000000";
-const C_TaskNameFont = "13px 新宋体";
-const C_FontHeight = 10;
+//const C_TaskNameFont = "16px 新宋体";
+const C_TaskNameFont = "24px 微软雅黑";
+const C_FontHeight = 24;
 
-const C_Taskbar_Height = 10;
-const C_Taskbar_VSpace = 10;
-const C_Taskbar_DayUnit = 10;
+const C_Taskbar_Height = 30;
+const C_Taskbar_VSpace = 30;
+const C_Taskbar_DayUnit = 30;
 
 
 var origX = 200;
 var origY = 50;
+
+var lastX = -1;
+var lastY = 0;
+
+var g_tasks = [];
+var canvas = null;
+var context = null;
+var mouseIsDown = false;
+
 
 Date.prototype.addDays = function(days) {
     var dat = new Date(this.valueOf());
@@ -67,9 +81,90 @@ $(function()
     //alert("init()");
     //console.log($("#tasks"));
     //drawProjectBlueprint($("#tasks"));
+    canvas = document.getElementById("projectCanvas");
+    context = canvas.getContext('2d');
 
+    canvas.onmousemove = onCanvasMouseMove;
+    canvas.onmousedown = onCanvasMouseDown;
+    canvas.onmouseup = onCanvasMouseUp;
+    canvas.onmouseout = onCanvasMouseOut;
 });
 //*/
+
+function onCanvasMouseOut(evt)
+{
+    mouseIsDown = false;
+    console.log("!!!! canvas mouse out !!!!");
+}
+
+function onCanvasMouseMove(evt)
+{
+    var mousePos = getMousePos(canvas, evt);
+    var message = 'Mouse position: ' + mousePos.x + ',' + mousePos.y;
+    writeMessage(canvas, message, mousePos);
+
+    if(lastX == -1)
+    {
+        lastX = mousePos.x;
+        lastY = mousePos.y;
+    }
+
+    if(mouseIsDown)
+    {
+        origX += mousePos.x - lastX;
+        //origY += mousePos.y - lastY;
+    }
+
+    lastX = mousePos.x;
+    lastY = mousePos.y;
+}
+
+function onCanvasMouseDown(evt)
+{
+    mouseIsDown = true;
+    var mousePos = getMousePos(canvas, evt);
+    var message = 'Mouse Down: ' + mousePos.x + ',' + mousePos.y;
+    writeMessage(canvas, message, mousePos);
+}
+
+function onCanvasMouseUp(evt)
+{
+    mouseIsDown = false;
+    var mousePos = getMousePos(canvas, evt);
+    var message = 'Mouse Up: ' + mousePos.x + ',' + mousePos.y;
+    writeMessage(canvas, message, mousePos);
+}
+
+function writeMessage(canvas, message, mousePos) {
+    //var context = canvas.getContext('2d');
+    //console.log("====msg " + message);
+
+    context.clearRect(0, 0, canvas.width, canvas.height);
+
+    //context.translate(0, 0);
+    drawBg();
+
+    //context.translate(0, 0);
+    drawProjectBlueprintGlobal();
+
+    //context.translate(0, 0);
+    drawDeadline();
+
+
+    context.font = '18pt Calibri';
+    context.fillStyle = 'black';
+    //context.translate(0, 0);
+    context.fillText(message, mousePos.x, mousePos.y);
+}
+
+function getMousePos(canvas, evt) {
+    var rect = canvas.getBoundingClientRect();
+    return {
+        x: evt.clientX - rect.left,
+        y: evt.clientY - rect.top
+    };
+}
+
 
 $(document).ready(function()
 {
@@ -81,28 +176,6 @@ $(document).ready(function()
 
 });
 
-function drawBg()
-{
-    var canvas = document.getElementById("projectCanvas");
-
-    //canvas.setWidth(document.width);
-    //alert("canvas:" + canvas.id + " docW:" + document.width);
-    var ctx = canvas.getContext("2d");
-    ctx.fillStyle = "#ffFFff";
-    ctx.fillRect(0, 0, 4096, 4096);
-}
-
-function drawDeadline()
-{
-    var canvas = document.getElementById("projectCanvas");
-    var ctx = canvas.getContext("2d");
-    //ctx.translate(origX, -100000);
-    ctx.beginPath();
-    ctx.strokeStyle = "#FF6600";
-    ctx.moveTo(0, -1000000);
-    ctx.lineTo(0, 1000000);
-    ctx.stroke();
-}
 
 function ajaxGetTasks()
 {
@@ -115,9 +188,12 @@ function ajaxGetTasks()
     $.getJSON(link, function(r)
     {
         //alert("ajaxGetTasks:" + r.toString());
-        tasks = r;
+        g_tasks = r;
+        canvas.height = ((g_tasks.length + 6) * (C_Taskbar_Height + C_Taskbar_VSpace));
+        canvas.width = 2048;
+        console.log("==== w:" + document.width + " H:" + canvas.height);
         drawBg();
-        drawProjectBlueprint(tasks);
+        drawProjectBlueprintGlobal();
         drawDeadline();
     });
     //*/
@@ -150,16 +226,53 @@ function ajaxGetTasks()
     return tasks;
 }
 
+function drawBg()
+{
+    //var canvas = document.getElementById("projectCanvas");
+    ctx = context;
+    ctx.save();
+    ctx.translate(origX, origY);
+    //canvas.setWidth(document.width);
+    //alert("canvas:" + canvas.id + " docW:" + document.width);
+    var ctx = canvas.getContext("2d");
+    ctx.fillStyle = "#ffFFff";
+    ctx.fillRect(0, 0, 4096, 4096);
+    ctx.restore();
+}
+
+function drawDeadline()
+{
+    //var canvas = document.getElementById("projectCanvas");
+    var ctx = context;//canvas.getContext("2d");
+    ctx.save();
+    ctx.translate(origX, origY);
+
+    ctx.strokeStyle = "#7e0000";
+    ctx.beginPath();
+    ctx.moveTo(0, -1000000);
+    ctx.lineTo(0, 1000000);
+    ctx.lineWidth = 4;
+    ctx.stroke();
+    ctx.restore();
+}
+
+
+function drawProjectBlueprintGlobal()
+{
+    drawProjectBlueprint(g_tasks);
+}
+
 function drawProjectBlueprint(tasks)
 {
     //alert("drawProjectBlueprint:" + tasks.length);
 
-    var canvas = document.getElementById("projectCanvas");
+    //var canvas = document.getElementById("projectCanvas");
 
     //canvas.setWidth(document.width);
     //alert("canvas:" + canvas.id + " docW:" + document.width);
-    var ctx = canvas.getContext("2d");
+    var ctx = context;//canvas.getContext("2d");
 
+    ctx.save();
     ctx.translate(origX, origY);
 
     /*
@@ -176,9 +289,10 @@ function drawProjectBlueprint(tasks)
         {
             drawTask(ctx, tasks[i].id, tasks[i].name,  tasks[i].realStarted, tasks[i].estimate, tasks[i].status, i);
             //alert("task:" + tasks[i]);
-            console.log("task[" + tasks[i].id + "]: " + tasks[i].name + " start:" + tasks[i].realStarted + " status:" + tasks[i].status);
+            //console.log("task[" + tasks[i].id + "]: " + tasks[i].name + " start:" + tasks[i].realStarted + " status:" + tasks[i].status);
         }
     }
+    ctx.restore();
     //alert("canvas:" + canvas.id + " docW:" + document.width);
 
 }
@@ -189,19 +303,6 @@ function drawTask(ctx, id, name, startDate, hours, status, idx)
     ctx.fillStyle = C_TaskNameColor;
     ctx.font = C_TaskNameFont;
     //ctx.fillText("auto:" + name, 10, 30);
-
-
-    if(status == 'done')
-    {
-        ctx.fillStyle = C_TaskColor_Completed;
-    }
-    else if(status == 'wait')
-    {
-        ctx.fillStyle = C_TaskColor_Pending;
-    }
-
-    //alert(ctx.fillStyle);
-
     var cur = Date.now();
 
     var start = convertStringToDate(startDate);
@@ -213,7 +314,17 @@ function drawTask(ctx, id, name, startDate, hours, status, idx)
     var taskDays =  Math.ceil(hours / 8);
     //alert("taskDays:" + taskDays);
 
-    if(status != 'done')
+
+
+    ctx.fillStyle = C_TaskColor_Pending;
+    if(status == 'done')
+    {
+        ctx.fillStyle = C_TaskColor_Completed;
+    }
+
+    //alert(ctx.fillStyle);
+
+    if(status == 'doing')
     {
         if(d + taskDays < 0)
         {
@@ -225,12 +336,38 @@ function drawTask(ctx, id, name, startDate, hours, status, idx)
         }
     }
 
+    if(status == 'wait')
+    {
+        if(d + 1 < 0)
+        {
+            ctx.fillStyle = C_TaskColor_ErrorStart;
+        }
+    }
+
+    if(status == 'closed')
+    {
+        ctx.fillStyle = C_TaskColor_Closed;
+    }
+
+    if(status == 'pause')
+    {
+        ctx.fillStyle = C_TaskColor_Pause;
+    }
+
+    if(status == 'cancel')
+    {
+        ctx.fillStyle = C_TaskColor_Cancel;
+    }
+
     var xy = dateToCoord(start, idx);
     var xyend =  dateToCoord(new Date(start).addDays(taskDays), idx);
 
-    ctx.fillRect(xy[0], xy[1], xyend[0] - xy[0], xyend[1] - xy[1] + C_Taskbar_Height);
+    //ctx.fillRect(xy[0], xy[1], xyend[0] - xy[0], xyend[1] - xy[1] + C_Taskbar_Height);
 
+    roundRect(ctx, xy[0], xy[1], xyend[0] - xy[0], xyend[1] - xy[1] + C_Taskbar_Height, 5, true, true);
+    ctx.strokeStyle = "#111111";
     ctx.fillStyle = C_TaskNameColor;
+    ctx.lineWidth = 2;
     ctx.font = C_TaskNameFont;
     ctx.fillText("[" + id + "]" + name, xyend[0] + 8, xyend[1] + C_FontHeight);
 }
@@ -248,4 +385,57 @@ function dateToCoord(startDate, idx)
     //print_call_stack();
     //console.log("dateToCoord idx:" + idx + " date:" + startDate + " xy:" + x + "," + y + " d:" + d);
     return [x, y];
+}
+
+/**
+ * Draws a rounded rectangle using the current state of the canvas.
+ * If you omit the last three params, it will draw a rectangle
+ * outline with a 5 pixel border radius
+ * @param {CanvasRenderingContext2D} ctx
+ * @param {Number} x The top left x coordinate
+ * @param {Number} y The top left y coordinate
+ * @param {Number} width The width of the rectangle
+ * @param {Number} height The height of the rectangle
+ * @param {Number} [radius = 5] The corner radius; It can also be an object
+ *                 to specify different radii for corners
+ * @param {Number} [radius.tl = 0] Top left
+ * @param {Number} [radius.tr = 0] Top right
+ * @param {Number} [radius.br = 0] Bottom right
+ * @param {Number} [radius.bl = 0] Bottom left
+ * @param {Boolean} [fill = false] Whether to fill the rectangle.
+ * @param {Boolean} [stroke = true] Whether to stroke the rectangle.
+ */
+function roundRect(ctx, x, y, width, height, radius, fill, stroke) {
+    if (typeof stroke == 'undefined') {
+        stroke = true;
+    }
+    if (typeof radius === 'undefined') {
+        radius = 5;
+    }
+    if (typeof radius === 'number') {
+        radius = {tl: radius, tr: radius, br: radius, bl: radius};
+    } else {
+        var defaultRadius = {tl: 0, tr: 0, br: 0, bl: 0};
+        for (var side in defaultRadius) {
+            radius[side] = radius[side] || defaultRadius[side];
+        }
+    }
+    ctx.beginPath();
+    ctx.moveTo(x + radius.tl, y);
+    ctx.lineTo(x + width - radius.tr, y);
+    ctx.quadraticCurveTo(x + width, y, x + width, y + radius.tr);
+    ctx.lineTo(x + width, y + height - radius.br);
+    ctx.quadraticCurveTo(x + width, y + height, x + width - radius.br, y + height);
+    ctx.lineTo(x + radius.bl, y + height);
+    ctx.quadraticCurveTo(x, y + height, x, y + height - radius.bl);
+    ctx.lineTo(x, y + radius.tl);
+    ctx.quadraticCurveTo(x, y, x + radius.tl, y);
+    ctx.closePath();
+    if (fill) {
+        ctx.fill();
+    }
+    if (stroke) {
+        ctx.stroke();
+    }
+
 }

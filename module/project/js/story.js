@@ -90,7 +90,7 @@ function on_createRootTask(projectID, storyID, productID) {
                 alert("批量创建主任务成功！");
             },
             error: function(error){
-                alert("批量创建主任务成功出错：" + JSON.stringify(error));
+                alert("批量创建主任务出错：" + JSON.stringify(error));
             },
             complete:function()
             {

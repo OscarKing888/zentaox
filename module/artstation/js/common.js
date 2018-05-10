@@ -206,6 +206,7 @@ $(document).ready(function()
     setForm();
 
     /* Bind ajaxForm for form again. */
+    /*
     $.ajaxForm("form[data-type='ajax']", function(response)
     {
         if(response.message) alert(response.message);
@@ -223,6 +224,7 @@ $(document).ready(function()
         }
         return false;
     });
+    //*/
 });
 
 /* show team menu. */

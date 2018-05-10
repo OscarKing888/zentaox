@@ -45,6 +45,9 @@ $lang->story->batchChangeStage  = "批量修改阶段";
 $lang->story->batchAssignTo     = "批量指派";
 $lang->story->batchChangeModule = "批量修改模块";
 
+$lang->story->batchChangePriorityAB = '优先级';
+$lang->story->batchChangePriority = '批量修改优先级';
+
 $lang->story->common         = '需求';
 $lang->story->id             = '编号';
 $lang->story->product        = "所属{$lang->productCommon}";

@@ -33,6 +33,9 @@ foreach (explode(',', $showFields) as $field) {
     if ($field) $visibleFields[$field] = '';
 }
 if ($this->story->checkForceReview()) unset($visibleFields['review']);
+
+$deptUsers['ditto'] = $this->lang->story->ditto;
+
 ?>
 <form class='form-condensed' method='post' enctype='multipart/form-data' target='hiddenwin'>
     <table class='table table-form table-fixed with-border'>
@@ -47,6 +50,7 @@ if ($this->story->checkForceReview()) unset($visibleFields['review']);
             <th <?php if (count($visibleFields) >= 9) echo "class='w-150px'" ?>><?php echo $lang->story->title; ?> <span
                         class='required'></span></th>
             <th class='w-p15<?php echo zget($visibleFields, 'spec', ' hidden') ?>'><?php echo $lang->story->spec; ?></th>
+            <th class='w-80px'><?php echo $lang->task->assignedTo; ?> <span class='required'></span></th>
             <th class='w-80px<?php echo zget($visibleFields, 'source', ' hidden') ?>'><?php echo $lang->story->source; ?></th>
             <th class='w-p15<?php echo zget($visibleFields, 'verify', ' hidden') ?>'><?php echo $lang->story->verify; ?></th>
             <th class='w-80px<?php echo zget($visibleFields, 'pri', ' hidden') ?>'><?php echo $lang->story->pri; ?></th>
@@ -80,6 +84,7 @@ if ($this->story->checkForceReview()) unset($visibleFields['review']);
                         </div>
                     </td>
                     <td class='<?php echo zget($visibleFields, 'spec', 'hidden') ?>'><?php echo html::textarea("spec[$i]", $spec, "rows='1' class='form-control autosize'"); ?></td>
+
                     <td class='text-left<?php echo zget($visibleFields, 'source', ' hidden') ?>'><?php echo html::select("source[$i]", $sourceList, $source, "class='form-control'"); ?></td>
                     <td class='<?php echo zget($visibleFields, 'verify', 'hidden') ?>'><?php echo html::textarea("verify[$i]", '', "rows='1' class='form-control autosize'"); ?></td>
                     <td class='text-left<?php echo zget($visibleFields, 'pri', ' hidden') ?>'
@@ -98,6 +103,7 @@ if ($this->story->checkForceReview()) unset($visibleFields['review']);
             <?php $planID = $i - $nextStart == 0 ? $planID : 'ditto'; ?>
             <?php $pri = $i - $nextStart == 0 ? '' : 'ditto'; ?>
             <?php $source = $i - $nextStart == 0 ? '' : 'ditto'; ?>
+            <?php $assignedTo = $i - $nextStart == 0 ? 0 : 'ditto'; ?>
             <tr class='text-center'>
                 <td><?php echo $i + 1; ?></td>
                 <td class='text-left<?php echo zget($visibleFields, $product->type, ' hidden') ?>'><?php echo html::select("branch[$i]", $branches, $branch, "class='form-control' onchange='setModuleAndPlan(this.value, $productID, $i)'"); ?></td>
@@ -116,6 +122,7 @@ if ($this->story->checkForceReview()) unset($visibleFields['review']);
                     </div>
                 </td>
                 <td class='<?php echo zget($visibleFields, 'spec', 'hidden') ?>'><?php echo html::textarea("spec[$i]", $spec, "rows='1' class='form-control autosize'"); ?></td>
+                <td><?php $userList = $deptUsers; if(!empty($batchCreateRoot)) $userList = $leaders; echo html::select("assignedTo[$i]", $userList, $assignedTo, 'class=form-control chosen'); ?></td>
                 <td class='text-left<?php echo zget($visibleFields, 'source', ' hidden') ?>'><?php echo html::select("source[$i]", $sourceList, $source, "class='form-control'"); ?></td>
                 <td class='<?php echo zget($visibleFields, 'verify', 'hidden') ?>'><?php echo html::textarea("verify[$i]", '', "rows='1' class='form-control autosize'"); ?></td>
                 <td class='text-left<?php echo zget($visibleFields, 'pri', ' hidden') ?>'
@@ -151,6 +158,7 @@ if ($this->story->checkForceReview()) unset($visibleFields['review']);
             </div>
         </td>
         <td class='<?php echo zget($visibleFields, 'spec', ' hidden') ?>'><?php echo html::textarea("spec[%s]", $spec, "rows='1' class='form-control autosize'"); ?></td>
+        <td><?php $userList = $deptUsers; if(!empty($batchCreateRoot)) $userList = $leaders; echo html::select("assignedTo[$i]", $userList, $assignedTo, 'class=form-control chosen'); ?></td>
         <td class='text-left<?php echo zget($visibleFields, 'source', ' hidden') ?>'><?php echo html::select("source[%s]", $sourceList, $source, "class='form-control'"); ?></td>
         <td class='<?php echo zget($visibleFields, 'verify', ' hidden') ?>'><?php echo html::textarea("verify[%s]", '', "rows='1' class='form-control autosize'"); ?></td>
         <td class='text-left<?php echo zget($visibleFields, 'pri', ' hidden') ?>'

@@ -1,6 +1,8 @@
 <?php
 $config->story = new stdclass();
 
+$config->story->forceReview = false;
+
 $config->story->batchCreate      = 10;
 $config->story->affectedFixedNum = 7;
 $config->story->needReview = 1;
@@ -38,14 +40,15 @@ $config->story->list->exportFields      = '
     childStories, linkStories, duplicateStory, files';
 
 //oscar:$config->story->list->customCreateFields      = 'source,verify,pri,estimate,mailto,keywords';
-$config->story->list->customCreateFields      = 'pri,files';
-$config->story->list->customBatchCreateFields = 'plan,spec,source,verify,pri,estimate,review,keywords';
+$config->story->list->customCreateFields      = 'pri,files,assignedTo';
+//$config->story->list->customBatchCreateFields = 'assignedTo,plan,spec,source,verify,pri,estimate,review,keywords';
+$config->story->list->customBatchCreateFields = 'assignedTo,module,spec,pri';
 $config->story->list->customBatchEditFields   = 'branch,plan,estimate,pri,assignedTo,source,stage,closedBy,closedReason,keywords';
 
 $config->story->custom = new stdclass();
 $config->story->custom->createFields      = $config->story->list->customCreateFields;
 //oscar:$config->story->custom->batchCreateFields = 'module,plan,spec,pri,estimate,review';
-$config->story->custom->batchCreateFields = 'module,spec,pri';
+$config->story->custom->batchCreateFields = 'module,spec,assignedTo,pri';
 
 $config->story->custom->batchEditFields   = 'branch,module,plan,estimate,pri,source,stage,closedBy,closedReason';
 
