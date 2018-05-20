@@ -110,7 +110,11 @@
             <span class='caret'></span>
         </button>
         <ul class='dropdown-menu' id='importActionMenu'>
-        <?php 
+        <?php
+        // oscar[
+        $link = common::hasPriv('task', 'importTaskFromMSProject') ?  $this->createLink('task', 'importTaskFromMSProject', "project=$project->id") : '#';
+        echo "<li>" . html::a($link, $lang->task->importTaskFromMSProject, '', "") . "</li>";
+        // oscar]
         $misc = common::hasPriv('project', 'importTask') ? '' : "class=disabled";
         $link = common::hasPriv('project', 'importTask') ?  $this->createLink('project', 'importTask', "project=$project->id") : '#';
         echo "<li>" . html::a($link, $lang->project->importTask, '', $misc) . "</li>";

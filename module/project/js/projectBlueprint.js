@@ -13,9 +13,17 @@ const C_TaskNameColor = "#000000";
 const C_TaskNameFont = "24px 微软雅黑";
 const C_FontHeight = 24;
 
-const C_Taskbar_Height = 30;
-const C_Taskbar_VSpace = 30;
-const C_Taskbar_DayUnit = 30;
+var EDrawUnit =
+{
+    "day" : 0,
+    "week" : 1,
+    "month" : 2,
+    "season" : 3
+};
+
+var C_Taskbar_Height = 10;
+var C_Taskbar_VSpace = 30;
+var C_Taskbar_DayUnit = 10;
 
 
 var origX = 200;
@@ -29,11 +37,61 @@ var canvas = null;
 var context = null;
 var mouseIsDown = false;
 
+var drawType = EDrawUnit.day;
+
 
 Date.prototype.addDays = function(days) {
     var dat = new Date(this.valueOf());
     dat.setDate(dat.getDate() + days);
     return dat;
+}
+
+function onZoomIn()
+{
+    //alert("onZoomIn");
+    C_Taskbar_DayUnit = Math.min(C_Taskbar_DayUnit + 5, 30);
+    redraw();
+}
+
+function onZoomOut()
+{
+    //alert("onZoomOut");
+    C_Taskbar_DayUnit = Math.max(C_Taskbar_DayUnit - 5, 2);
+    redraw();
+}
+
+function onZoomDay()
+{
+    drawType = EDrawUnit.day;
+    C_Taskbar_DayUnit = 40;
+    redraw();
+}
+
+function onZoomWeek()
+{
+    drawType = EDrawUnit.week;
+    C_Taskbar_DayUnit = 20;
+    redraw();
+}
+
+function onZoomMonth()
+{
+    drawType = EDrawUnit.month;
+    C_Taskbar_DayUnit = 5;
+    redraw();
+}
+
+
+function onZoomSeason()
+{
+    drawType = EDrawUnit.season;
+    C_Taskbar_DayUnit = 2;
+    redraw();
+}
+
+function drawRuler()
+{
+
 }
 
 function test()
@@ -139,6 +197,16 @@ function writeMessage(canvas, message, mousePos) {
     //var context = canvas.getContext('2d');
     //console.log("====msg " + message);
 
+    redraw();
+
+    context.font = '18pt Calibri';
+    context.fillStyle = 'black';
+    //context.translate(0, 0);
+    context.fillText(message, mousePos.x, mousePos.y);
+}
+
+function redraw()
+{
     context.clearRect(0, 0, canvas.width, canvas.height);
 
     //context.translate(0, 0);
@@ -150,11 +218,7 @@ function writeMessage(canvas, message, mousePos) {
     //context.translate(0, 0);
     drawDeadline();
 
-
-    context.font = '18pt Calibri';
-    context.fillStyle = 'black';
-    //context.translate(0, 0);
-    context.fillText(message, mousePos.x, mousePos.y);
+    drawRuler();
 }
 
 function getMousePos(canvas, evt) {
@@ -192,9 +256,11 @@ function ajaxGetTasks()
         canvas.height = ((g_tasks.length + 6) * (C_Taskbar_Height + C_Taskbar_VSpace));
         canvas.width = 2048;
         console.log("==== w:" + document.width + " H:" + canvas.height);
-        drawBg();
-        drawProjectBlueprintGlobal();
-        drawDeadline();
+
+       redraw();
+
+
+        //console.warn("blueprint tasks:", g_tasks, g_tasks.length);
     });
     //*/
 
@@ -266,6 +332,8 @@ function drawProjectBlueprint(tasks)
 {
     //alert("drawProjectBlueprint:" + tasks.length);
 
+    //console.error("task len:", tasks.length);
+
     //var canvas = document.getElementById("projectCanvas");
 
     //canvas.setWidth(document.width);
@@ -287,7 +355,7 @@ function drawProjectBlueprint(tasks)
     {
         for(var i = 0; i < tasks.length; ++i)
         {
-            drawTask(ctx, tasks[i].id, tasks[i].name,  tasks[i].realStarted, tasks[i].estimate, tasks[i].status, i);
+            drawTask(ctx, tasks[i].id, tasks[i].name,  tasks[i].estStarted, tasks[i].estimate, tasks[i].status, i);
             //alert("task:" + tasks[i]);
             //console.log("task[" + tasks[i].id + "]: " + tasks[i].name + " start:" + tasks[i].realStarted + " status:" + tasks[i].status);
         }

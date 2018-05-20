@@ -11,13 +11,13 @@
         </thead>
         <tbody aria-live="polite" aria-relevant="all">
 
-        <?php for($i = 0; $i < count($depts); ++$i): ?>
+        <?php $i = 0; foreach($depts as $k => $v): ?>
             <tr class="text-center">
-                <td><?php echo $i + 1; ?></td>
-                <td><?php echo $depts[$i]; ?></td>
-                <td><?php $account = $leaders[$i]; $user = $account; echo html::select("username[$i]", $allUsers, $user, "class='form-control chosen'"); ?></td>
+                <td><?php echo $i + 1;  ++$i; ?></td>
+                <td><?php echo $v; echo html::select("dept[$i]", $depts, $k, "class='form-control hidden'");?></td>
+                <td><?php $account = $leaders[$k]; $user = $account; echo html::select("username[$i]", $allUsers, $user, "class='form-control chosen'"); ?></td>
             </tr>
-        <?php endfor ?>
+        <?php endforeach ?>
         </tbody>
 
         <tfoot>

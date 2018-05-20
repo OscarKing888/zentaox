@@ -33,7 +33,7 @@ $visibleFields = array();
 foreach (explode(',', $showFields) as $field) {
     if ($field) $visibleFields[$field] = '';
 }
-$colspan = count($visibleFields) + 3;
+$colspan = count($visibleFields);
 $hiddenStory = ((isonlybody() and $storyID) || $this->config->global->flow == 'onlyTask') ? ' hidden' : '';
 if ($hiddenStory and isset($visibleFields['story'])) $colspan -= 1;
 ?>
@@ -42,28 +42,43 @@ if ($hiddenStory and isset($visibleFields['story'])) $colspan -= 1;
         <thead>
         <tr class='text-center'>
             <th class='w-30px'><?php echo $lang->idAB; ?></th>
+            <th class='w-150px<?php echo zget($visibleFields, 'project', ' hidden') ?>'><?php echo $lang->task->module ?></th>
             <th class='w-150px<?php echo zget($visibleFields, 'module', ' hidden') ?>'><?php echo $lang->task->module ?></th>
             <?php if ($project->type != 'ops'): ?>
                 <th class='w-200px<?php echo zget($visibleFields, 'story', ' hidden');
                 echo $hiddenStory; ?>'><?php echo $lang->task->story; ?></th><?php endif; ?>
-            <th><?php echo $lang->task->name; ?> <span class='required'></span></th>
-            <th class='w-80px'><?php echo $lang->task->dept; ?> <span class='required'></span></th>
-            <th class='w-150px<?php echo zget($visibleFields, 'assignedTo', ' hidden') ?>'><?php echo $lang->task->assignedTo; ?></th>
-            <th class='w-50px<?php echo zget($visibleFields, 'estimate', ' hidden') ?>'><?php echo $lang->task->estimateAB; ?></th>
-            <th class='w-100px<?php echo zget($visibleFields, 'estStarted', ' hidden') ?>'><?php echo $lang->task->estStarted; ?></th>
-            <th class='w-100px<?php echo zget($visibleFields, 'deadline', ' hidden') ?>'><?php echo $lang->task->deadline; ?></th>
             <th class='w-p20<?php echo zget($visibleFields, 'desc', ' hidden') ?>'><?php echo $lang->task->desc; ?></th>
+            <th><?php echo $lang->task->name; ?> <span class='required'></span></th>
             <th class='w-70px<?php echo zget($visibleFields, 'pri', ' hidden') ?>'><?php echo $lang->task->pri; ?></th>
+            <th class='w-100px<?php echo zget($visibleFields, 'estStarted', ' hidden') ?>'><?php echo $lang->task->estStarted; ?></th>
+            <th class='w-50px<?php echo zget($visibleFields, 'estimate', ' hidden') ?>'><?php echo $lang->task->estimateAB; ?></th>
+            <th class='w-100px<?php echo zget($visibleFields, 'deadline', ' hidden') ?>'><?php echo $lang->task->deadline; ?></th>
+            <th class='w-80px'><?php echo $lang->task->assignedTo; ?> <span class='required'></span></th>
         </tr>
         </thead>
 
         <?php
+
+        function array_remove($data, $key)
+        {
+            if (!array_key_exists($key, $data)) {
+                return $data;
+            }
+            $keys = array_keys($data);
+            $index = array_search($key, $keys);
+            if ($index !== FALSE) {
+                array_splice($data, $index, 1);
+            }
+            return $data;
+        }
+
         $stories['ditto'] = $lang->task->ditto;
         $lang->task->typeList['ditto'] = $lang->task->ditto;
         $members['ditto'] = $lang->task->ditto;
         $modules['ditto'] = $lang->task->ditto;
 
-        $depts['ditto'] = $lang->task->ditto; //oscar:
+        $deptUsers['ditto'] = $lang->task->ditto; //oscar:
+        //$leaders = array_remove('admin', $leaders);
 
         if ($project->type == 'ops') $colspan = $colspan - 1;
         ?>
@@ -72,18 +87,23 @@ if ($hiddenStory and isset($visibleFields['story'])) $colspan -= 1;
             if ($i == 0) {
                 $currentStory = $storyID;
                 $type = '';
-                $dept = '';
+                $dept = $project = $assignedTo = 0;
                 $member = '';
                 $module = $story ? $story->module : '';
             } else {
-                $dept = $currentStory = $type = $member = $module = 'ditto';
+                $dept = $project = $assignedTo = $currentStory = $type = $member = $module = 'ditto';
             }
             ?>
-            <?php $pri = 3; ?>
+            <?php $pri = $parentTask->pri; ?>
             <tr>
-                <td class='text-center'><?php echo $i + 1; ?><?php echo html::hidden("parent[]", $parent); ?></td>
+                <td class='text-center'><?php echo html::input("id[$i]", '', "class='form-control text-center' autocomplete='off'"); ?></td>
+
+                <td <?php echo zget($visibleFields, 'project', "class='hidden'") ?>
+                        style='overflow:visible'><?php echo html::select("project[$i]", $projects, $project, "class='form-control chosen'") ?></td>
+
                 <td <?php echo zget($visibleFields, 'module', "class='hidden'") ?>
                         style='overflow:visible'><?php echo html::select("module[$i]", $modules, $module, "class='form-control chosen' onchange='setStories(this.value, $project->id, $i)'") ?></td>
+
                 <?php if ($project->type != 'ops'): ?>
                     <td <?php echo zget($visibleFields, 'story', "class='hidden'");
                     echo $hiddenStory; ?> style='overflow: visible'>
@@ -97,20 +117,22 @@ if ($hiddenStory and isset($visibleFields['story'])) $colspan -= 1;
                         </div>
                     </td>
                 <?php endif; ?>
+
+                <td><?php echo html::select("dept[$i]", $depts, $dept, 'class=form-control chosen'); ?></td>
+
                 <td style='overflow:visible'>
                     <div class='input-group'>
                         <?php echo html::hidden("color[$i]", '', "data-provide='colorpicker' data-wrapper='input-group-btn fix-border-right' data-pull-menu-right='false' data-btn-tip='{$lang->task->colorTag}' data-update-text='#name\\[{$i}\\]'"); ?>
                         <?php echo html::input("name[$i]", '', "class='form-control' autocomplete='off'"); ?>
                     </div>
                 </td>
-                <td><?php echo html::select("dept[$i]", $depts, $dept, 'class=form-control chosen'); ?></td>
-                <td <?php echo zget($visibleFields, 'assignedTo', "class='hidden'") ?>
-                        style='overflow:visible'><?php echo html::select("assignedTo[$i]", $members, $member, "class='form-control chosen'"); ?></td>
-                <td <?php echo zget($visibleFields, 'estimate', "class='hidden'") ?>><?php echo html::input("estimate[$i]", '', "class='form-control text-center' autocomplete='off'"); ?></td>
-                <td <?php echo zget($visibleFields, 'estStarted', "class='hidden'") ?>><?php echo html::input("estStarted[$i]", '', "class='form-control text-center form-date'"); ?></td>
-                <td <?php echo zget($visibleFields, 'deadline', "class='hidden'") ?>><?php echo html::input("deadline[$i]", '', "class='form-control text-center form-date'"); ?></td>
-                <td <?php echo zget($visibleFields, 'desc', "class='hidden'") ?>><?php echo html::textarea("desc[$i]", '', "rows='1' class='form-control autosize'"); ?></td>
                 <td <?php echo zget($visibleFields, 'pri', "class='hidden'") ?>><?php echo html::select("pri[$i]", (array)$lang->task->priList, $pri, 'class=form-control'); ?></td>
+                <td <?php echo zget($visibleFields, 'estimate', "class='hidden'") ?>><?php echo html::input("estimate[$i]", '24', "class='form-control text-center' autocomplete='off'"); ?></td>
+                <td <?php echo zget($visibleFields, 'estStarted', "class='hidden'") ?>><?php echo html::input("estStarted[$i]", '', "class='form-control text-center form-date'"); ?></td>
+                <td <?php echo zget($visibleFields, 'deadline', "class='hidden'") ?>><?php echo html::input("deadline[$i]", helper::nowafter(5), "class='form-control text-center form-date'"); ?></td>
+                <td><?php $userList = $users;
+                    echo html::select("assignedTo[$i]", $userList, $assignedTo, 'class=form-control chosen'); ?></td>
+
             </tr>
         <?php endfor; ?>
         <tr>
@@ -122,7 +144,11 @@ if ($hiddenStory and isset($visibleFields['story'])) $colspan -= 1;
 <table class='hide' id='trTemp'>
     <tbody>
     <tr>
-        <td class='text-center'>%s</td>
+        <td class='text-center'><?php echo html::input("id[$s]", '$s', "class='form-control text-center' autocomplete='off'"); ?></td>
+
+        <td <?php echo zget($visibleFields, 'project', "class='hidden'") ?>
+                style='overflow:visible'><?php echo html::select("project[$s]", $projects, $project, "class='form-control chosen'") ?></td>
+
         <td <?php echo zget($visibleFields, 'module', "class='hidden'") ?>
                 style='overflow:visible'><?php echo html::select("module[%s]", $modules, $module, "class='form-control' onchange='setStories(this.value, $project->id, \"%s\")'") ?></td>
         <td <?php echo zget($visibleFields, 'story', "class='hidden'");
@@ -135,20 +161,19 @@ if ($hiddenStory and isset($visibleFields['story'])) $colspan -= 1;
           </span>
             </div>
         </td>
+        <td><?php echo html::select("dept[$s]", $depts, $dept, 'class=form-control chosen'); ?></td>
         <td style='overflow:visible'>
             <div class='input-group'>
                 <?php echo html::hidden("color[%s]", '', "data-wrapper='input-group-btn fix-border-right' data-pull-menu-right='false' data-btn-tip='{$lang->task->colorTag}' data-update-text='#name\\[%s\\]'"); ?>
                 <?php echo html::input("name[%s]", '', "class='form-control' autocomplete='off'"); ?>
             </div>
         </td>
-        <td><?php echo html::select("type[%s]", $depts, $dept, 'class=form-control'); ?></td>
-        <td <?php echo zget($visibleFields, 'assignedTo', "class='hidden'") ?>
-                style='overflow:visible'><?php echo html::select("assignedTo[%s]", $members, $member, "class='form-control'"); ?></td>
+        <td <?php echo zget($visibleFields, 'pri', "class='hidden'") ?>><?php echo html::select("pri[%s]", (array)$lang->task->priList, $pri, 'class=form-control'); ?></td>
         <td <?php echo zget($visibleFields, 'estimate', "class='hidden'") ?>><?php echo html::input("estimate[%s]", '', "class='form-control text-center' autocomplete='off'"); ?></td>
         <td <?php echo zget($visibleFields, 'estStarted', "class='hidden'") ?>><?php echo html::input("estStarted[%s]", '', "class='form-control text-center form-date'"); ?></td>
         <td <?php echo zget($visibleFields, 'deadline', "class='hidden'") ?>><?php echo html::input("deadline[%s]", '', "class='form-control text-center form-date'"); ?></td>
-        <td <?php echo zget($visibleFields, 'desc', "class='hidden'") ?>><?php echo html::textarea("desc[%s]", '', "rows='1' class='form-control autosize'"); ?></td>
-        <td <?php echo zget($visibleFields, 'pri', "class='hidden'") ?>><?php echo html::select("pri[%s]", (array)$lang->task->priList, $pri, 'class=form-control'); ?></td>
+
+        <td><?php $userList = $users; echo html::select("assignedTo[%s]", $userList, $assignedTo, 'class=form-control'); ?></td>
     </tr>
     </tbody>
 </table>

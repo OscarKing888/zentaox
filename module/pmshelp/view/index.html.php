@@ -32,6 +32,7 @@
                     <td>
                         <ul>
                             <li>记录工作中美好的回忆：<?php echo html::a(helper::createLink('Blog', 'create',""), "Blog"); ?>📷</li>
+                            <li><b>开发子任务</b>功能：<?php echo html::a(helper::createLink('my', 'task', ''), "我的任务"); ?></li
                             <li>借书📖：<?php echo html::a(helper::createLink('books', 'index',""), "图书"); ?></li>
                         </ul>
                     </td>
@@ -67,7 +68,7 @@
                 <tr>
                     <th>我是组员🐑</th>
                     <td>
-                        <li><b>开发子任务</b>功能：<?php echo html::a(helper::createLink('my', 'task', 'assignedTo'), "我的任务"); ?></li>
+                        <li><b>开发子任务</b>功能：<?php echo html::a(helper::createLink('my', 'task', ''), "我的任务"); ?></li>
                     </td>
                 </tr>
                 <tr>

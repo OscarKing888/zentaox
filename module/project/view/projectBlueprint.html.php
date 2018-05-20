@@ -21,31 +21,20 @@
         <?php endif; ?>
     </div>
     <div class='actions'>
+        <div class='btn-group'>
+            <button onclick="onZoomDay()">日</button>
+            <button onclick="onZoomWeek()">周</button>
+            <button onclick="onZoomMonth()">月</button>
+            <button onclick="onZoomSeason()">季</button>
+
+            <button onclick="onZoomOut()">-</button>
+            <button onclick="onZoomIn()">+</button>
+        </div>
         <?php
-        $params = "project=$project->id";
-        $browseLink = $this->session->projectList ? $this->session->projectList : inlink('browse', "projectID=$project->id");
-        if (!$project->deleted) {
-            ob_start();
-            echo "<div class='btn-group'>";
-            common::printIcon('project', 'start', "projectID=$project->id", $project, 'button', '', '', 'iframe', true);
-            common::printIcon('project', 'activate', "projectID=$project->id", $project, 'button', '', '', 'iframe', true);
-            common::printIcon('project', 'putoff', "projectID=$project->id", $project, 'button', '', '', 'iframe', true);
-            common::printIcon('project', 'suspend', "projectID=$project->id", $project, 'button', '', '', 'iframe', true);
-            common::printIcon('project', 'close', "projectID=$project->id", $project, 'button', '', '', 'iframe', true);
-            echo '</div>';
+        echo "<div class='btn-group'>";
+        //common::printIcon('project', 'close', "projectID=$project->id", $project, 'button', '', '', 'iframe', true);
+        echo '</div>';
 
-            echo "<div class='btn-group'>";
-            common::printIcon('project', 'edit', $params, $project);
-            common::printIcon('project', 'delete', $params, $project, 'button', '', 'hiddenwin');
-            echo '</div>';
-            common::printRPN($browseLink);
-
-            $actionLinks = ob_get_contents();
-            ob_end_clean();
-            echo $actionLinks;
-        } else {
-            common::printRPN($browseLink);
-        }
         ?>
     </div>
 </div>

@@ -43,6 +43,8 @@ class taskModel extends model
             ->remove('after,files,labels,assignedTo,uid,storyEstimate,storyDesc,storyPri,qq,team,teamEstimate,teamMember,multiple,teams')
             ->get();
 
+        error_log("oscar createTask start:$task->estStarted deadline:$task->deadline");
+
         $task = $this->file->processImgURL($task, $this->config->task->editor->create['id'], $this->post->uid);
         $this->dao->insert(TABLE_TASK)->data($task)
             ->autoCheck()

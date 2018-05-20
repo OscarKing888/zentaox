@@ -221,7 +221,8 @@ class story extends control
                 $stories[] = $mail->storyID;
                 if($mail->actionID) $this->story->sendmail($mail->storyID, $mail->actionID);
             }
-            if($project) $this->loadModel('project')->linkStory($project, $stories);
+
+            //if($project) $this->loadModel('project')->linkStory($project, $stories); // oscar move to model batch create
 
             /* If storyID not equal zero, subdivide this story to child stories and close it. */
             if($storyID)

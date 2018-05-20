@@ -2121,10 +2121,12 @@ class project extends control
 
         $tasks = $this->dao->select()
             ->from(TABLE_TASK)
-            ->where('deleted')->eq(0)
+            //->where('deleted')->eq(0)
+            //->andWhere('project')->eq($projectID)
             ->orderBy('id asc')
             ->fetchAll();
         $this->tasks = $tasks;
+        //var_dump($tasks);
         //$this->grouptask($project->id, 'assignedTo');
         $this->display();
     }

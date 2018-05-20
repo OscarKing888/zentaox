@@ -125,14 +125,14 @@ $(document).ready(function()
       <td>
         <div class='input-group'>
           <span class='input-group-addon'><?php echo $lang->setFileName;?></span>
-          <?php echo html::input('fileName', '', "class='form-control' autocomplete='off'");?>
+          <?php echo html::input('fileName', 'tasks', "class='form-control' autocomplete='off'");?>
         </div>
       </td>
       <td class='w-60px'>
         <?php echo html::select('fileType',   $lang->exportFileTypeList, '', 'onchange=switchEncode(this.value) class="form-control"');?>
       </td>
       <td class='w-80px'>
-        <?php echo html::select('encode',     $config->charsets[$this->cookie->lang], 'utf-8', key($lang->exportFileTypeList) == 'csv' ? "class='form-control'" : "class='form-control'");?>
+        <?php echo html::select('encode',     $config->charsets[$this->cookie->lang], 'gbk', key($lang->exportFileTypeList) == 'csv' ? "class='form-control'" : "class='form-control'");?>
       </td>
       <td class='w-90px'>
         <?php echo html::select('exportType', $lang->exportTypeList, 'all', "class='form-control'");?>

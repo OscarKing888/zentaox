@@ -1407,6 +1407,8 @@ class task extends control
             $relatedFiles = $this->dao->select('id, objectID, pathname, title')->from(TABLE_FILE)->where('objectType')->eq('task')->andWhere('objectID')->in(@array_keys($tasks))->andWhere('extra')->ne('editor')->fetchGroup('objectID');
             $relatedModules = $this->loadModel('tree')->getTaskOptionMenu($projectID);
 
+            $depts =  $this->loadModel('dept')->getOptionMenu();
+
             $children = $this->dao->select('*')->from(TABLE_TASK)->where('deleted')->eq(0)
                 ->andWhere('parent')->in(array_keys($tasks))
                 ->beginIF($this->post->exportType == 'selected')->andWhere('id')->in($this->cookie->checkedItem)->fi()
@@ -1454,14 +1456,21 @@ class task extends control
                 }
 
                 /* fill some field with useful value. */
-                $task->story = isset($relatedStories[$task->story]) ? $relatedStories[$task->story] . "(#$task->story)" : '';
+                //$task->story = isset($relatedStories[$task->story]) ? $relatedStories[$task->story] . "(#$task->story)" : '';
+                //$task->dept = $depts[$task->dept] . "(#$task->dept)"; // oscar
 
-                if (isset($projects[$task->project])) $task->project = $projects[$task->project] . "(#$task->project)";
+                $task->story = isset($relatedStories[$task->story]) ? $relatedStories[$task->story] . "" : ''; // oscar
+                $task->dept = $depts[$task->dept]; // oscar
+
+                //if (isset($projects[$task->project])) $task->project = $projects[$task->project] . "(#$task->project)";
+                if (isset($projects[$task->project])) $task->project = $projects[$task->project] . ""; // oscar
+
                 if (isset($taskLang->typeList[$task->type])) $task->type = $taskLang->typeList[$task->type];
                 if (isset($taskLang->priList[$task->pri])) $task->pri = $taskLang->priList[$task->pri];
                 if (isset($taskLang->statusList[$task->status])) $task->status = $taskLang->statusList[$task->status];
                 if (isset($taskLang->reasonList[$task->closedReason])) $task->closedReason = $taskLang->reasonList[$task->closedReason];
-                if (isset($relatedModules[$task->module])) $task->module = $relatedModules[$task->module] . "(#$task->module)";
+                //if (isset($relatedModules[$task->module])) $task->module = $relatedModules[$task->module] . "(#$task->module)";
+                if (isset($relatedModules[$task->module])) $task->module = $relatedModules[$task->module] . ""; // oscar
 
                 if (isset($users[$task->openedBy])) $task->openedBy = $users[$task->openedBy];
                 if (isset($users[$task->assignedTo])) $task->assignedTo = $users[$task->assignedTo];
@@ -1470,7 +1479,10 @@ class task extends control
                 if (isset($users[$task->closedBy])) $task->closedBy = $users[$task->closedBy];
                 if (isset($users[$task->lastEditedBy])) $task->lastEditedBy = $users[$task->lastEditedBy];
 
-                if (!empty($task->parent)) $task->name = '[' . $taskLang->childrenAB . '] ' . $task->name;
+
+
+                //if (!empty($task->parent)) $task->name = '[' . $taskLang->childrenAB . '] ' . $task->name; // oscar
+
                 if (!empty($task->team)) $task->name = '[' . $taskLang->multipleAB . '] ' . $task->name;
 
                 $task->openedDate = substr($task->openedDate, 0, 10);
@@ -1526,4 +1538,121 @@ class task extends control
         $tasks = $this->task->ajaxGetBlueprintTasks();
         die(json_encode($tasks));
     }
+
+    // oscar[
+    public function importTaskFromMSProject($projectID = 0, $storyID = 0, $iframe = 0, $taskID = 0, $createType = 'manualBatchCreate')
+    {
+        $project = $this->project->getById($projectID);
+        $taskLink = $this->createLink('project', 'browse', "projectID=$projectID&tab=task");
+        $storyLink = $this->session->storyList ? $this->session->storyList : $this->createLink('project', 'story', "projectID=$projectID");
+
+        /* Set menu. */
+        $this->project->setMenu($this->project->getPairs(), $project->id);
+
+        if (!empty($_POST)) {
+
+            $tasks = fixer::input('post')->get();
+            $batchNum = count(reset($tasks));
+            for($i = 0; $i < $batchNum; ++$i)
+            {
+                $taskId      = $tasks->id[$i];
+
+                $task             = new stdclass();
+                $task->project      = $tasks->project[$i];
+                $task->module      = $tasks->module[$i];
+                $task->story      = $tasks->story[$i];
+                $task->dept      = $tasks->dept[$i];
+                $task->name      = $tasks->name[$i];
+                $task->pri      = $tasks->pri[$i];
+                $task->estimate      = $tasks->estimate[$i];
+                $task->estStarted      = $tasks->estStarted[$i];
+                $task->deadline      = $tasks->deadline[$i];
+                $task->assignedTo      = $tasks->assignedTo[$i];
+
+                $oldTask = $this->dao->select('*')->from(TABLE_TASK)->where('id')->eq((int)$taskId)->fetch();
+
+                error_log("oscar: id:$taskId start:$task->estStarted deadline:$task->deadline");
+
+                if(!empty($oldTask))
+                {
+                    $this->dao->update(TABLE_TASK)->data($task)
+                        ->autoCheck()
+                        ->batchCheckIF($task->status != 'cancel', $this->config->task->edit->requiredFields, 'notempty')
+                        ->checkIF($task->deadline != '0000-00-00', 'deadline', 'ge', $task->estStarted)
+
+                        ->checkIF($task->estimate != false, 'estimate', 'float')
+                        ->checkIF($task->left     != false, 'left',     'float')
+                        ->checkIF($task->consumed != false, 'consumed', 'float')
+                        ->checkIF($task->status   != 'wait' and $task->left == 0 and $task->status != 'cancel' and $task->status != 'closed', 'status', 'equal', 'done')
+
+                        ->batchCheckIF($task->status == 'wait' or $task->status == 'doing', 'finishedBy, finishedDate,canceledBy, canceledDate, closedBy, closedDate, closedReason', 'empty')
+
+                        ->checkIF($task->status == 'done', 'consumed', 'notempty')
+                        ->checkIF($task->status == 'done' and $task->closedReason, 'closedReason', 'equal', 'done')
+                        ->batchCheckIF($task->status == 'done', 'canceledBy, canceledDate', 'empty')
+
+                        ->checkIF($task->status == 'closed', 'closedReason', 'notempty')
+                        ->batchCheckIF($task->closedReason == 'cancel', 'finishedBy, finishedDate', 'empty')
+                        ->where('id')->eq((int)$taskId)->exec();
+
+                    $this->task->computeWorkingHours($oldTask->parent);
+                }
+                else
+                {
+                    $this->dao->insert(TABLE_TASK)->data($task)
+                        ->autoCheck()
+                        ->batchCheck($this->config->task->create->requiredFields, 'notempty')
+                        //->checkIF($task->estimate != '', 'estimate', 'float')
+                        ->checkIF($task->deadline != '0000-00-00', 'deadline', 'ge', $task->estStarted)
+                        //->check($task->deadline != '0000-00-00', 'deadline')
+                        ->exec();
+                }
+
+                if (dao::isError()) die(js::error(dao::getError()));
+            }
+
+
+            /* Locate the browser. */
+            if ($iframe) die(js::reload('parent.parent'));
+            die(js::locate($storyLink, 'parent'));
+        }
+
+        /* Set Custom*/
+        foreach (explode(',', $this->config->task->importFields) as $field) {
+            $customFields[$field] = $this->lang->task->$field;
+        }
+
+        $this->view->customFields = $customFields;
+        $this->view->showFields = $this->config->task->exportFields;
+
+        $stories = $this->story->getProjectStoryPairs($projectID, 0, 0, 0, 'titleonly');
+        $members = $this->project->getTeamMemberPairs($projectID, 'nodeleted');
+        $modules = $this->loadModel('tree')->getTaskOptionMenu($projectID);
+        $title = $project->name . $this->lang->colon . $this->lang->task->batchCreate;
+        $position[] = html::a($taskLink, $project->name);
+        $position[] = $this->lang->task->common;
+        $position[] = $this->lang->task->batchCreate;
+
+        $this->view->title = $title;
+        $this->view->position = $position;
+        $this->view->project = $project;
+        $this->view->stories = $stories;
+        $this->view->modules = $modules;
+        $this->view->parent = $taskID;
+        $this->view->parentTask = $this->task->getByID($taskID); // oscar
+        $this->view->storyID = $storyID;
+        $this->view->story = $this->story->getByID($storyID);
+        $this->view->storyTasks = $this->task->getStoryTaskCounts(array_keys($stories), $projectID);
+        $this->view->members = $members;
+
+        $projects = $this->loadModel('project')->getPairs('nocode');
+        $this->view->projects = $projects;
+
+        $this->dept->setupDeptUsers($this->view, $this->app->user->account, $this->app->user->dept);
+        $this->loadModel('user');
+        $this->view->deptUsers = $this->user->getPairs('nodeleted|noclosed|noletter');
+
+        $this->display();
+    }
+    // oscar]
 }

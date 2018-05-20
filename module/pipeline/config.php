@@ -21,6 +21,11 @@ $config->pipeline->defaultStages = 2;
 
 define('TABLE_PIPELINE',                   'gamepipeline');
 define('TABLE_PIPELINE_STAGES',           'gamepipelinestages');
+
+define('TABLE_GAMEGROUPLEADERS',                   'gamegroupleaders');
+
+define('TABLE_AUTOSTORY',                   'autostory');
+
 $config->pipeline->fields = 'product,content,contentimages,date';
 
 $config->pipeline->create->requiredFields = 'pipename';

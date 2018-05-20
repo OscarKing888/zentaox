@@ -64,7 +64,7 @@ $deptUsers['ditto'] = $this->lang->story->ditto;
             <?php foreach ($titles as $storyTitle => $fileName): ?>
                 <?php $moduleID = $i == 0 ? $moduleID : 'ditto'; ?>
                 <?php $planID = $i == 0 ? $planID : 'ditto'; ?>
-                <?php $pri = $i == 0 ? '' : 'ditto'; ?>
+                <?php $pri = ($i == 0 ? '3' : 'ditto'); ?>
                 <?php $source = $i == 0 ? '' : 'ditto'; ?>
                 <tr class='text-center'>
                     <td><?php echo $i + 1; ?></td>
@@ -101,7 +101,7 @@ $deptUsers['ditto'] = $this->lang->story->ditto;
         <?php for ($i = $nextStart; $i < $config->story->batchCreate; $i++): ?>
             <?php $moduleID = $i - $nextStart == 0 ? $moduleID : 'ditto'; ?>
             <?php $planID = $i - $nextStart == 0 ? $planID : 'ditto'; ?>
-            <?php $pri = $i - $nextStart == 0 ? '' : 'ditto'; ?>
+            <?php $pri = $i - $nextStart == 0 ? '3' : 'ditto'; ?>
             <?php $source = $i - $nextStart == 0 ? '' : 'ditto'; ?>
             <?php $assignedTo = $i - $nextStart == 0 ? 0 : 'ditto'; ?>
             <tr class='text-center'>

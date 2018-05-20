@@ -31,4 +31,6 @@ $lang->pipeline->batchCreateRootTask = '批量创建主任务';
 $lang->pipeline->groupleaders     = '设置组长';
 $lang->project->manageProducts = '产品';
 
+$lang->pipeline->autostory = '设置自动需求关联';
+
 $lang->pipeline->methodOrder[5] = 'index';

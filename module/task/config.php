@@ -27,8 +27,8 @@ $config->task->editor->activate = array('id' => 'comment', 'tools' => 'simpleToo
 $config->task->editor->cancel   = array('id' => 'comment', 'tools' => 'simpleTools');
 $config->task->editor->pause    = array('id' => 'comment', 'tools' => 'simpleTools');
 
-$config->task->exportFields = '
-    id, project, module, story,
+$config->task->exportFieldsOld = '
+    id, project, module, story,dept,
     name, desc,
     type, pri,estStarted, realStarted, deadline, status,estimate, consumed, left,
     mailto, progress,
@@ -37,6 +37,15 @@ $config->task->exportFields = '
     closedBy, closedDate, closedReason,
     lastEditedBy, lastEditedDate,files
     ';
+
+$config->task->exportFields = '
+    id, project, module, story,dept,
+    name, pri, estimate, estStarted, deadline,     
+    assignedTo
+    ';
+
+$config->task->importFields = 'id,project,module,story,dept,name,pri,estimate,estStarted,deadline,assignedTo';
+
 if($config->global->flow == 'onlyTask') $config->task->exportFields = str_replace(array(' story,'), '', $config->task->exportFields);
 
 //oscar: $config->task->customCreateFields      = 'story,estStarted,deadline,mailto,pri,estimate';
@@ -67,6 +76,11 @@ $config->task->datatable->fieldList['id']['title']    = 'idAB';
 $config->task->datatable->fieldList['id']['fixed']    = 'left';
 $config->task->datatable->fieldList['id']['width']    = '70';
 $config->task->datatable->fieldList['id']['required'] = 'yes';
+
+$config->task->datatable->fieldList['project']['title']    = 'project';
+$config->task->datatable->fieldList['project']['fixed']    = 'left';
+$config->task->datatable->fieldList['project']['width']    = 'auto';
+$config->task->datatable->fieldList['project']['required'] = 'yes';
 
 $config->task->datatable->fieldList['pri']['title']    = 'priAB';
 $config->task->datatable->fieldList['pri']['fixed']    = 'left';

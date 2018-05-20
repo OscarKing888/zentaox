@@ -263,6 +263,7 @@ class storyModel extends model
         $now      = helper::now();
         $mails    = array();
         $stories  = fixer::input('post')->get();
+        $storiesDat = array();
         $batchNum = count(reset($stories));
 
         $result  = $this->loadModel('common')->removeDuplicate('story', $stories, "product={$productID}");
@@ -324,7 +325,11 @@ class storyModel extends model
                     die(js::reload('parent'));
                 }
 
+
                 $storyID = $this->dao->lastInsertID();
+
+                $storiesDat[$storyID] = $storyID; // oscar
+
                 $this->setStage($storyID);
 
                 $specData = new stdclass();
@@ -375,6 +380,22 @@ class storyModel extends model
             }
         }
 
+        // oscar[  自动关联到工程
+        $this->loadModel('pipeline');
+        $projects = $this->dao->select('id, project')->from(TABLE_AUTOSTORY)
+            ->where('product')->eq($productID)
+            ->orderBy('project asc')
+            ->fetchPairs();
+
+        $this->loadModel('project');
+        foreach ($projects as $k => $v)
+        {
+            error_log("oscar: batch link story ---- project:$k -> product:$v");
+            $this->linkStory($v, $productID, $storiesDat);
+        }
+        // oscar]
+
+
         /* Remove upload image file and session. */
         if(!empty($stories->uploadImage) and $this->session->storyImagesFile)
         {
@@ -387,6 +408,29 @@ class storyModel extends model
         if(!dao::isError())  $this->loadModel('score')->create('ajax', 'batchCreate');
         return $mails;
     }
+
+    // oscar[
+    public function linkStory($projectID, $productID, $stories)
+    {
+        if(empty($stories)) return false;
+
+        //$this->loadModel('action');
+        $versions  = $this->loadModel('story')->getVersions(array_keys($stories));
+        $lastOrder = (int)$this->dao->select('*')->from(TABLE_PROJECTSTORY)->where('project')->eq($projectID)->orderBy('order_desc')->limit(1)->fetch('order');
+        foreach($stories as $key => $storyID)
+        {
+            $data = new stdclass();
+            $data->project = $projectID;
+            $data->product = $productID;
+            $data->story   = $storyID;
+            $data->version = $versions[$storyID];
+            $data->order   = ++$lastOrder;
+            $this->dao->insert(TABLE_PROJECTSTORY)->data($data)->exec();
+            $this->story->setStage($storyID);
+           // $this->action->create('story', $storyID, 'linked2project', '', $projectID);
+        }
+    }
+    // oscar]
 
     /**
      * Change a story.
@@ -2021,15 +2065,20 @@ class storyModel extends model
         $i = 0;
         foreach($stories as $story)
         {
-            if($type == 'short')
+            // oscar[
+            if($type == 'titleonly')
             {
-                $property = '[p' . $story->pri . ', ' . $story->estimate . 'h]';
+                $storyPairs[$story->id] = $story->title;
             }
-            else
-            {
-                $property = '(' . $this->lang->story->pri . ':' . $story->pri . ',' . $this->lang->story->estimate . ':' . $story->estimate . ')';
+            else {
+                if ($type == 'short') {
+                    $property = '[p' . $story->pri . ', ' . $story->estimate . 'h]';
+                } else {
+                    $property = '(' . $this->lang->story->pri . ':' . $story->pri . ',' . $this->lang->story->estimate . ':' . $story->estimate . ')';
+                }
+                $storyPairs[$story->id] = $story->id . ':' . $story->title . $property;
             }
-            $storyPairs[$story->id] = $story->id . ':' . $story->title . $property;
+            // oscar]
 
             if($limit > 0 && ++$i > $limit)
             {

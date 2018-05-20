@@ -138,6 +138,9 @@ $lang->task->deptList['11'] = '美术-UI';
 $lang->task->deptList['12']  = '美术';
 $lang->task->deptList['13']   = 'PM';
 $lang->task->deptList['18'] = '孵化部';
+
+$lang->task->importTaskFromMSProject = '从Microsoft Project格式导入';
+$lang->task->project = '所属工程';
 // oscar]
 
 

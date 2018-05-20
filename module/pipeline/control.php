@@ -260,7 +260,7 @@ class pipeline extends control
                 }
 
                 $dat = new stdclass();
-                $dat->dept = $i;
+                $dat->dept = $leader->dept[$i];
                 $dat->username = $leader->username[$i];
 
                 $c = $this->dao->select()->from(TABLE_GAMEGROUPLEADERS)
@@ -304,6 +304,61 @@ class pipeline extends control
 
         //error_log("oscar: view groupleaders  count:" . count($leaders));
         $this->view->leaders = $leaders;
+
+        $this->display();
+    }
+
+    public function autostory()
+    {
+        $products = $this->loadModel('product')->getPairs();
+        $this->view->products = $products;
+
+        $projects = $this->loadModel('project')->getPairs();
+        $this->view->projects = $projects;
+
+        if (!empty($_POST)) {
+
+
+            $projprodPairs = fixer::input('post')->get();
+            $batchNum = count($projects);
+
+
+            for ($i = 0; $i < $batchNum; $i++) {
+
+                if (empty($projprodPairs->product[$i])) {
+                    continue;
+                }
+
+                $dat = new stdclass();
+                $dat->project = $projprodPairs->project[$i];
+                $dat->product = $projprodPairs->product[$i];
+
+                $c = $this->dao->select()->from(TABLE_AUTOSTORY)
+                    ->where('project')->eq($dat->project)
+                    ->count();
+
+
+                if ($c == 0) {
+                    $this->dao->insert(TABLE_AUTOSTORY)->data($dat)
+                        ->exec();
+                } else {
+                    $this->dao->update(TABLE_AUTOSTORY)->data($dat)
+                        ->where('project')->eq($dat->project)
+                        ->exec();
+                }
+
+                if (dao::isError()) {
+                    die(js::error(dao::getError()));
+                }
+            }
+
+        }
+
+        $projProdPairs = $this->dao->select('project, product')->from(TABLE_AUTOSTORY)
+            ->orderBy('project asc')
+            ->fetchPairs();
+
+        $this->view->projProdPairs = $projProdPairs;
 
         $this->display();
     }
