@@ -29,6 +29,8 @@ $lang->artstation->files  = 'PSD文件';
 $lang->artstation->tags  = '标签';
 $lang->artstation->type  = '作品类型';
 $lang->artstation->owner  = '作者';
+$lang->artstation->author  = '作者';
+
 $lang->artstation->requirement  = '关联需求';
 
 $lang->artstation->confirmtomodeling  = '确认制作';

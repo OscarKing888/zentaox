@@ -22,6 +22,8 @@
     </div>
     <div class='actions'>
         <div class='btn-group'>
+            
+            <button type="select" onclick="onShowDelayOnly()">延</button>
             <button onclick="onZoomDay()">日</button>
             <button onclick="onZoomWeek()">周</button>
             <button onclick="onZoomMonth()">月</button>

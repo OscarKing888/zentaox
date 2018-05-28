@@ -6,11 +6,15 @@ const C_TaskColor_Delay = "#AA0000";
 const C_TaskColor_ErrorStart = "#FFEE00";
 const C_TaskColor_Closed = "#888888";
 const C_TaskColor_Pause = "#880088";
-const C_TaskColor_Cancel = "#440000";
+//const C_TaskColor_Cancel = "#440000";
+const C_TaskColor_Cancel = "#AAAAAA";
 
 const C_TaskNameColor = "#000000";
 //const C_TaskNameFont = "16px 新宋体";
+const C_TaskUserNameColor = "#d10054";
+const C_TaskUserDeptColor = "#006ea5";
 const C_TaskNameFont = "24px 微软雅黑";
+const C_RulerFont = "16px 微软雅黑";
 const C_FontHeight = 24;
 
 var EDrawUnit =
@@ -27,7 +31,7 @@ var C_Taskbar_DayUnit = 10;
 
 
 var origX = 200;
-var origY = 50;
+var origY = C_Taskbar_Height * 4;
 
 var lastX = -1;
 var lastY = 0;
@@ -39,11 +43,19 @@ var mouseIsDown = false;
 
 var drawType = EDrawUnit.day;
 
+var g_showDelayOnly = false;
 
 Date.prototype.addDays = function(days) {
     var dat = new Date(this.valueOf());
     dat.setDate(dat.getDate() + days);
     return dat;
+}
+
+function onShowDelayOnly()
+{
+    g_showDelayOnly = !g_showDelayOnly;
+    console.log("show delay:", g_showDelayOnly);
+    redraw();
 }
 
 function onZoomIn()
@@ -91,7 +103,20 @@ function onZoomSeason()
 
 function drawRuler()
 {
+    ctx = context;
+    ctx.save();
+    ctx.translate(origX, 0);
 
+    ctx.font = ctx.font = C_RulerFont;
+    ctx.strokeStyle = "#888888";
+    ctx.lineWidth = 2;
+
+    ctx.fillStyle = "#dddddd";
+    ctx.fillRect(-100000, 0, 1000000, 30);
+
+
+
+    ctx.restore();
 }
 
 function test()
@@ -152,7 +177,7 @@ $(function()
 function onCanvasMouseOut(evt)
 {
     mouseIsDown = false;
-    console.log("!!!! canvas mouse out !!!!");
+    //console.log("!!!! canvas mouse out !!!!");
 }
 
 function onCanvasMouseMove(evt)
@@ -353,9 +378,14 @@ function drawProjectBlueprint(tasks)
 
     if(tasks != null)
     {
+        var drawYIdx = 0;
         for(var i = 0; i < tasks.length; ++i)
         {
-            drawTask(ctx, tasks[i].id, tasks[i].name,  tasks[i].estStarted, tasks[i].estimate, tasks[i].status, i);
+            if(!g_showDelayOnly || (g_showDelayOnly && isTaskDelay(tasks[i])))
+            {
+                drawTask(ctx, tasks[i].id, tasks[i].name, tasks[i].assignedToRealName, tasks[i].deptName,  tasks[i].estStarted, tasks[i].estimate, tasks[i].status, drawYIdx);
+                ++drawYIdx;
+            }
             //alert("task:" + tasks[i]);
             //console.log("task[" + tasks[i].id + "]: " + tasks[i].name + " start:" + tasks[i].realStarted + " status:" + tasks[i].status);
         }
@@ -365,8 +395,29 @@ function drawProjectBlueprint(tasks)
 
 }
 
+function isTaskDelay(task)
+{
+    var start = convertStringToDate(task.estStarted);
+    var cur = Date.now();
+    var d = days_between(start, cur);
+    var taskDays =  Math.ceil(task.estimate / 8);
+
+   // console.log("isTaskDelay: staus:", task.status);
+
+    if(task.status == 'doing')
+    {
+        if(d + taskDays <= 0)
+        {
+            //console.log("task is delay:", task.id, task.name);
+            return true;
+        }
+    }
+
+    return false;
+}
+
 //wait,doing,done,pause,cancel,closed
-function drawTask(ctx, id, name, startDate, hours, status, idx)
+function drawTask(ctx, id, name, user, dept, startDate, hours, status, idx)
 {
     ctx.fillStyle = C_TaskNameColor;
     ctx.font = C_TaskNameFont;
@@ -433,11 +484,38 @@ function drawTask(ctx, id, name, startDate, hours, status, idx)
     //ctx.fillRect(xy[0], xy[1], xyend[0] - xy[0], xyend[1] - xy[1] + C_Taskbar_Height);
 
     roundRect(ctx, xy[0], xy[1], xyend[0] - xy[0], xyend[1] - xy[1] + C_Taskbar_Height, 5, true, true);
+    if(status == 'cancel')
+    {
+        drawLine(xy[0], xy[1] + C_Taskbar_Height / 2, xyend[0] - xy[0]);
+    }
     ctx.strokeStyle = "#111111";
     ctx.fillStyle = C_TaskNameColor;
     ctx.lineWidth = 2;
     ctx.font = C_TaskNameFont;
-    ctx.fillText("[" + id + "]" + name, xyend[0] + 8, xyend[1] + C_FontHeight);
+    ctx.fillText("[" + id + "]  " + name, xyend[0] + 8, xyend[1] + C_FontHeight);
+
+    ctx.fillStyle = C_TaskUserNameColor;
+    var userNameStr = "        [" + user + "]";
+    ctx.fillText(userNameStr, xyend[0] + 8 + ctx.measureText(name).width + 50, xyend[1] + C_FontHeight);
+
+    ctx.fillStyle = C_TaskUserDeptColor;
+    var depStr = " - " + dept;
+    ctx.fillText(depStr, xyend[0] + 8 + ctx.measureText(name).width + ctx.measureText(userNameStr).width + 50, xyend[1] + C_FontHeight);
+}
+
+function drawLine(x, y, w)
+{
+    ctx = context;
+    ctx.save();
+    //ctx.translate(origX, origY);
+
+    ctx.strokeStyle = "#000000";
+    ctx.beginPath();
+    ctx.moveTo(x - 8, y);
+    ctx.lineTo(x + w + 8, y);
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    ctx.restore();
 }
 
 function dateToCoord(startDate, idx)
@@ -474,6 +552,7 @@ function dateToCoord(startDate, idx)
  * @param {Boolean} [stroke = true] Whether to stroke the rectangle.
  */
 function roundRect(ctx, x, y, width, height, radius, fill, stroke) {
+    ctx.save();
     if (typeof stroke == 'undefined') {
         stroke = true;
     }
@@ -506,4 +585,5 @@ function roundRect(ctx, x, y, width, height, radius, fill, stroke) {
         ctx.stroke();
     }
 
+    ctx.restore();
 }

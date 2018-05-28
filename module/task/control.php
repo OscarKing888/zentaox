@@ -1448,7 +1448,28 @@ class task extends control
                 }
             }
 
-            foreach ($tasks as $task) {
+            $newTasks = array();
+            foreach ($tasks as $k => $task) {
+                $hasChildren = false;
+                foreach ($children as $p => $id) {
+                    error_log("oscar: hasChildren parent:$p = $task->id : $task->name");
+                    if($p == $task->id)
+                    {
+                        $hasChildren = true;
+                        break;
+                    }
+                }
+
+                if(!$hasChildren)
+                {
+                    $newTasks[$task->id] = $task;
+                }
+            }
+
+            $tasks = $newTasks;
+            foreach ($tasks as $k => $task) {
+
+                //error_log("oscar: ==== $k -> $task->name : $task->id");
                 if ($this->post->fileType == 'csv') {
                     $task->desc = htmlspecialchars_decode($task->desc);
                     $task->desc = str_replace("<br />", "\n", $task->desc);
@@ -1481,7 +1502,7 @@ class task extends control
 
 
 
-                //if (!empty($task->parent)) $task->name = '[' . $taskLang->childrenAB . '] ' . $task->name; // oscar
+                if (!empty($task->parent)) $task->name = '[' . $taskLang->childrenAB . '] ' . $task->name; // oscar
 
                 if (!empty($task->team)) $task->name = '[' . $taskLang->multipleAB . '] ' . $task->name;
 
@@ -1491,6 +1512,13 @@ class task extends control
                 $task->canceledDate = substr($task->canceledDate, 0, 10);
                 $task->closedDate = substr($task->closedDate, 0, 10);
                 $task->lastEditedDate = substr($task->lastEditedDate, 0, 10);
+
+                // oscar[ pri is 0 should export 0 not null
+                if($task->pri == 0)
+                {
+                    $task->pri = '0';
+                }
+                // oscar[
 
                 /* Set related files. */
                 if (isset($relatedFiles[$task->id])) {
@@ -1536,6 +1564,13 @@ class task extends control
     public function ajaxGetBlueprintTasks()
     {
         $tasks = $this->task->ajaxGetBlueprintTasks();
+        $depts = $this->dept->getOptionMenu(); //oscar:
+        foreach ($tasks as $task) {
+            $task->deptName = $depts[$task->dept];
+        }
+        //$retTasks = new stdClass();
+        //$retTasks->tasks = $tasks;
+        //$retTasks->users = $this->user->getPairs('nodeleted|noclosed|noletter');
         die(json_encode($tasks));
     }
 
@@ -1562,7 +1597,7 @@ class task extends control
                 $task->module      = $tasks->module[$i];
                 $task->story      = $tasks->story[$i];
                 $task->dept      = $tasks->dept[$i];
-                $task->name      = $tasks->name[$i];
+                $task->name      = str_replace('[' . $this->lang->task->childrenAB . '] ', '', $tasks->name[$i]);
                 $task->pri      = $tasks->pri[$i];
                 $task->estimate      = $tasks->estimate[$i];
                 $task->estStarted      = $tasks->estStarted[$i];
@@ -1599,6 +1634,9 @@ class task extends control
                 }
                 else
                 {
+                    $task->openedBy = $this->app->user->account;
+                    $task->openedDate = helper::now();
+
                     $this->dao->insert(TABLE_TASK)->data($task)
                         ->autoCheck()
                         ->batchCheck($this->config->task->create->requiredFields, 'notempty')

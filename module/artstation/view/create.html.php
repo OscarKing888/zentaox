@@ -37,6 +37,13 @@ include '../../common/view/datepicker.html.php';
                 </tr>
 
                 <tr>
+                    <th><?php echo $lang->artstation->author; ?></th>
+                    <td class='text-left' id='ownerBox'>
+                        <?php echo html::select("owner", $deptUsers, $user, "class='form-control chosen' onchange=''"); ?>
+                    </td>
+                </tr>
+
+                <tr>
                     <th><?php echo $lang->artstation->type; ?></th>
                     <td class='text-left' id='typeBox'>
                         <?php echo html::select("type", (array)$lang->artstation->typeList, 0, "class='form-control chosen' onchange=''"); ?>

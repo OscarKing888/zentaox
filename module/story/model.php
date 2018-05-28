@@ -481,6 +481,9 @@ class storyModel extends model
             ->remove('files,labels,comment,needNotReview,uid')
             ->get();
         if($this->checkForceReview()) $story->status = 'changed';
+
+        $story->status = 'active';// oscar we don't require review
+
         $story = $this->loadModel('file')->processImgURL($story, $this->config->story->editor->change['id'], $this->post->uid);
         $this->dao->update(TABLE_STORY)->data($story, 'spec,verify')
             ->autoCheck()

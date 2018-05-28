@@ -86,6 +86,9 @@ class artstation extends control
         $stories = $this->story->getProjectStoryByProduct($product);
         //$stories = $this->story->getProjectStoryPairs(1);
         $this->view->stories = $stories;
+        $this->view->user = $this->app->user->account;
+        $this->loadModel('dept');
+        $this->dept->setupDeptUsers($this->view, $this->app->user->account, $this->app->user->dept);
         $this->display();
     }
 

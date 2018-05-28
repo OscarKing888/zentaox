@@ -165,7 +165,7 @@ class artstationModel extends model
     {
         $article = fixer::input('post')->specialchars($this->config->artstation->fields)
             ->add('createDate', helper::now())
-            ->add('owner', $this->app->user->account)
+            //->add('owner', $this->app->user->account)
             ->stripTags($this->config->artstation->editor->create['id'], $this->config->allowedTags)
             ->remove('files,labels')
             ->get();

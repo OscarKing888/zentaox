@@ -2119,13 +2119,20 @@ class project extends control
         $this->view->actions = $this->loadModel('action')->getList('project', $projectID);
         $this->view->users = $this->loadModel('user')->getPairs('noletter');
 
+        $this->app->user->currentPrj = $projectID;
+
+        /*
         $tasks = $this->dao->select()
             ->from(TABLE_TASK)
-            //->where('deleted')->eq(0)
-            //->andWhere('project')->eq($projectID)
+            ->where('deleted')->eq(0)
+            ->andWhere('project')->eq($projectID)
+            //->markRight(1)
             ->orderBy('id asc')
             ->fetchAll();
         $this->tasks = $tasks;
+        //*/
+        $this->tasks = array();
+
         //var_dump($tasks);
         //$this->grouptask($project->id, 'assignedTo');
         $this->display();

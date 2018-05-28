@@ -1596,15 +1596,15 @@ class taskModel extends model
         $myDepts = array_unique($myDepts);
         //*/
 
-        /*
-        error_log("### dept:" . $depts[$this->app->user->dept]);
+        //*
+        error_log("### dept:" . $this->view->depts[$this->app->user->dept]);
         foreach ($deptUsers as $deptUser) {
-            error_log("### deptuser:$deptUser");
+            //error_log("### deptuser:$deptUser");
         }
 
-        foreach($myDepts as $d)
+        foreach($myDepts as $d => $v)
         {
-            error_log("### My Depts --- $d:" . $depts[$d]);
+            error_log("### My Depts --- $d:$v");
         }
         //*/
 
@@ -1612,6 +1612,7 @@ class taskModel extends model
 
 
         //baseDAO::dumpsql(true);
+        //error_log("oscar: getProjectTasks type:$type");
 
         if(is_string($type)) $type = strtolower($type);
         $tasks = $this->dao->select('t1.*, t2.id AS storyID, t2.title AS storyTitle, t2.product, t2.branch, t2.version AS latestStoryVersion, t2.status AS storyStatus, t3.realname AS assignedToRealName')
@@ -1624,11 +1625,12 @@ class taskModel extends model
             ->beginIF(!in_array($type, array('assignedtome', 'myinvolved')))->andWhere('t1.parent')->eq(0)->fi()
 
             // oscar:
+
             ->beginIF($type == 'mydept')
-                ->andWhere('t1.dept')->in(array_values($myDepts))
+                ->andWhere('t1.dept', true)->in(array_values($myDepts))
                 //->andWhere('t1.dept', true)->in(array_values($myDepts))
                 //->orWhere('t1.assignedTo')->in(array_values($deptUsers))
-                //->markRight(1)
+                ->markRight(1)
             ->fi()
             // oscar:
 
@@ -1686,7 +1688,7 @@ class taskModel extends model
             ->beginIF($type == 'assignedtome')->andWhere('t1.assignedTo')->eq($this->app->user->account)->fi()
             ->beginIF($type == 'finishedbyme')->andWhere('t1.finishedby')->eq($this->app->user->account)->fi()
             ->beginIF($type == 'delayed')->andWhere('t1.deadline')->gt('1970-1-1')->andWhere('t1.deadline')->lt(date(DT_DATE1))->andWhere('t1.status')->in('wait,doing')->fi()
-            ->beginIF(is_array($type) or strpos(',all,undone,needconfirm,assignedtome,delayed,finishedbyme,myinvolved,', ",$type,") === false)->andWhere('t1.status')->in($type)->fi()
+            ->beginIF($type != 'mydept' and (is_array($type) or strpos(',all,undone,needconfirm,assignedtome,delayed,finishedbyme,myinvolved,', ",$type,") === false))->andWhere('t1.status')->in($type)->fi()
             ->beginIF($modules)->andWhere('t1.module')->in($modules)->fi()
             ->orderBy('t1.`id`,' . $orderBy)
             ->fetchAll('id');
@@ -2792,7 +2794,7 @@ class taskModel extends model
             ->from(TABLE_TASK)->alias('t1')
             ->leftJoin(TABLE_STORY)->alias('t2')->on('t1.story = t2.id')
             ->leftJoin(TABLE_USER)->alias('t3')->on('t1.assignedTo = t3.account')
-            //->where('t1.project')->eq((int)$projectID)
+            ->where('t1.project')->eq((int)$this->app->user->currentPrj)
             //->beginIF($moduleIdList)->andWhere('t1.module')->in($moduleIdList)->fi()
             ->andWhere('t1.deleted')->eq(0)
             ->orderBy('id asc')

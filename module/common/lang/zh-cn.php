@@ -380,7 +380,9 @@ $lang->webhook->menu   = $lang->admin->menu;
 /* 菜单分组。*/
 $lang->menugroup = new stdclass();
 $lang->menugroup->release     = 'product';
-$lang->menugroup->story       = 'product';
+//$lang->menugroup->story       = 'product'; // oscar
+$lang->menugroup->story       = 'project';
+
 $lang->menugroup->branch      = 'product';
 $lang->menugroup->productplan = 'product';
 $lang->menugroup->task        = 'project';
