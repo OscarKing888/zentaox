@@ -627,6 +627,7 @@ class baseDAO
         }
 
         self::$querys[] = $this->processKeywords($sql);
+        //error_log("=======oscar:$sql");
         return $sql;
     }
 
@@ -1104,7 +1105,7 @@ class baseDAO
             $checkFunc = 'check' . $funcName;
             if(validater::$checkFunc($value, $arg0, $arg1, $arg2) === false)
             {
-                $this->logError($funcName, $fieldName, $fieldLabel, $funcArgs);
+                $this->logError($funcName, $fieldName, $fieldLabel, $funcArgs, $value); // oscar
             }
         }
 
@@ -1220,7 +1221,7 @@ class baseDAO
      * @access public
      * @return void
      */
-    public function logError($checkType, $fieldName, $fieldLabel, $funcArgs = array())
+    public function logError($checkType, $fieldName, $fieldLabel, $funcArgs = array(), $val = 0)
     {
         global $lang;
         $error    = $lang->error->$checkType;
@@ -1259,6 +1260,8 @@ class baseDAO
                 }
             }
         }
+
+        $error = $error . " val:$val"; // oscar
         dao::$errors[$fieldName][] = $error;
     }
 

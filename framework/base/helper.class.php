@@ -459,6 +459,15 @@ class baseHelper
         date_add($date,date_interval_create_from_date_string($d));
         return date_format($date,"Y-m-d");
     }
+
+    static public function dayafter($from, $days)
+    {
+        $now = date($from);
+        $d = "$days days";
+        $date = date_create($now);
+        date_add($date,date_interval_create_from_date_string($d));
+        return date_format($date,"Y-m-d");
+    }
     // oscar
 
     /**

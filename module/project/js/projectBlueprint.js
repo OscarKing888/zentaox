@@ -377,6 +377,7 @@ function clampMinMaxOrigXY()
 {
 
     origY = Math.min(C_Taskbar_Height * 4 + 3 * C_RulerHeight, origY);
+    return;
     //origY = Math.max(-(C_Taskbar_Height + C_Taskbar_VSpace) * (g_drawYIdx), origY);
     origY = Math.max(-g_boundYMax, origY);
 
