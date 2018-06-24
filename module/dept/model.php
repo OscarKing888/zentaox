@@ -325,6 +325,15 @@ class deptModel extends model
             ->fetchPairs();
     }
 
+    public function getDeptUserPairsWithoutChilds($deptID = 0)
+    {
+        return $this->dao->select('account, realname')->from(TABLE_USER)
+            ->where('deleted')->eq(0)
+            ->beginIF($deptID)->andWhere('dept')->eq($deptID)->fi()
+            ->orderBy('account')
+            ->fetchPairs();
+    }
+
     /**
      * Delete a department.
      *
@@ -449,11 +458,40 @@ class deptModel extends model
         }
 
 
+        ksort($leadersPair);
         $view->leaders = $leadersPair;
         $view->deptLeaders = $leaders;
         $view->dept = $dept;
         $view->user = $account;
-        $view->deptUsers = $deptUsers;
+        if($this->app->user->account == 'dengdapeng'
+        //|| $this->app->user->account == 'chenwang'
+        )
+        {
+            $artDepts = $this->getAllChildId($this->app->user->dept);
+            $artLeaders = array();
+            foreach ($artDepts as $k) {
+                if(array_key_exists($k, $leaders))
+                {
+                    $artLeaders[$leaders[$k]] = $allUsers[$leaders[$k]];
+                }
+            }
+            ksort($artLeaders);
+
+            $deptUsers = $this->getDeptUserPairsWithoutChilds($this->app->user->dept);
+            foreach ($deptUsers as $act => $user) {
+                $firstLetter = ucfirst(substr($act, 0, 1)) . ':';
+                $deptUsers[$act] = $firstLetter . $user;
+            }
+
+            //$deptUsers = array_unique($deptUsers);
+            sort($deptUsers);
+            $deptUsers = array_merge($artLeaders, $deptUsers);
+            $view->deptUsers = $deptUsers;
+        }
+        else
+        {
+            $view->deptUsers = $deptUsers;
+        }
         $view->depts = $this->getOptionMenu();
 
         /*

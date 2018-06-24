@@ -168,7 +168,7 @@
                         //echo html::select("batchCreateRootTask[$story->id]", $pipeline, 0, 'class="hiddens"');
 
                         $pipeline[-1] = "无";
-                        echo html::select("batchCreateRootTask_$story->id", $pipeline, -1, "onchange=\"on_createRootTask('$story->project', '$story->id', '$productID')\"");
+                        echo html::select("batchCreateRootTask_$story->id", $pipeline, -1, "onchange=\"on_createRootTask('$story->project', '$story->id', '$story->title', '$productID')\"");
 
                         /*
                         echo "<div class='btn-group'>";

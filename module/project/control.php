@@ -191,6 +191,7 @@ class project extends control
         $memberPairs = array();
         foreach ($this->view->teamMembers as $key => $member) $memberPairs[$key] = $member->realname;
 
+
         $showModule = !empty($this->config->datatable->projectTask->showModule) ? $this->config->datatable->projectTask->showModule : '';
         $this->view->modulePairs = $showModule ? $this->tree->getModulePairs($projectID, 'task', $showModule) : array();
 

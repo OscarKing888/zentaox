@@ -156,6 +156,29 @@ class pipeline extends control
         $this->locate(inlink('restore'));
     }
 
+    public function batchCreateRootTaskWithConfirm()
+    {
+        $projectID = 0;
+        $pipelineID = 0;
+        $storyID = 0;
+        $productID = 0;
+
+        if(!empty($_POST)) {
+            $postVals = fixer::input('post')
+                ->get();
+            $projectID = $postVals->projectID;
+            $pipelineID = $postVals->pipelineID;
+            $storyID = $postVals->storyID;
+            $productID = $postVals->productID;
+        }
+        else
+        {
+            return false;
+        }
+
+        $this->display();
+    }
+
     public function batchCreateRootTask()
     {
         $projectID = 0;
@@ -213,7 +236,8 @@ class pipeline extends control
                 $task->left = 0;
                 //$task->build = 0;
                 $task->status = 'wait';
-                $task->estStarted = '0000-00-00';
+                $task->estStarted = helper::nowafter(5);
+                $task->deadline =  helper::nowafter(10);
                 $task->openedBy = $this->app->user->account;
                 $task->openedDate = helper::now();
                 $task->pipeline = $pipelineID;
@@ -224,7 +248,7 @@ class pipeline extends control
                     ->autoCheck()
                     ->batchCheck($this->config->task->create->requiredFields, 'notempty')
                     //->checkIF($task->estimate != '', 'estimate', 'float')
-                    ->checkIF($task->deadline != '0000-00-00', 'deadline', 'ge', $task->estStarted)
+                    //->checkIF($task->deadline != '0000-00-00', 'deadline', 'ge', $task->estStarted)
                     //->check($task->deadline != '0000-00-00', 'deadline')
                     ->exec();
 

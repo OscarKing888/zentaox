@@ -478,7 +478,7 @@ class task extends control
 
     public function batchSetWorkhour()
     {
-        //*
+        /*
         $msg = " count:" . count($_POST) . "  ";
         $msg .= " workHour:" . $this->post->workHour . "  ";
 
@@ -496,7 +496,7 @@ class task extends control
         if (!empty($_POST)) {
             //error_log( var_export($_POST));
 
-            $assignedTo = $this->post->workHour;
+            $estimate = $this->post->workHour;
             $taskIDList = $this->post->taskIDList;
             //$taskIDList = array_unique($taskIDList);
             //unset($_POST['taskIDList']);
@@ -507,9 +507,25 @@ class task extends control
             //echo js::alert("batchSetWorkhour: $msg");
             //echo $msg;
 
+            $workDays = Math.ceil($estimate / 8);
+
+
             foreach ($taskIDList as $taskID) {
+
+
+                $oldTask = $this->task->getById($taskID);
+
+                $deadline = helper::dayafter($oldTask->estStarted, $workDays);
+                //error_log("assign task:" . $oldTask->name . " newDeadline:" . $deadline. " deadline:" . $oldTask->deadline);
+
+                $dat = new stdClass();
+                $dat->estimate = $estimate;
+                $dat->deadline = $deadline;
+
                 $this->dao->update(TABLE_TASK)
-                    ->set('estimate')->eq($assignedTo)
+                    ->data($dat)
+                    //->set('estimate')->eq($assignedTo)
+                    //->set('deadline')->eq($deadline)
                     ->where('id')->eq($taskID)->exec();
 
                 //$this->loadModel('action');
@@ -1586,6 +1602,8 @@ class task extends control
 
         if (!empty($_POST)) {
 
+            //$this->dao->begin();
+
             $tasks = fixer::input('post')->get();
             $batchNum = count(reset($tasks));
             for($i = 0; $i < $batchNum; ++$i)
@@ -1606,14 +1624,27 @@ class task extends control
 
                 $oldTask = $this->dao->select('*')->from(TABLE_TASK)->where('id')->eq((int)$taskId)->fetch();
 
-                error_log("oscar: id:$taskId start:$task->estStarted deadline:$task->deadline");
+                if($task->estStarted == '0000-00-00')
+                {
+                    //$this->dao->rollBack();
+                    die(js::error("任务[$taskId]预计开始日期不正确，注意:这个任务之前的任务都已经成功更新或添加，如果是新建任务请删除此任务前的ID为0的行再重新粘贴,否则会重复创建！"));
+                }
+
+                if($task->deadline == '0000-00-00')
+                {
+                    //$this->dao->rollBack();
+                    die(js::error("任务[$taskId]截止日期不正确，注意:这个任务之前的任务都已经成功更新或添加，如果是新建任务请删除此任务前的ID为0的行再重新粘贴,否则会重复创建！"));
+                }
+
+                //error_log("oscar: id:$taskId start:$task->estStarted deadline:$task->deadline");
 
                 if(!empty($oldTask))
                 {
                     $this->dao->update(TABLE_TASK)->data($task)
                         ->autoCheck()
                         ->batchCheckIF($task->status != 'cancel', $this->config->task->edit->requiredFields, 'notempty')
-                        ->checkIF($task->deadline != '0000-00-00', 'deadline', 'ge', $task->estStarted)
+                        //->checkIF($task->estStarted != '0000-00-00', 'estStarted')
+                        //->checkIF($task->deadline != '0000-00-00', 'deadline', 'ge', $task->estStarted)
 
                         ->checkIF($task->estimate != false, 'estimate', 'float')
                         ->checkIF($task->left     != false, 'left',     'float')
@@ -1628,7 +1659,8 @@ class task extends control
 
                         ->checkIF($task->status == 'closed', 'closedReason', 'notempty')
                         ->batchCheckIF($task->closedReason == 'cancel', 'finishedBy, finishedDate', 'empty')
-                        ->where('id')->eq((int)$taskId)->exec();
+                        ->where('id')->eq((int)$taskId)
+                        ->exec();
 
                     $this->task->computeWorkingHours($oldTask->parent);
                 }
@@ -1641,14 +1673,20 @@ class task extends control
                         ->autoCheck()
                         ->batchCheck($this->config->task->create->requiredFields, 'notempty')
                         //->checkIF($task->estimate != '', 'estimate', 'float')
-                        ->checkIF($task->deadline != '0000-00-00', 'deadline', 'ge', $task->estStarted)
+                        //->checkIF($task->estStarted != '0000-00-00', 'estStarted')
+                        //->checkIF($task->deadline != '0000-00-00', 'deadline', 'ge', $task->estStarted)
                         //->check($task->deadline != '0000-00-00', 'deadline')
                         ->exec();
                 }
 
-                if (dao::isError()) die(js::error(dao::getError()));
+                if (dao::isError()){
+                    //$this->dao->rollBack();
+                    die(js::error(dao::getError()));
+                }
             }
 
+
+            //$this->dao->commit();
 
             /* Locate the browser. */
             if ($iframe) die(js::reload('parent.parent'));

@@ -282,6 +282,10 @@ class taskModel extends model
         $assignedTo       = 0; //oscar:
         //$dept = 0;
 
+        $leaders = $this->dao->select('dept,username')->from(TABLE_GAMEGROUPLEADERS)
+            ->orderBy('dept asc')
+            ->fetchPairs();
+
         for($i = 0; $i < $batchNum; $i++)
         {
             $story      = !isset($tasks->story[$i]) || $tasks->story[$i]           == 'ditto' ? $story     : $tasks->story[$i];
@@ -300,7 +304,7 @@ class taskModel extends model
             $data[$i]->story      = (int)$story;
             $data[$i]->type       = $type;
             $data[$i]->module     = (int)$module;
-            $data[$i]->assignedTo = $assignedTo;
+            $data[$i]->assignedTo = $leaders[$dept];
             $data[$i]->color      = $tasks->color[$i];
             $data[$i]->name       = $tasks->name[$i];
             $data[$i]->desc       = nl2br($tasks->desc[$i]);
@@ -719,6 +723,12 @@ class taskModel extends model
         $now        = helper::now();
         $allChanges = array();
         $oldTasks   = $this->getByList($taskIDList);
+
+        $this->loadModel('dept');
+        $leaders = $this->dao->select('dept,username')->from(TABLE_GAMEGROUPLEADERS)
+            ->orderBy('dept asc')
+            ->fetchPairs();
+
         foreach($taskIDList as $taskID)
         {
             $oldTask = $oldTasks[$taskID];
@@ -728,7 +738,7 @@ class taskModel extends model
             $task->lastEditedBy   = $this->app->user->account;
             $task->lastEditedDate = $now;
             $task->dept         = $dept;
-            $task->assignedTo = '';
+            $task->assignedTo = $leaders[$dept];
 
             $this->dao->update(TABLE_TASK)->data($task)->autoCheck()->where('id')->eq((int)$taskID)->exec();
             if(!dao::isError()) $allChanges[$taskID] = common::createChanges($oldTask, $task);
@@ -886,7 +896,7 @@ class taskModel extends model
 
         $now  = helper::now();
         $task = new stdClass();
-        $task->assignedTo = $this->app->user->account;
+        //$task->assignedTo = $this->app->user->account;
         $task->lastEditedBy = $this->app->user->account;
         $task->lastEditedDate = $now;
         $task->realStarted = $now;
@@ -894,7 +904,7 @@ class taskModel extends model
 
         if($oldTask->assignedTo != $this->app->user->account)
         {
-            $task->assignedDate = $now;
+            //$task->assignedDate = $now;
         }
         /*
         $task = fixer::input('post')
@@ -1596,7 +1606,7 @@ class taskModel extends model
         $myDepts = array_unique($myDepts);
         //*/
 
-        //*
+        /*
         error_log("### dept:" . $this->view->depts[$this->app->user->dept]);
         foreach ($deptUsers as $deptUser) {
             //error_log("### deptuser:$deptUser");
@@ -2797,10 +2807,38 @@ class taskModel extends model
             ->where('t1.project')->eq((int)$this->app->user->currentPrj)
             //->beginIF($moduleIdList)->andWhere('t1.module')->in($moduleIdList)->fi()
             ->andWhere('t1.deleted')->eq(0)
-            ->orderBy('id asc')
+            //->andWhere('t1.id')->lt(1200)
+            //->andWhere('t1.status')->eq('doing')
+            //->groupBy('assignedTo')
+            ->orderBy('dept_asc,assignedTo_asc,estStarted_asc')
+            ->limit(200)
             //->page($pager)
             ->fetchAll();
 
+        //foreach ($tasks as $k => $taskGroup) {
+            //error_log("==== task: $k -> $taskGroup->id $taskGroup->name");
+        //}
+        /*
+        $procTasks = array();
+
+        error_log(" gggggggggggg:" . var_dump($tasks));
+
+        $idx = 0;
+        foreach ($tasks as $k => $taskGroup)
+        {
+            error_log("task:", $k, $taskGroup);
+
+            foreach ($taskGroup as $k2 => $task)
+            {
+                error_log(" task2:", $k2);
+                $procTasks[$idx] = $task;
+                $idx++;
+            }
+
+        }
+        //*/
+
+        //return $tasks;
 
         if($tasks)
         {

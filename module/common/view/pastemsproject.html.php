@@ -64,6 +64,7 @@
             data = data.replace(/月/g, "-");
             data = data.replace(/日/g, "");
             data = data.replace("[子]", "");
+            //data = data.replace(/\//g, "-");
 
             var fields = data.split("\t");
             //console.log("oscar: paste data count:" + fields.length + " dat: " + data);
@@ -130,13 +131,16 @@
 
             idField = $('form tbody tr').eq(index).find("input[id*='estStarted']");
             var datStr = fields[idx_estStarted];
+            datStr = datStr.replace(/\//g, "-");
             var datStrLst = datStr.split('-');
             var newDatStr = datStrLst[0] + "-" + ("0" + datStrLst[1]).slice(-2) + "-" + ("0" + datStrLst[2]).slice(-2);
-            console.warn("date -> local", datStr, newDatStr);
+            //console.warn("date -> local", datStr, newDatStr);
             $(idField).val(newDatStr);
 
             idField = $('form tbody tr').eq(index).find("input[id*='deadline']");
-            $(idField).val(fields[idx_deadline]);
+            var datStr = fields[idx_deadline];
+            datStr = datStr.replace(/\//g, "-");
+            $(idField).val(datStr);
 
             idField = $('form tbody tr').eq(index).find("select[id*='assignedTo']");
             v = getSelectOptionsValue(idField, fields[idx_assignedTo]);

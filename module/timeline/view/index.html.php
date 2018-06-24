@@ -23,12 +23,22 @@
     <div class='actions'>
         <div class='btn-group'>
 
-            <button type="select" onclick="onShowDelayOnly()">延</button>
-            <button onclick="onZoomDay()">日</button>
-            <button onclick="onZoomWeek()">周</button>
-            <button onclick="onZoomMonth()">月</button>
+            <button onclick="onZoomDay()">D</button>
+            <button onclick="onZoomMonth()">M</button>
+            <button onclick="onZoomYear()">Y</button>
+            <button onclick="onZoom10Years()">10Y</button>
+            <button onclick="onZoom100Years()">100Y</button>
+            <button onclick="onZoom1000Years()">1KY</button>
 
             <button onclick="onOrigi()">O</button>
+            <button onclick="<?php echo html::a(inlink('create')); ?>">+</button>
+
+            <?php
+            $lnk = html::a(inlink('create'),
+                "<i class='icon icon-plus'></i>" . $lang->timeline->add,
+                "", "class='btn'");
+            echo $lnk;
+            ?>
         </div>
         <?php
         echo "<div class='btn-group'>";

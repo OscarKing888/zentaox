@@ -17,63 +17,85 @@ myDate.toLocaleString( ); //获取日期与时间
 
  */
 
-const C_TaskColor_Pending = "#0080c8";
-const C_TaskColor_Completed = "#64c800";
-const C_TaskColor_Warning = "#ff8000";
-const C_TaskColor_Delay = "#AA0000";
-const C_TaskColor_ErrorStart = "#FFEE00";
-const C_TaskColor_Closed = "#888888";
-const C_TaskColor_Pause = "#880088";
-//const C_TaskColor_Cancel = "#440000";
-const C_TaskColor_Cancel = "#AAAAAA";
+const C_EventColor_Pending = "#0080c8";
+const C_EventColor_Completed = "#64c800";
+const C_EventColor_Warning = "#ff8000";
+const C_EventColor_Delay = "#AA0000";
+const C_EventColor_ErrorStart = "#FFEE00";
+const C_EventColor_Closed = "#888888";
+const C_EventColor_Pause = "#880088";
+//const C_EventColor_Cancel = "#440000";
+const C_EventColor_Cancel = "#AAAAAA";
 
-const C_TaskColor_StartNotSet = "#ff0000";
+const C_EventColor_StartNotSet = "#ff0000";
 
-const C_TaskNameColor = "#000000";
-//const C_TaskNameFont = "16px 新宋体";
-const C_TaskUserNameColor = "#d10054";
-const C_TaskUserDeptColor = "#006ea5";
+const C_EventNameColor = "#000000";
+//const C_EventNameFont = "16px 新宋体";
+const C_EventUserNameColor = "#d10054";
+const C_EventUserDeptColor = "#006ea5";
 
 var EDrawUnit =
-{
-    "day" : 0,
-    "week" : 1,
-    "month" : 2,
-    "season" : 3
-};
+    {
+        "day" : 0,
+        "week" : 1,
+        "month" : 2,
+        "season" : 3
+    };
 
-var C_Taskbar_DayUnit = 32;
-var C_Taskbar_Height = 10;
-var C_Taskbar_VSpace = 20;
 
-var C_TaskNameFont = "20px 微软雅黑";
-var C_RulerFont = "14pt Calibri";
-var C_FontHeight = 20;
-var C_RulerHeight = 24;
+var EDrawMode =
+    {
+        "day" : 0,
+        "month" : 1,
+        "year" : 2,
+        "years10" : 3,
+        "years100" : 4,
+        "years1000" : 5
+    };
 
+var EDrawColor =
+    {
+        0 : "#0080c8",
+        1 : "#ff0000",
+        2 : "#64c800",
+        3 : "#880088",
+        4 : "#ff8000"
+    };
+
+var g_drawMode = EDrawMode.years100;
+
+var C_Eventbar_DayUnit = 0.005;
+var C_Eventbar_Height = 6;
+var C_Eventbar_VSpace = 20;
+
+var C_EventNameFont = "12px 微软雅黑";
+var C_RulerFont = "12pt Calibri";
+var C_FontHeight = 8;
+var C_RulerHeight = 15;
+var C_FontOffset = 3;
 
 var origX = 200;
-var origY = C_RulerHeight * 3;
+var C_RulerRows = 2;
+var origY = C_RulerHeight * C_RulerRows;
 
 var lastX = -1;
 var lastY = 0;
 
-var g_tasks = [];
+var g_events = [];
 var canvas = null;
 var context = null;
 var mouseIsDown = false;
 
 var drawType = EDrawUnit.day;
 
-var g_showDelayOnly = false;
-var g_minTaskDate = Date.now();
-var g_maxTaskDate = Date.now();
-var g_maxTaskDays = 1;
 
 var g_drawYIdx = 0;
 var g_boundYMax = 0;
 var g_boundXMin = 0;
 var g_boundXMax = 0;
+
+var g_eventFirst = null;
+var g_eventLast = null;
 
 Date.prototype.addDays = function(days) {
     var dat = new Date(this.valueOf());
@@ -84,56 +106,83 @@ Date.prototype.addDays = function(days) {
 function onOrigi()
 {
     origX = canvas.width / 3 * 1;
-    origY = C_Taskbar_Height * 4 + C_RulerHeight * 3;
+    origY = C_Eventbar_Height * 4 + C_RulerHeight * C_RulerRows;
     redraw();
 }
 
-function onShowDelayOnly()
-{
-    g_showDelayOnly = !g_showDelayOnly;
-    console.log("show delay:", g_showDelayOnly);
-    redraw();
-}
 
 function onZoomIn()
 {
     //alert("onZoomIn");
-    C_Taskbar_DayUnit = Math.min(C_Taskbar_DayUnit + 5, 30);
+    C_Eventbar_DayUnit = Math.min(C_Eventbar_DayUnit + 5, 30);
     redraw();
 }
 
 function onZoomOut()
 {
     //alert("onZoomOut");
-    C_Taskbar_DayUnit = Math.max(C_Taskbar_DayUnit - 5, 2);
+    C_Eventbar_DayUnit = Math.max(C_Eventbar_DayUnit - 5, 2);
     redraw();
 }
 
-function onZoomDay()
+function onZoom1000Years()
 {
-    drawType = EDrawUnit.day;
-    C_Taskbar_DayUnit = 32;
-    C_Taskbar_Height = 10;
-    C_Taskbar_VSpace = 20;
+    g_drawMode = EDrawMode.years1000;
+    C_Eventbar_DayUnit = 0.001;
+    C_Eventbar_Height = 6;
+    C_Eventbar_VSpace = 20;
 
-    C_TaskNameFont = "20px 微软雅黑";
-    C_RulerFont = "14pt Calibri";
-    C_FontHeight = 20;
-    C_RulerHeight = 24;
+    C_EventNameFont = "12px 微软雅黑";
+    C_RulerFont = "12pt Calibri";
+    C_FontHeight = 8;
+    C_RulerHeight = 15;
+    C_FontOffset = 4;
 
     redraw();
 }
 
-function onZoomWeek()
+function onZoom100Years()
 {
-    drawType = EDrawUnit.week;
-    C_Taskbar_DayUnit = 24;
-    C_Taskbar_Height = 8;
-    C_Taskbar_VSpace = 15;
+    g_drawMode = EDrawMode.years100;
+    C_Eventbar_DayUnit = 0.005;
+    C_Eventbar_Height = 6;
+    C_Eventbar_VSpace = 20;
 
-    C_TaskNameFont = "14px 微软雅黑";
+    C_EventNameFont = "12px 微软雅黑";
+    C_RulerFont = "12pt Calibri";
+    C_FontHeight = 8;
+    C_RulerHeight = 15;
+    C_FontOffset = 3;
+
+    redraw();
+}
+
+function onZoom10Years()
+{
+    g_drawMode = EDrawMode.years10;
+    C_Eventbar_DayUnit = 0.01;
+    C_Eventbar_Height = 6;
+    C_Eventbar_VSpace = 20;
+
+    C_EventNameFont = "12px 微软雅黑";
     C_RulerFont = "8pt Calibri";
-    C_FontHeight = 12;
+    C_FontHeight = 8;
+    C_RulerHeight = 15;
+    C_FontOffset = 3;
+
+    redraw();
+}
+
+function onZoomYear()
+{
+    g_drawMode = EDrawMode.year;
+    C_Eventbar_DayUnit = 0.1;
+    C_Eventbar_Height = 8;
+    C_Eventbar_VSpace = 20;
+
+    C_EventNameFont = "12px 微软雅黑";
+    C_RulerFont = "8pt Calibri";
+    C_FontHeight = 8;
     C_RulerHeight = 15;
 
     redraw();
@@ -141,25 +190,32 @@ function onZoomWeek()
 
 function onZoomMonth()
 {
-    drawType = EDrawUnit.month;
-    C_Taskbar_DayUnit = 16;
-    C_Taskbar_Height = 8;
-    C_Taskbar_VSpace = 8;
+    g_drawMode = EDrawMode.month;
+    C_Eventbar_DayUnit = 1;
+    C_Eventbar_Height = 8;
+    C_Eventbar_VSpace = 20;
 
-    C_TaskNameFont = "12px 微软雅黑";
+    C_EventNameFont = "12px 微软雅黑";
     C_RulerFont = "8pt Calibri";
-    C_FontHeight = 12;
+    C_FontHeight = 6;
     C_RulerHeight = 15;
     redraw();
 }
 
-
-function onZoomSeason()
+function onZoomDay()
 {
-    drawType = EDrawUnit.season;
-    C_Taskbar_DayUnit = 2;
+    g_drawMode = EDrawMode.day;
+    C_Eventbar_DayUnit = 8;
+    C_Eventbar_Height = 8;
+    C_Eventbar_VSpace = 20;
+
+    C_EventNameFont = "12px 微软雅黑";
+    C_RulerFont = "8pt Calibri";
+    C_FontHeight = 8;
+    C_RulerHeight = 15;
     redraw();
 }
+
 
 var g_weekDay =
     {
@@ -183,14 +239,93 @@ function drawRuler()
 
     ctx.fillStyle = "#dddddd";
     var ruleHeight = C_RulerHeight;
-    ctx.fillRect(0, 0, window.innerWidth, ruleHeight * 3);
+    //ctx.translate(0, 0);
+    ctx.fillRect(-canvas.width, 0, window.innerWidth * 2, ruleHeight * C_RulerRows);
 
     ctx.translate(origX, 0);
 
     context.font = C_RulerFont;
     context.fillStyle = 'black';
 
-    var cur = Date.now();
+    if(g_eventFirst == null)
+    {
+        console.log("g_eventFirst is null");
+        return;
+    }
+
+    if(g_eventLast == null)
+    {
+        console.log("g_eventLast is null");
+        return;
+    }
+
+    var beginDate = convertStringToDate(g_eventFirst.datebegin);
+    var endDate =  convertStringToDate(g_eventFirst.dateend);
+
+
+
+    var beginYear = new Date(beginDate).getFullYear();
+    var endYear = new Date(endDate).getFullYear();
+
+    // draw year
+    if(g_drawMode <= EDrawMode.year) {
+        for (var y = beginYear; y < endYear + 10000; ++y) {
+            var curDrawYear = new Date(y, 0, 0);
+            var nextDrawYear = new Date(y + 1, 0, 0);
+
+            var xy = dateToCoord(curDrawYear, 0);
+            var xy2 = dateToCoord(nextDrawYear, 0);
+
+            ctx.rect(xy[0], xy[1], xy2[0] - xy[0], ruleHeight);
+            var ymStr = y.toString();// + "-" + (nextMonth + 1).toString();// + "月";// + "   cur:" + curMonth;
+            ctx.fillText(ymStr, xy[0] + 8, xy[1] + C_FontHeight + 4);
+        }
+    }
+
+    if(g_drawMode == EDrawMode.years10) {
+        for (var y = beginYear; y < endYear + 10000; y += 10) {
+            var curDrawYear = new Date(y, 0, 0);
+            var nextDrawYear = new Date(y + 10, 0, 0);
+
+            var xy = dateToCoord(curDrawYear, 0);
+            var xy2 = dateToCoord(nextDrawYear, 0);
+
+            ctx.rect(xy[0], xy[1], xy2[0] - xy[0], ruleHeight);
+            var ymStr = y.toString();// + "-" + (nextMonth + 1).toString();// + "月";// + "   cur:" + curMonth;
+            ctx.fillText(ymStr, xy[0] + 8, xy[1] + C_FontHeight + 4);
+        }
+    }
+
+    if(g_drawMode == EDrawMode.years100) {
+        for (var y = beginYear; y < endYear + 10000; y += 100) {
+            var curDrawYear = new Date(y, 0, 0);
+            var nextDrawYear = new Date(y + 100, 0, 0);
+
+            var xy = dateToCoord(curDrawYear, 0);
+            var xy2 = dateToCoord(nextDrawYear, 0);
+
+            ctx.rect(xy[0], xy[1], xy2[0] - xy[0], ruleHeight);
+            var ymStr = y.toString();// + "-" + (nextMonth + 1).toString();// + "月";// + "   cur:" + curMonth;
+            ctx.fillText(ymStr, xy[0] + 8, xy[1] + C_FontHeight + 4);
+        }
+    }
+
+    if(g_drawMode == EDrawMode.years1000) {
+        for (var y = beginYear; y < endYear + 10000; y += 1000) {
+            var curDrawYear = new Date(y, 0, 0);
+            var nextDrawYear = new Date(y + 1000, 0, 0);
+
+            var xy = dateToCoord(curDrawYear, 0);
+            var xy2 = dateToCoord(nextDrawYear, 0);
+
+            ctx.rect(xy[0], xy[1], xy2[0] - xy[0], ruleHeight);
+            var ymStr = y.toString();// + "-" + (nextMonth + 1).toString();// + "月";// + "   cur:" + curMonth;
+            ctx.fillText(ymStr, xy[0] + 8, xy[1] + C_FontHeight + 4);
+        }
+    }
+
+    /*
+    var cur = beginDate;
     var curMonth = new Date(cur).getMonth();
     var curYear = new Date(cur).getFullYear();
 
@@ -208,7 +343,7 @@ function drawRuler()
         var xy2 = dateToCoord(nextDate2, 0);
 
         ctx.rect(xy[0], xy[1], xy2[0] - xy[0], ruleHeight);
-        var ymStr = nextYear.toString() + "年" + (nextMonth + 1).toString() + "月";// + "   cur:" + curMonth;
+        var ymStr = nextYear.toString() + "-" + (nextMonth + 1).toString();// + "月";// + "   cur:" + curMonth;
         ctx.fillText(ymStr, xy[0] + 8, xy[1] + C_FontHeight);
     }
 
@@ -232,35 +367,29 @@ function drawRuler()
         }
 
         // draw days
-        ctx.fillRect(xy[0], xy[1] + ruleHeight * 1, C_Taskbar_DayUnit, ruleHeight);
-        ctx.rect(xy[0], xy[1] + ruleHeight * 1, C_Taskbar_DayUnit, ruleHeight);
+        ctx.fillRect(xy[0], xy[1] + ruleHeight * 1, C_Eventbar_DayUnit, ruleHeight);
+        ctx.rect(xy[0], xy[1] + ruleHeight * 1, C_Eventbar_DayUnit, ruleHeight);
         var dayStr = nextDate.getDate().toString();
         var dayStrWidth = ctx.measureText(dayStr).width;
 
-
-        // draw weekdays
-        ctx.fillRect(xy[0], xy[1] + ruleHeight * 2, C_Taskbar_DayUnit, ruleHeight);
-        ctx.rect(xy[0], xy[1] + ruleHeight * 2, C_Taskbar_DayUnit, ruleHeight);
-        var weekdayStr = g_weekDay[weekDay];
-        var weekdayStrWidth = ctx.measureText(weekdayStr).width;
-
         ctx.fillStyle = "black";
-        ctx.fillText(dayStr, xy[0] + (C_Taskbar_DayUnit - dayStrWidth) / 2, xy[1] + C_FontHeight + ruleHeight * 1);
-        ctx.fillText(weekdayStr, xy[0] + (C_Taskbar_DayUnit - weekdayStrWidth) / 2, xy[1] + C_FontHeight + ruleHeight * 2);
-        //console.log("draw ruler day:", xy, nextDate.getDaysInMonth());
+        ctx.fillText(dayStr, xy[0] + (C_Eventbar_DayUnit - dayStrWidth) / 2, xy[1] + C_FontHeight + ruleHeight * 1);
     }
 
     //ctx.fillText("ssssssssssssssssssssssssssss", 100, 10);
+*/
 
+    var weekendClr = "#aaaaaa";
+    var weekdayClr = "#eeeeee";
     ctx.stroke();
 
     ctx.translate(-origX, 0);
     ctx.fillStyle = weekdayClr;
-    ctx.fillRect(canvas.width - ruleHeight/2, ruleHeight * 3, ruleHeight/2, g_boundYMax);
+    ctx.fillRect(canvas.width - ruleHeight/2, ruleHeight * C_RulerRows, ruleHeight/2, g_boundYMax);
 
     ctx.fillStyle = weekendClr;
     var scrollPos = Math.abs(origY) / Math.abs(g_boundYMax) * canvas.height;
-    ctx.fillRect(canvas.width - ruleHeight/2, ruleHeight * 3 + scrollPos, ruleHeight / 2, ruleHeight / 2);
+    ctx.fillRect(canvas.width - ruleHeight/2, ruleHeight * C_RulerRows + scrollPos, ruleHeight / 2, ruleHeight / 2);
 
     //*
     //if(mouseIsDown)
@@ -270,7 +399,7 @@ function drawRuler()
 
         ctx.fillStyle = weekendClr;
         var scrollPosX =((origX) / (g_boundXMax - g_boundXMin)) * canvas.width;
-        ctx.fillRect(scrollPosX, canvas.height - ruleHeight / 2, C_Taskbar_DayUnit, ruleHeight / 2);
+        ctx.fillRect(scrollPosX, canvas.height - ruleHeight / 2, C_Eventbar_DayUnit, ruleHeight / 2);
 
         console.warn("ox:%d oy:%d pos:%f minX:%d maxX:%d maxY:%d", origX, origY, scrollPosX, g_boundXMin, g_boundXMax, g_boundYMax);
     }
@@ -284,10 +413,6 @@ function drawMiniMap()
 
 }
 
-function test()
-{
-    alert("test");
-}
 
 function days_between(date1, date2) {
 
@@ -327,8 +452,8 @@ function print_call_stack() {
 $(function()
 {
     //alert("init()");
-    //console.log($("#tasks"));
-    //drawProjectBlueprint($("#tasks"));
+    //console.log($("#timelineEvents"));
+    //drawEvents($("#timelineEvents"));
     canvas = document.getElementById("projectCanvas");
     context = canvas.getContext('2d');
 
@@ -340,6 +465,7 @@ $(function()
 
     window.addEventListener("resize", resizeCanvas, false);
     resizeCanvas();
+    //onZoom100Years();
     onOrigi();
 });
 //*/
@@ -375,14 +501,14 @@ function onCanvasMouseOut(evt)
 
 function clampMinMaxOrigXY()
 {
-
-    origY = Math.min(C_Taskbar_Height * 4 + 3 * C_RulerHeight, origY);
-    //origY = Math.max(-(C_Taskbar_Height + C_Taskbar_VSpace) * (g_drawYIdx), origY);
-    origY = Math.max(-g_boundYMax, origY);
-
     return;
+
     origX = Math.max(g_boundXMin, origX);
-    origX = Math.min(g_boundXMax - C_Taskbar_Height, origX);
+    origX = Math.min(g_boundXMax - C_Eventbar_Height, origX);
+
+    origY = Math.min(C_Eventbar_Height * 4 + 3 * C_RulerHeight, origY);
+    //origY = Math.max(-(C_Eventbar_Height + C_Eventbar_VSpace) * (g_drawYIdx), origY);
+    origY = Math.max(-g_boundYMax, origY);
 
     //console.warn("ox:%d oy:%d minX:%d maxX:%d maxY:%d", origX, origY, g_boundXMin, g_boundXMax, g_boundYMax);
 }
@@ -450,12 +576,12 @@ function redraw()
     drawBg();
 
     //context.translate(0, 0);
-    drawProjectBlueprintGlobal();
+    drawEventsGlobal();
 
     drawRuler();
 
     //context.translate(0, 0);
-    drawDeadline();
+    drawCurrentDayLine();
 
     drawMiniMap();
 }
@@ -474,33 +600,48 @@ $(document).ready(function()
     //alert("doc.ready");
 
 
-    var tasks = ajaxGetTasks();
-    //alert("init:" + tasks);
+    var timelineEvents = ajaxGetEvents();
+    //alert("init:" + timelineEvents);
 
 });
 
 
-function ajaxGetTasks()
+function ajaxGetEvents()
 {
-    url = createLink('task', 'ajaxGetBlueprintTasks');
-    //alert("on_createUserAbsent userid:" + userid + " day:" + day + " url:" + url);
+    url = createLink('timeline', 'ajaxGetTimelineEvents');
+    //alert("ajaxGetEvents url:" + url);
 
-    var tasks = null;
+    var timelineEvents = null;
 
     //*
     $.getJSON(link, function(r)
     {
-        //console.log("ajaxGetTasks:", JSON.stringify(r));
-        g_tasks = r;
-        //canvas.height = ((g_tasks.length + 6) * (C_Taskbar_Height + C_Taskbar_VSpace));
+        //console.log("ajaxGetEvents:", JSON.stringify(r));
+        g_events = r;
+
+
+        if(r.length > 0)
+        {
+            g_eventFirst = r[0];
+            g_eventLast = r[0];
+        }
+
+        if(r.length > 1)
+        {
+            g_eventLast = r[r.length - 1];
+        }
+
+        console.log("begin:%s end:%s", g_eventFirst.datebegin, g_eventFirst.dateend);
+
+        //canvas.height = ((g_events.length + 6) * (C_Eventbar_Height + C_Eventbar_VSpace));
         //canvas.width = 4096;
         //canvas.height = 2080;
-        //console.log("==== w:" + document.width + " H:" + canvas.height + " tasks:" + g_tasks.length);
+        //console.log("==== w:" + document.width + " H:" + canvas.height + " timelineEvents:" + g_events.length);
 
-       redraw();
+        redraw();
 
 
-        //console.warn("blueprint tasks:", g_tasks, g_tasks.length);
+        //console.warn("blueprint timelineEvents:", g_events, g_events.length);
     });
     //*/
 
@@ -514,22 +655,22 @@ function ajaxGetTasks()
 
             success:  function(r)
             {
-                alert("ajaxGetTasks success:" + (r));
-                tasks = r;
+                alert("ajaxGetEvents success:" + (r));
+                timelineEvents = r;
             },
             error: function(error){
-                alert("ajaxGetTasks error:" + JSON.stringify(error));
+                alert("ajaxGetEvents error:" + JSON.stringify(error));
             },
             complete:function()
             {
-                //alert("ajaxGetTasks:complete");
+                //alert("ajaxGetEvents:complete");
             }
 
         });
 
     //*/
 
-    return tasks;
+    return timelineEvents;
 }
 
 function drawBg()
@@ -537,16 +678,16 @@ function drawBg()
     //var canvas = document.getElementById("projectCanvas");
     ctx = context;
     ctx.save();
-    ctx.translate(origX, origY);
+    ctx.translate(-canvas.width, 0);
     //canvas.setWidth(document.width);
     //alert("canvas:" + canvas.id + " docW:" + document.width);
     var ctx = canvas.getContext("2d");
-    ctx.fillStyle = "#ffFFff";
+    ctx.fillStyle = "#ffffff";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.restore();
 }
 
-function drawDeadline()
+function drawCurrentDayLine()
 {
     //var canvas = document.getElementById("projectCanvas");
     var ctx = context;//canvas.getContext("2d");
@@ -563,16 +704,16 @@ function drawDeadline()
 }
 
 
-function drawProjectBlueprintGlobal()
+function drawEventsGlobal()
 {
-    drawProjectBlueprint(g_tasks);
+    drawEvents(g_events);
 }
 
-function drawProjectBlueprint(tasks)
+function drawEvents(timelineEvents)
 {
-    //alert("drawProjectBlueprint:" + tasks.length);
+    //alert("drawEvents:" + timelineEvents.length);
 
-    //console.error("task len:", tasks.length);
+    //console.error("task len:", timelineEvents.length);
 
     //var canvas = document.getElementById("projectCanvas");
 
@@ -585,13 +726,13 @@ function drawProjectBlueprint(tasks)
 
     /*
     var idx = 0;
-    drawTask(ctx, "1 CRASH自动收集分析",  "2018-5-1", 24, 'done', idx++);
-    drawTask(ctx, "2 CRASH自动收集分析",  "2018-5-1", 32, 'doing', idx++);
-    drawTask(ctx, "3 CRASH自动收集分析",  "2018-5-2", 40, 'wait', idx++);
-    drawTask(ctx, "4 CRASH自动收集分析",  "2018-5-6", 48, 'wait', idx++);
+    drawEvent(ctx, "1 CRASH自动收集分析",  "2018-5-1", 24, 'done', idx++);
+    drawEvent(ctx, "2 CRASH自动收集分析",  "2018-5-1", 32, 'doing', idx++);
+    drawEvent(ctx, "3 CRASH自动收集分析",  "2018-5-2", 40, 'wait', idx++);
+    drawEvent(ctx, "4 CRASH自动收集分析",  "2018-5-6", 48, 'wait', idx++);
     //*/
 
-    ctx.fillStyle = C_TaskColor_Completed;
+    ctx.fillStyle = C_EventColor_Completed;
     //ctx.fillText("SSSSSSSSSSSSSSSSSSS", 0, C_FontHeight);
     //ctx.moveTo(0, 1000);
     //ctx.lineTo(4000, 4000);
@@ -601,26 +742,24 @@ function drawProjectBlueprint(tasks)
     g_boundXMin = 0;
     g_boundXMax = 0;
 
-    if(tasks != null)
+    if(timelineEvents != null)
     {
-        for(var i = 0; i < tasks.length; ++i)
+        for(var i = 0; i < timelineEvents.length; ++i)
         {
-            //console.log("   drawTasks:", JSON.stringify(tasks[i]));
-            //console.log("   drawTasks:", i, tasks[i].name);
+            //console.log("   drawtimelineEvents:", JSON.stringify(timelineEvents[i]));
+            //console.log("   drawtimelineEvents:", i, timelineEvents[i].name);
 
-            if(!g_showDelayOnly || (g_showDelayOnly && isTaskDelay(tasks[i])))
+
+            drawEvent(ctx, timelineEvents[i], timelineEvents[i].title, timelineEvents[i].datebegin, timelineEvents[i].dateend, g_drawYIdx);
+            ++g_drawYIdx;
+
+            //if(g_drawYIdx > 100)
             {
-                drawTask(ctx, tasks[i], tasks[i].id, tasks[i].name, tasks[i].assignedToRealName, tasks[i].deptName,  tasks[i].estStarted, tasks[i].estimate, tasks[i].status, g_drawYIdx);
-                ++g_drawYIdx;
-
-                //if(g_drawYIdx > 100)
-                {
-                    //console.error("break for 100 tasks");
-                   // break;
-                }
+                //console.error("break for 100 timelineEvents");
+                // break;
             }
-            //alert("task:" + tasks[i]);
-            //console.log("task[" + tasks[i].id + "]: " + tasks[i].name + " start:" + tasks[i].realStarted + " status:" + tasks[i].status);
+            //alert("task:" + timelineEvents[i]);
+            //console.log("task[" + timelineEvents[i].id + "]: " + timelineEvents[i].name + " start:" + timelineEvents[i].realStarted + " status:" + timelineEvents[i].status);
         }
     }
     ctx.stroke();
@@ -629,64 +768,26 @@ function drawProjectBlueprint(tasks)
 
 }
 
-function isTaskDelay(task)
-{
-    var start = convertStringToDate(task.estStarted);
-    var deadline = convertStringToDate(task.deadline);
-    var cur = Date.now();
-    var d = days_between(start, cur);
-    //var d = days_between(deadline, start);
-
-    var taskDays =  (1 + days_between(deadline, start));//Math.ceil(task.estimate / 8);
-
-   // console.log("isTaskDelay: staus:", task.status);
-
-    if(task.status == 'doing'
-    || task.status == 'wait')
-    {
-        if(d + taskDays <= 0)
-        {
-            //console.log("task is delay:", task.id, task.name);
-            return true;
-        }
-    }
-
-    return false;
-}
 
 //wait,doing,done,pause,cancel,closed
-function drawTask(ctx, task, id, name, user, dept, startDate, hours, status, idx) {
-    ctx.fillStyle = C_TaskNameColor;
-    ctx.font = C_TaskNameFont;
+function drawEvent(ctx, evt, title, begindate, enddate, idx) {
+    ctx.fillStyle = C_EventNameColor;
+    ctx.font = C_EventNameFont;
     //ctx.fillText("auto:" + name, 10, 30);
     var cur = Date.now();
 
-    var start = convertStringToDate(startDate);
+    var start = convertStringToDate(begindate);
+    var end = convertStringToDate(enddate);
 
     //alert(start);
 
-    var d = days_between(start, cur);
+    var d = days_between(start, end);
     //alert("days:" + d);
 
-    var deadline = convertStringToDate(task.deadline);
-    var taskDays =  (1 + days_between(deadline, start));//Math.ceil(task.estimate / 8);
-
-    //alert("taskDays:" + taskDays);
-
-    if(start > g_maxTaskDate)
-    {
-        g_maxTaskDate = start;
-        g_maxTaskDays = taskDays;
-    }
-    else if(start < g_minTaskDate)
-    {
-        g_minTaskDate = start;
-    }
-
-    //console.warn("==== drawTask start");
+    //var taskDays = Math.ceil(hours / 8);
 
     var xy = dateToCoord(start, idx);
-    var xyend = dateToCoord(new Date(start).addDays(taskDays), idx);
+    var xyend = dateToCoord(end, idx);
 
     /*
     if(Math.abs(xy[0] - origX) > 4000)
@@ -696,65 +797,12 @@ function drawTask(ctx, task, id, name, user, dept, startDate, hours, status, idx
     }
     */
 
-    ctx.fillStyle = C_TaskColor_Pending;
-    if (status == 'done') {
-        ctx.fillStyle = C_TaskColor_Completed;
-    }
+    ctx.fillStyle = EDrawColor[evt.type];
+    ctx.strokeStyle = "#000000";
 
-    //alert(ctx.fillStyle);
-
-    if (status == 'doing') {
-        if (d + taskDays < 0) {
-            ctx.fillStyle = C_TaskColor_Delay;
-        }
-        else if (d + taskDays < 2) {
-            ctx.fillStyle = C_TaskColor_Warning;
-        }
-    }
-
-    if (status == 'wait') {
-        if (d + 1 < 0) {
-            ctx.fillStyle = C_TaskColor_ErrorStart;
-        }
-    }
-
-    if (status == 'closed') {
-        ctx.fillStyle = C_TaskColor_Closed;
-    }
-
-    if (status == 'pause') {
-        ctx.fillStyle = C_TaskColor_Pause;
-    }
-
-    if (status == 'cancel') {
-        ctx.fillStyle = C_TaskColor_Cancel;
-    }
-
-    if (startDate == "0000-00-00") {
-        ctx.fillStyle = C_TaskColor_StartNotSet;
-        ctx.setLineDash([2]);
-        xy[0] = 0;
-        xyend[0] = taskDays * C_Taskbar_DayUnit;
-        name = "【" + startDate + "】 " + name;
-    }
-    else
-    {
-        ctx.setLineDash([0]);
-    }
-
-    //var xy = dateToCoord(start, idx);
-    //var xyend =  dateToCoord(new Date(start).addDays(taskDays), idx);
-    //xy = dateToCoord(start, idx);
-    //xyend =  dateToCoord(new Date(start).addDays(taskDays), idx);
-
-
-    //ctx.fillRect(xy[0], xy[1], xyend[0] - xy[0], xyend[1] - xy[1] + C_Taskbar_Height);
-
-    roundRect(ctx, xy[0], xy[1], xyend[0] - xy[0], xyend[1] - xy[1] + C_Taskbar_Height, 5, true, false);
-    if(status == 'cancel')
-    {
-        drawLine(xy[0], xy[1] + C_Taskbar_Height / 2, xyend[0] - xy[0]);
-    }
+    //roundRect(ctx, xy[0], xy[1], xyend[0] - xy[0], xyend[1] - xy[1] + C_Eventbar_Height, 5, true, false);
+    ctx.fillRect(xy[0], xy[1], xyend[0] - xy[0], xyend[1] - xy[1] + C_Eventbar_Height);
+    //ctx.rect(xy[0], xy[1], xyend[0] - xy[0], xyend[1] - xy[1] + C_Eventbar_Height);
 
     ctx.stroke();
     //console.warn("==== stroke");
@@ -762,35 +810,21 @@ function drawTask(ctx, task, id, name, user, dept, startDate, hours, status, idx
     var allStr = "";
 
     ctx.strokeStyle = "#111111";
-    ctx.fillStyle = C_TaskNameColor;
+    ctx.fillStyle = C_EventNameColor;
     ctx.lineWidth = 2;
-    ctx.font = C_TaskNameFont;
-    var idStr = "[" + id + "]  " + name;
-    ctx.fillText(idStr, xyend[0] + 8, xyend[1] + C_FontHeight);
+    ctx.font = C_EventNameFont;
+    //var idStr = "[" + title + "]  " + name;
+    var idStr = title;
+    ctx.fillText(idStr, xy[0], xy[1] - C_FontHeight + C_FontOffset);
 
-    allStr += idStr;
+    g_boundYMax = Math.max((idx + 2) * (C_Eventbar_Height + C_Eventbar_VSpace) - canvas.height, g_boundXMax);
 
-    ctx.fillStyle = C_TaskUserNameColor;
-    var userNameStr = "        [" + user + "]";
-    ctx.fillText(userNameStr, xyend[0] + 8 + ctx.measureText(name).width + 50, xyend[1] + C_FontHeight);
-
-    allStr += userNameStr;
-
-
-    ctx.fillStyle = C_TaskUserDeptColor;
-    var depStr = " - " + dept;
-    ctx.fillText(depStr, xyend[0] + 8 + ctx.measureText(name).width + ctx.measureText(userNameStr).width + 50, xyend[1] + C_FontHeight);
-    allStr += depStr;
-
-
-    g_boundYMax = Math.max((idx + 2) * (C_Taskbar_Height + C_Taskbar_VSpace) - canvas.height, g_boundXMax);
-
-    var strW = ctx.measureText(allStr).width + 8 + 50 + 50;
+    //var strW = ctx.measureText(allStr).width + 8 + 50 + 50;
     g_boundXMin = Math.min(xy[0] - canvas.width, g_boundXMin);
-    g_boundXMin = Math.min(xyend[0] - strW, g_boundXMin);
+    g_boundXMin = Math.min(xyend[0], g_boundXMin);
 
-    g_boundXMax = Math.max(xy[0] + strW, g_boundXMax);
-    g_boundXMax = Math.max(xyend[0] + strW, g_boundXMax);
+    g_boundXMax = Math.max(xy[0], g_boundXMax);
+    g_boundXMax = Math.max(xyend[0], g_boundXMax);
 }
 
 function drawLine(x, y, w)
@@ -813,10 +847,17 @@ function dateToCoord(startDate, idx)
     var now = Date.now();
     //new Date(now).getTime();
 
-    var d = days_between(startDate, now);
+    var refNow = now;
 
-    var x = d * C_Taskbar_DayUnit;
-    var y = (C_Taskbar_Height + C_Taskbar_VSpace) * idx;
+    if(g_eventFirst != null)
+    {
+        refNow = convertStringToDate(g_eventFirst.datebegin);
+    }
+
+    var d = days_between(startDate, refNow);
+
+    var x = d * C_Eventbar_DayUnit;
+    var y = (C_Eventbar_Height + C_Eventbar_VSpace) * idx;
 
     /*
     if(isNaN(x))

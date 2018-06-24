@@ -65,15 +65,26 @@ function showCheckedSummary()
 
 
 
-function on_createRootTask(projectID, storyID, productID) {
+function on_createRootTask(projectID, storyID, storyTitle, productID) {
 
     //var pipelineID = document.getElementById('batchCreateRootTask[' + storyID + ']').val();
     var pipelineID = $("#batchCreateRootTask_" + storyID).val();
+    var pipelineText = $("#batchCreateRootTask_" + storyID + " option:selected").text();
     if(pipelineID == -1)
     {
         //alert("不创建None");
         return;
     }
+
+     if(!confirm("确认要对需求：[" + storyID + "] [" + storyTitle + "]  根据Pipeline自动创建任务?\n批量任务类型:" + pipelineText))
+     {
+         $("#batchCreateRootTask_" + storyID + ' option:last').attr('selected','selected');
+         //$("#batchCreateRootTask_" + storyID).selectpicker('refresh');
+         //$("#batchCreateRootTask_" + storyID).remove();
+         //$("#batchCreateRootTask_" + storyID + 'option:first').text("ssss");
+
+         return;
+     }
 
     url = createLink('pipeline', 'batchCreateRootTask');
     //alert("on_createRootTask productID:" + productID + " projectID:" + projectID + " pipelineID:" + pipelineID + " storyID:" + storyID + " url:" + url);
