@@ -139,6 +139,19 @@ class pipelineModel extends model
         $pst = fixer::input('post')
             ->get();
 
+        /*
+        foreach ($pst as $k => $v) {
+            error_log("$k -> $v");
+            if(is_array($v))
+            {
+                foreach($v as $kk => $vv)
+                {
+                    error_log(" $kk -> $vv");
+                }
+            }
+        }
+        //*/
+
         $pipeline = new stdClass();
         $pipeline->pipename = $pst->pipename;
 
@@ -154,23 +167,45 @@ class pipelineModel extends model
 
             $parentStepID = 0;
 
+            //error_log("============== add steps=============");
+
+            $idx = 0;
             foreach ($pst->steps as $stepID => $dept) {
-                if ($dept == 0) continue;
+                //if ($dept == 0) continue;
                 $stepType = $this->post->stepType;
                 $step = new stdClass();
-                $step->type = ($stepType[$stepID] == 'item' and $parentStepID == 0) ? 'step' : $stepType[$stepID];
-                $step->parent = ($step->type == 'item') ? $parentStepID : 0;
+                $step->type = ($stepType[$stepID] == 'group' and $parentStepID == 0) ? 'group' : $stepType[$stepID];
+                $step->parent = ($step->type == 'group') ? $parentStepID : 0;
                 $step->gamepipeline = $pipeId;
                 $step->desc = $stepID;
-                $step->dept = $dept;
-                $step->estimate = (int)$pst->expects[$stepID];
 
-                //error_log("oscaar: ======= stepID:$stepID -> dept:$dept type:$step->type parent:$step->parent pipeId:$step->gamepipeline workhour:$step->estimate");
+                $step->estimate = (int)$pst->expects[$stepID];
+                if($step->type == 'step')
+                {
+                    $step->stepname = $dept;
+                    $step->dept = 0;
+                }
+                else
+                {
+                    $step->stepname = "dept";
+                    $step->dept = $dept;
+                }
+
+                //error_log("oscaar: ======= stepID:$stepID -> dept:$dept type:$step->type stepName:$step->stepname parent:$step->parent pipeId:$step->gamepipeline workhour:$step->estimate");
+
+                if ($dept == 0 && $idx + 1 == count($pst->steps))
+                {
+                    break;
+                }
 
                 $this->dao->insert(TABLE_PIPELINE_STAGES)->data($step)->autoCheck()->exec();
+                ++$idx;
+
                 if ($step->type == 'group') $parentStepID = $this->dao->lastInsertID();
                 if ($step->type == 'step') $parentStepID = 0;
             }
+
+            //error_log("============== add steps end=============");
             //return array('status' => 'created', 'id' => $pipeId);
         }
     }
@@ -200,12 +235,13 @@ class pipelineModel extends model
                 ->exec();
 
             $parentStepID = 0;
+            $idx = 0;
             foreach ($pst->steps as $stepID => $dept) {
-                if ($dept == 0) continue;
+                //if ($dept == 0) continue;
                 $stepType = $this->post->stepType;
                 $step = new stdClass();
-                $step->type = ($stepType[$stepID] == 'item' and $parentStepID == 0) ? 'step' : $stepType[$stepID];
-                $step->parent = ($step->type == 'item') ? $parentStepID : 0;
+                $step->type = ($stepType[$stepID] == 'group' and $parentStepID == 0) ? 'group' : $stepType[$stepID];
+                $step->parent = ($step->type == 'group') ? $parentStepID : 0;
                 $step->gamepipeline = $pipelineId;
                 $step->desc = $stepID;
                 $step->dept = $dept;
@@ -213,7 +249,28 @@ class pipelineModel extends model
 
                 //error_log("oscar: ======= update stepID:$stepID -> dept:$dept type:$step->type parent:$step->parent pipeId:$step->gamepipeline workhour:$step->estimate");
 
+                if($step->type == 'step')
+                {
+                    $step->stepname = $dept;
+                    $step->dept = 0;
+                }
+                else
+                {
+                    $step->stepname = "dept";
+                    $step->dept = $dept;
+                }
+
+                //error_log("oscar: ======= update stepID:$stepID -> dept:$dept type:$step->type parent:$step->parent pipeId:$step->gamepipeline workhour:$step->estimate");
+                //error_log("oscar: ======= update stepID:$stepID -> dept:$dept type:$step->type stepName:$step->stepname parent:$step->parent pipeId:$step->gamepipeline workhour:$step->estimate");
+
+                if ($dept == 0 && $idx + 1 == count($pst->steps))
+                {
+                    break;
+                }
+
                 $this->dao->insert(TABLE_PIPELINE_STAGES)->data($step)->autoCheck()->exec();
+                ++$idx;
+
                 if ($step->type == 'group') $parentStepID = $this->dao->lastInsertID();
                 if ($step->type == 'step') $parentStepID = 0;
             }

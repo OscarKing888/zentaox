@@ -71,9 +71,9 @@ class pipeline extends control
         {
             $paddingCount = $this->config->pipeline->defaultStages - count($steps);
             $step = new stdclass();
-            $step->type   = 'item';
+            $step->type   = 'group';
             $step->desc   = '';
-            $step->expect = '';
+            $step->estimate = 8;
             for($i = 1; $i <= $paddingCount; $i ++)
                 $steps[$i] = $step;
         }
@@ -91,6 +91,8 @@ class pipeline extends control
         $this->view->title = $this->lang->pipeline->create;
         $this->view->depts = $this->dept->getOptionMenu();
         $this->view->steps            = $steps;
+
+        //error_log(var_dump($_POST));
 
         $this->display();
     }

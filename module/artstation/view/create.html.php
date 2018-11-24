@@ -66,7 +66,7 @@ include '../../common/view/datepicker.html.php';
                         <div class='row-table'>
                             <div class='col-table'>
                                 <div class='input-group w-p100'>
-                                    <?php echo html::select('story', $stories, 0, "class='form-control chosen' onchange='setStoryRelated();'"); ?>
+                                    <?php echo html::select('story', $stories, 37, "class='form-control chosen' onchange='setStoryRelated();'"); ?>
 
                                     <span class='input-group-btn' id='preview'><a href='#'
                                                                                   class='btn iframe'><?php echo $lang->preview; ?></a></span>

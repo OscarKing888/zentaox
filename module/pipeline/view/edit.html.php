@@ -55,12 +55,12 @@ $steps = $article->steps;
                                         <span class='input-group-addon step-item-id'></span>
                                         <?php echo html::select("steps[]", $depts, 0, 'class=form-control chosen'); ?>
                                         <span class="input-group-addon step-type-toggle">
-                                          <input type='hidden' name='stepType[]' value='item' class='step-type'>
+                                          <input type='hidden' name='stepType[]' value='step' class='step-type'>
                                           <label class="checkbox-inline"><input tabindex='-1' type="checkbox" class='step-group-toggle'> <?php echo "子阶段" ?></label>
                                         </span>
                                     </div>
                                 </td>
-                                <td><input name='expects[]' value='0' class='form-control autosize step-expects'></td>
+                                <td><input name='expects[]' value='8' class='form-control autosize step-expects'></td>
                                 <td class='step-actions'>
                                     <div class='btn-group'>
                                         <button type='button' class='btn btn-step-add' tabindex='-1'><i class='icon icon-plus'></i></button>
@@ -80,7 +80,17 @@ $steps = $article->steps;
                                         <div class='input-group'>
                                             <span class='input-group-addon step-item-id'></span>
 
-                                            <?php echo html::select("steps[]", $depts, $step->dept, 'class=form-control chosen'); ?>
+                                            <?php
+                                            if($step->type == 'group')
+                                            {
+                                                echo html::select("steps[]", $depts, $step->dept, 'class=form-control chosen');
+                                            }
+                                            else
+                                            {
+                                                echo html::input("steps[]", $step->stepname, 'class=step-type');
+                                            }
+                                            ?>
+
                                             <span class='input-group-addon step-type-toggle'>
                                                 <?php if (!isset($step->type)) $step->type = 'step'; ?>
                                                 <input type='hidden' name='stepType[]'

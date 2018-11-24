@@ -44,7 +44,14 @@
                         <?php
                         foreach($article->steps as $k => $val)
                         {
-                            echo "<tr  class='text-center'><td>$val->desc </td><td>" . $depts[$val->dept] . "</td><td>" . $val->estimate . "(H)</td></tr>";
+                            if($val->type == 'group')
+                            {
+                                echo "<tr  class='text-center'><td>$val->desc </td><td>" . $depts[$val->dept] . "</td><td>" . $val->estimate . "(H)</td></tr>";
+                            }
+                            else
+                            {
+                                echo "<tr  class='text-center'><td>$val->desc </td><td>" . $val->stepname . "</td><td>" . $val->estimate . "(H)</td></tr>";
+                            }
                         }
                         ?>
 

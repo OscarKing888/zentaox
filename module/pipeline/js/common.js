@@ -1,4 +1,5 @@
 var newRowID = 0;
+var g_stepTemplate;
 /**
  * Load modules and stories of a product.
  * 
@@ -134,6 +135,8 @@ function setStories()
  * @access public
  * @return void
  */
+
+
 function initSteps(selector)
 {
     //alert("initSteps");
@@ -145,6 +148,14 @@ function initSteps(selector)
             this.style.height = (this.scrollHeight + 2) + "px"; 
         });
     }
+
+    //---------------------
+    {
+        g_stepTemplate = $('#stepTemplate');//.detach().removeClass('template').attr('id', null);
+        //console.log("g_stepTemplate:" + g_stepTemplate.html());
+    }
+    //---------------------
+
     var $steps = $(selector || '#steps');
     var $stepTemplate = $('#stepTemplate').detach().removeClass('template').attr('id', null);
     var initSortableCallTask = null;
@@ -268,14 +279,33 @@ function initSteps(selector)
         var $checkbox = $(this);
         var $step = $checkbox.closest('.step');
         var isChecked = $checkbox.is(':checked');
-        var suggestType = isChecked ? 'group' : 'item';
+        var suggestType = isChecked ? 'group' : 'step';
         if(!isChecked) 
         {
             var $prevStep = $step.prev('.step:not(.drag-shadow)');
             var suggestChild = $prevStep.length && $prevStep.is('.step-group') && $step.next('.step:not(.drag-shadow)').length;
-            suggestType = suggestChild ? 'item' : 'step';
+            //suggestType = suggestChild ? 'group' : 'step';
         }
         $step.find('.step-type').val(suggestType);
+        //$step.find('.step-type').val(isChecked);
+
+        var $steps = $step.find('[name^="steps["]');
+
+        var $deptSel = g_stepTemplate.find('[name^="steps["]');//.getElementsByName("steps[]");
+        //console.log("$deptSel:" + $deptSel.html());
+        //console.log("steps:" + $steps + $steps.html());
+
+        if(isChecked)
+        {
+            $steps.parent().prepend($deptSel.clone());
+        }
+        else
+        {
+            $steps.parent().prepend("<input type=\"text\" name=\"steps[]\" id=\"steps[]\" value=\"阶段\" class=\"form-control autosize step-steps\"\">");
+        }
+
+        $steps.remove();
+
         refreshSteps();
     }).on('change', '.form-control', function()
     {
@@ -286,7 +316,7 @@ function initSteps(selector)
             if($step.data('index') === getStepsElements().length)
             {
                 insertStepRow($step, 1, 'step', true);
-                if($step.is('.step-item,.step-group')) insertStepRow($step, 1, 'item', true);
+                if($step.is('.step-item,.step-group')) insertStepRow($step, 1, 'group', true);
                 refreshSteps();
             }
         }
