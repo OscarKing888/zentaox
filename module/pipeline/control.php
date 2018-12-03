@@ -218,16 +218,35 @@ class pipeline extends control
         $this->loadModel('story');
         $story = $this->story->getById($storyID);
 
+        $depts = $this->dept->getOptionMenu();
+
+        $preEstimate = 0;
         foreach ($pipeline->steps as $step) {
-            //error_log("oscar: batchCreateRootTask step:$step $step->type dept:$step->dept");
-            if($step->type == 'step')
+            error_log("oscar: batchCreateRootTask step:$step $step->type dept:$step->dept");
+            if($step->type == 'group')
             {
-                //error_log("oscar: create root task step:$step dept:$step->dept est:$step->estimate");
+                error_log("oscar: create root task step:$step dept:$step->dept est:$step->estimate");
 
                 $task = new stdClass();
                 $task->dept = $step->dept;
                 $task->estimate = (float)$step->estimate;
                 $task->name = $story->title;
+
+                /*
+                if($step->type == 'group')
+                {
+                    $task->name = $task->name . " - " . $depts[$step->dept];
+
+                    error_log("oscar: task dept name:" . $depts[$step->dept]);
+                }
+                else
+                {
+                    $task->name = $task->name . " - " . $step->stepnname;
+                    error_log("oscar: task step name:" . $step->stepnname);
+                }
+                */
+
+
                 $task->desc = $story->spec;
                 //$task->product = $productID;
                 $task->module = $story->module;
@@ -238,8 +257,14 @@ class pipeline extends control
                 $task->left = 0;
                 //$task->build = 0;
                 $task->status = 'wait';
-                $task->estStarted = helper::nowafter(5);
-                $task->deadline =  helper::nowafter(10);
+
+                $workHour = (int)($task->estimate / 8 + 0.5);
+                $task->estStarted = helper::nowafter($preEstimate + 5);
+                $task->deadline =  helper::nowafter($preEstimate + 5 + $workHour);
+                $preEstimate = $preEstimate + $workHour + 1;
+
+                error_log("oscar: create task with pipeline - workHour:$workHour preEstimate:$preEstimate");
+
                 $task->openedBy = $this->app->user->account;
                 $task->openedDate = helper::now();
                 $task->pipeline = $pipelineID;

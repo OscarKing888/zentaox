@@ -1841,6 +1841,7 @@ class storyModel extends model
         $stories = $this->dao->select()
             ->from(TABLE_STORY)
             ->where('deleted')->eq(0)
+            ->andWhere('status')->eq('active')
             ->beginIF($productID)->andWhere('product')->eq((int)$productID)->fi()
             ->orderBy('id desc')
             ->fetchAll();

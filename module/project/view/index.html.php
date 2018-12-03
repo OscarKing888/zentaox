@@ -15,11 +15,11 @@
 </style>
 <?php echo $this->fetch('block', 'dashboard', 'module=project');?>
 <script>
-<?php if($this->config->project->homepage != 'index'):?>
-$(function()
-{
-    $('#modulemenu .nav li.right:last').after("<li class='right'><a style='font-size:12px' href='javascript:setHomepage(\"project\", \"index\")'><i class='icon icon-cog'></i> <?php echo $lang->homepage?></a></li>")
-});
-<?php endif;?>
+    <?php if($this->config->project->homepage != 'index'):?>
+    $(function()
+    {
+        $('#modulemenu .nav li.right:last').after("<li class='right'><a style='font-size:12px' href='javascript:setHomepage(\"project\", \"index\")'><i class='icon icon-cog'></i> <?php echo $lang->homepage?></a></li>")
+    });
+    <?php endif;?>
 </script>
 <?php include '../../common/view/footer.html.php';?>

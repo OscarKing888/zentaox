@@ -74,6 +74,7 @@ $lang->task->assign            = 'Assign';
 $lang->task->assignTo          = $lang->task->assign;
 $lang->task->batchAssignTo     = 'Batch Assign';
 $lang->task->assignedToDept    = 'Assign To Dept';
+$lang->task->batchChangeVersion     = 'Mile Stone';
 $lang->task->assignedTo        = 'Assignee';
 $lang->task->assignedToAB      = 'Assignee';
 $lang->task->assignedDate      = 'Assign on';

@@ -31,7 +31,26 @@
         if($project->type == 'ops' && $menuItem->name == 'needconfirm') continue;
         if(isset($menuItem->hidden)) continue;
         $menuType = $menuItem->name;
-        if(strpos($menuType, 'QUERY') === 0)
+
+        //error_log("project task menuType:$menuType");
+
+        if($menuType == 'milestone')
+        {
+            echo "<li id='milestoneTab' class='dropdown'>";
+            $milestoneType = isset($versions) ? $this->session->milestone : '';
+            $current        = zget($lang->project->milestone, $milestoneType, '');
+            if(empty($current)) $current = $menuItem->text;
+            echo html::a('javascript:;', $current . " <span class='caret'></span>", '', "data-toggle='dropdown'");
+            echo "<ul class='dropdown-menu'>";
+            foreach ($versions as $key => $value)
+            {
+                if($key == '') continue;
+                echo '<li' . ($key == $milestoneType ? " class='active'" : '') . '>';
+                echo html::a($this->createLink('project', 'task', "project=$projectID&type=milestone&param=$key"), $value);
+            }
+            echo '</ul></li>';
+        }
+        elseif(strpos($menuType, 'QUERY') === 0)
         {
             $queryID = (int)substr($menuType, 5);
             echo "<li id='{$menuType}Tab'>" . html::a(inlink('task', "project=$projectID&type=bySearch&param=$queryID"), $menuItem->text) . '</li>' ;
@@ -56,7 +75,18 @@
             }
             echo '</ul></li>';
         }
+
+
     }
+
+
+
+    /*
+    foreach ($versions as $key => $value)
+    {
+        echo "<li id='$key'> $value </li>";
+    }
+    //*/
 
     echo "<li id='kanbanTab'>"; common::printLink('project', 'kanban', "projectID=$projectID", $lang->project->kanban); echo '</li>';
     if($project->type == 'sprint' or $project->type == 'waterfall')

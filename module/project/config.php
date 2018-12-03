@@ -6,7 +6,7 @@ $config->project->maxBurnDay       = '31';
 $config->project->weekend          = '2';
 
 $config->project->list = new stdclass();
-$config->project->list->exportFields = 'id,name,code,dept,PM,end,status,totalEstimate,totalConsumed,totalLeft,progress';
+$config->project->list->exportFields = 'id,name,code,milestone,PM,end,status,totalEstimate,totalConsumed,totalLeft,progress';
 
 global $lang, $app;
 $app->loadLang('task');
@@ -113,3 +113,6 @@ $config->project->kanbanSetting->colorList['pause']  = '#e48600';
 $config->project->kanbanSetting->colorList['done']   = '#229f24';
 $config->project->kanbanSetting->colorList['cancel'] = '#333';
 $config->project->kanbanSetting->colorList['closed'] = '#777';
+
+
+define('TABLE_TASKMILESTONE',           'taskmilestone');

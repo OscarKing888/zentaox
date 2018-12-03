@@ -119,6 +119,8 @@ class project extends control
      */
     public function task($projectID = 0, $status = 'unclosed', $param = 0, $orderBy = '', $recTotal = 0, $recPerPage = 100, $pageID = 1)
     {
+        //error_log("oscar: project-task: status:$status param:$param");
+
         $this->loadModel('tree');
         $this->loadModel('search');
         $this->loadModel('task');
@@ -179,6 +181,13 @@ class project extends control
         if ($this->app->getViewType() == 'mhtml') $recPerPage = 10;
         $pager = new pager($recTotal, $recPerPage, $pageID);
 
+        // oscar
+        if($status == 'milestone')
+        {
+            $queryID = $param;
+        }
+        // oscar
+
         /* Get tasks. */
         $tasks = $this->project->getTasks($productID, $projectID, $this->projects, $browseType, $queryID, $moduleID, $sort, $pager);
 
@@ -224,6 +233,22 @@ class project extends control
 
         $this->loadModel('pipeline');
         $this->pipeline->setupOptionMenu($this->view);
+
+        $versions = $this->dao->select('id, name')->from(TABLE_TASKMILESTONE)
+            ->where('project')->eq($projectID)
+            ->andWhere('active')->eq(1)
+            ->orderBy('id desc')
+            //->fetchAll();
+            ->fetchPairs('id');
+
+        $this->view->versions = ($versions);
+
+        /*
+        error_log("==================== version ====================");
+        foreach ($versions as $k => $v) {
+            error_log("version: $k -> $v");
+        }
+        //*/
         //oscar:
 
         $this->display();
@@ -2138,4 +2163,155 @@ class project extends control
         //$this->grouptask($project->id, 'assignedTo');
         $this->display();
     }
+
+
+    public function taskmilestone($projectID = 0)
+    {
+        $project = $this->project->getById($projectID, true);
+        if (!$project) die(js::error($this->lang->notFound) . js::locate('back'));
+        $this->project->setMenu($this->projects, $project->id);
+        $this->view->project = $project;
+
+        $this->view->msg = "";
+
+        if (!empty($_POST)) {
+            $version = fixer::input('post')->get()->version;
+
+            $dat = array();
+            $dat['name'] = $version;
+            $dat['active'] = 1;
+            $dat['deadline'] = helper::today();
+            $dat['project'] = $projectID;
+
+            $c = $this->dao->select()->from(TABLE_TASKMILESTONE)
+                ->where('name')->eq($version)
+                ->count();
+
+            if ($c == 0) {
+                $this->dao->insert(TABLE_TASKMILESTONE)->data($dat)
+                    ->autoCheck()
+                    ->batchCheck('name', 'notempty')
+                    ->exec();
+                $this->view->msg = "版本[$version]添加成功!";
+            } else {
+                $this->view->msg = "版本[$version]已经存在!";
+            }
+        }
+
+        $versions = $this->dao->select()->from(TABLE_TASKMILESTONE)
+            ->where('project')->eq($projectID)
+            ->orderBy('id desc')
+            ->fetchAll();
+
+        $this->view->versions = ($versions);
+
+        /*
+        error_log("oscar ver cnt:" . count($versions));
+        foreach (array_keys($versions) as $v) {
+            error_log("oscar ver:" . $v);
+        }
+        //*/
+
+        $this->display();
+    }
+
+    public function activeVersion()
+    {
+        if (!empty($_POST)) {
+
+            $postVals = fixer::input('post')
+                ->get();
+
+            $id = $postVals->id;
+
+            //error_log("oscar: active_version $id");
+            $this->dao->update(TABLE_TASKMILESTONE)
+                ->set('active')->eq(1)
+                ->where('id')->eq($id)
+                ->exec();
+        } else {
+            return false;
+        }
+    }
+
+    public function closeVersion()
+    {
+        if (!empty($_POST)) {
+
+            $postVals = fixer::input('post')
+                ->get();
+
+            $id = $postVals->id;
+
+            //error_log("oscar: close_version $id");
+            $this->dao->update(TABLE_TASKMILESTONE)
+                ->set('active')->eq(0)
+                ->where('id')->eq($id)
+                ->exec();
+        } else {
+            return false;
+        }
+    }
+
+    public function updateVersionDeadline()
+    {
+        if (!empty($_POST)) {
+
+            $postVals = fixer::input('post')
+                ->get();
+
+            $deadline = $postVals->deadline;
+            $id = $postVals->id;
+
+            //error_log("oscar: updateVersionDeadline $id deadline:$deadline");
+            $this->dao->update(TABLE_TASKMILESTONE)
+                ->set('deadline')->eq($deadline)
+                ->where('id')->eq($id)
+                ->exec();
+        } else {
+            return false;
+        }
+    }
+
+    public function batchChangeVersion()
+    {
+        if(!empty($_POST))
+        {
+            //error_log( var_export($_POST));
+
+            $milestone  = $this->post->changeVersion;
+            $taskIDList = $this->post->taskIDList;
+            $taskIDList = array_unique($taskIDList);
+            //unset($_POST['taskIDList']);
+            if(!is_array($taskIDList)) die(js::locate($this->createLink('gametaskinternal', 'mydept', ""), 'parent'));
+
+            /*
+            $msg = '';
+            foreach ($taskIDList as $item) {$msg .= $item . "  ";}
+            echo js::alert("batchChangeVersion: $msg");
+            echo $msg;
+            //*/
+
+            foreach($taskIDList as $taskID)
+            {
+                $this->dao->update('zt_task')
+                    ->set('milestone')->eq($milestone)
+                    ->where('id')->eq($taskID)->exec();
+
+                //$this->loadModel('action');
+                //$changes = $this->task->assign($taskID);
+                if(dao::isError()) die(js::error(dao::getError()));
+                //$actionID = $this->action->create('task', $taskID, 'Assigned', $this->post->comment, $this->post->assignedTo);
+                //$this->action->logHistory($actionID, $changes);
+                //$this->task->sendmail($taskID, $actionID);
+            }
+            //if(!dao::isError()) $this->loadModel('score')->create('ajax', 'batchOther');
+            die(js::reload('parent'));
+            //$this->locate(inlink('details'));
+            //$this->display();
+            //echo js::alert("assignTo: $assignedTo");
+        }
+    }
+
+
 }

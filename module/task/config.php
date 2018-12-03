@@ -70,7 +70,7 @@ if($config->global->flow == 'onlyTask')
 
 $config->task->datatable = new stdclass();
 //$config->task->datatable->defaultField = array('id', 'pri', 'name', 'dept', 'status', 'deadline', 'openedDate', 'openedBy', 'assignedTo', 'finishedBy', 'estimate', 'consumed', 'left', 'actions');
-$config->task->datatable->defaultField = array('id', 'pri', 'name', 'dept', 'status', 'deadline', 'openedDate', 'openedBy', 'assignedTo', 'finishedBy', 'estimate', 'actions');
+$config->task->datatable->defaultField = array('id', 'pri', 'name', 'milestone', 'status', 'deadline', 'openedDate', 'openedBy', 'assignedTo', 'finishedBy', 'estimate', 'actions');
 
 $config->task->datatable->fieldList['id']['title']    = 'idAB';
 $config->task->datatable->fieldList['id']['fixed']    = 'left';
@@ -101,6 +101,11 @@ $config->task->datatable->fieldList['dept']['title']    = 'dept';
 $config->task->datatable->fieldList['dept']['fixed']    = 'no';
 $config->task->datatable->fieldList['dept']['width']    = 'auto';
 $config->task->datatable->fieldList['dept']['required'] = 'no';
+
+$config->task->datatable->fieldList['milestone']['title']    = 'milestone';
+$config->task->datatable->fieldList['milestone']['fixed']    = 'no';
+$config->task->datatable->fieldList['milestone']['width']    = 'auto';
+$config->task->datatable->fieldList['milestone']['required'] = 'yes';
 
 $config->task->datatable->fieldList['status']['title']    = 'statusAB';
 $config->task->datatable->fieldList['status']['fixed']    = 'no';

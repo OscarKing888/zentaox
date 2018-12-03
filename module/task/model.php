@@ -779,13 +779,19 @@ class taskModel extends model
         $oldTask = $this->getById($taskID);
 
         $now  = helper::now();
-        $task = fixer::input('post')
-            ->cleanFloat('left')
+        $pst = fixer::input('post')
+            //->cleanFloat('left')
             ->setDefault('lastEditedBy', $this->app->user->account)
             ->setDefault('lastEditedDate', $now)
             ->setDefault('assignedDate', $now)
             ->remove('comment,showModule,assignedToDept,batchChangeModule,workHour') //oscar:
             ->get();
+
+        $task = new stdClass();
+        $task->assignedTo = $pst->assignedTo;
+        $task->lastEditedBy = $pst->lastEditedBy;
+        $task->lastEditedDate = $pst->lastEditedDate;
+        $task->assignedDate = $pst->assignedDate;
 
         /*
         error_log("task::assign taskID:$taskID");
@@ -1624,6 +1630,10 @@ class taskModel extends model
         //baseDAO::dumpsql(true);
         //error_log("oscar: getProjectTasks type:$type");
 
+        //echo(js::alert("getProjectTasks:" . $type));
+
+        //error_log("task-getProjectTasks: type:$type milestone:" . $this->session->milestone);
+
         if(is_string($type)) $type = strtolower($type);
         $tasks = $this->dao->select('t1.*, t2.id AS storyID, t2.title AS storyTitle, t2.product, t2.branch, t2.version AS latestStoryVersion, t2.status AS storyStatus, t3.realname AS assignedToRealName')
             ->from(TABLE_TASK)->alias('t1')
@@ -1642,6 +1652,12 @@ class taskModel extends model
                 //->orWhere('t1.assignedTo')->in(array_values($deptUsers))
                 ->markRight(1)
             ->fi()
+
+            ->beginIF($type == 'milestone')
+            ->andWhere('t1.milestone', true)->eq($this->session->milestone)
+            ->markRight(1)
+            ->fi()
+
             // oscar:
 
             ->beginIF($type == 'myinvolved')
@@ -1656,7 +1672,7 @@ class taskModel extends model
             ->beginIF($type == 'assignedtome')->andWhere('t1.assignedTo')->eq($this->app->user->account)->fi()
             ->beginIF($type == 'finishedbyme')->andWhere('t1.finishedby')->eq($this->app->user->account)->fi()
             ->beginIF($type == 'delayed')->andWhere('t1.deadline')->gt('1970-1-1')->andWhere('t1.deadline')->lt(date(DT_DATE1))->andWhere('t1.status')->in('wait,doing')->fi()
-            ->beginIF($type != 'mydept' and (is_array($type) or strpos(',all,undone,needconfirm,assignedtome,delayed,finishedbyme,myinvolved,', ",$type,") === false))->andWhere('t1.status')->in($type)->fi()
+            ->beginIF($type != 'mydept' and $type != 'milestone' and (is_array($type) or strpos(',all,undone,needconfirm,assignedtome,delayed,finishedbyme,myinvolved,', ",$type,") === false))->andWhere('t1.status')->in($type)->fi()
             ->beginIF($modules)->andWhere('t1.module')->in($modules)->fi()
             ->andWhere('t1.deleted')->eq(0)
             ->orderBy('t1.`parent`,' . $orderBy)
@@ -1673,7 +1689,6 @@ class taskModel extends model
         }
 
         $tasks->deptUsers = $deptUsers;
-
 
 
         $taskList = array_keys($tasks);
@@ -2466,7 +2481,7 @@ class taskModel extends model
      * @access public
      * @return void
      */
-    public function printCell($col, $task, $users, $browseType, $branchGroups, $modulePairs = array(), $mode = 'datatable', $child = false, $depts = array(), $pipeline=array())
+    public function printCell($col, $task, $users, $browseType, $branchGroups, $modulePairs = array(), $mode = 'datatable', $child = false, $depts = array(), $pipeline=array(), $milestones=array())
     {
         $canView  = common::hasPriv('task', 'view');
         $taskLink = helper::createLink('task', 'view', "taskID=$task->id");
@@ -2507,9 +2522,12 @@ class taskModel extends model
 
                     //oscar
                     if(!empty($task->pipeline) or ($task->pipeline != 0)) echo "<span class=\"pri6\">P</span>";
+                    $deptNames = explode('/', $depts[$task->dept]);
+                    //$deptName = " [" . $deptNames[count($deptNames) - 1] . "]";
+                    $deptName = " - " . $deptNames[count($deptNames) - 1];
                     //oscar
 
-                    echo $canView ? html::a($taskLink, $task->name, null, "style='color: $task->color'") : "<span style='color: $task->color'>$task->name</span>";
+                    echo $canView ? html::a($taskLink, $task->name . $deptName, null, "style='color: $task->color'") : "<span style='color: $task->color'>$task->name . $deptName</span>";
                     if($task->fromBug) echo html::a(helper::createLink('bug', 'view', "id=$task->fromBug"), "[BUG#$task->fromBug]", '_blank', "class='bug'");
                     if(!empty($task->children)) echo '<span class="task-toggle" data-id="' . $task->id . '">&nbsp;&nbsp;<i class="icon icon-double-angle-up"></i>&nbsp;&nbsp;</span>';
                     break;
@@ -2521,6 +2539,10 @@ class taskModel extends model
                 case 'dept':
                     echo $depts[$task->dept];
                     //echo $task->dept;
+                    break;
+
+                case 'milestone':
+                    echo $milestones[$task->milestone];
                     break;
                 //oscar:
 
@@ -2815,9 +2837,12 @@ class taskModel extends model
             //->page($pager)
             ->fetchAll();
 
-        //foreach ($tasks as $k => $taskGroup) {
-            //error_log("==== task: $k -> $taskGroup->id $taskGroup->name");
-        //}
+        //*
+        foreach ($tasks as $k => $taskGroup) {
+            error_log("==== task: $k -> $taskGroup->id $taskGroup->name");
+        }
+        //*/
+
         /*
         $procTasks = array();
 

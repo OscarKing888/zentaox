@@ -277,9 +277,12 @@ $lang->printKanban->taskStatus = '状态';
 $lang->printKanban->typeList['all']       = '全部';
 $lang->printKanban->typeList['increment'] = '增量';
 
+
 $lang->project->featureBar['task']['mydept']   = $lang->project->mydept;
 $lang->project->featureBar['task']['assignedtome'] = $lang->project->assignedToMe;
 $lang->project->featureBar['task']['myinvolved']   = $lang->project->myInvolved;
+
+$lang->project->featureBar['task']['milestone']       =  '里程碑';
 
 $lang->project->featureBar['task']['unclosed']     = $lang->project->unclosed;
 $lang->project->featureBar['task']['all']          = $lang->project->allTasks;
@@ -299,3 +302,14 @@ if($config->global->flow == 'onlyTask')
     unset($lang->project->groups['story']);
     unset($lang->project->featureBar['task']['needconfirm']);
 }
+$lang->project->versionend = "结束";
+$lang->project->version = "里程碑";
+$lang->project->closeStat = "验收情况";
+$lang->project->closed = "已验收";
+$lang->project->unclose = "未验收";
+$lang->project->close = "验收";
+$lang->project->status              = "状态";
+$lang->project->active              = "激活";
+$lang->project->deadline     = '截止日期';
+$lang->project->update     = '更新';
+$lang->project->batchChangeVersion = '批量里程碑';

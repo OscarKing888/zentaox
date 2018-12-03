@@ -887,7 +887,16 @@ class projectModel extends model
      */
     public function getTasks($productID, $projectID, $projects, $browseType, $queryID, $moduleID, $sort, $pager)
     {
+        //error_log("project-getTasks: browseType:$browseType queryID:$queryID");
+
         $this->loadModel('task');
+
+        // oscar
+        if($browseType == 'milestone')
+        {
+            $this->session->set('milestone', $queryID);
+        }
+        // oscar
 
         /* Set modules and $browseType. */
         $modules = array();

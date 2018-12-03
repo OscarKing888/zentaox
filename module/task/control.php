@@ -266,6 +266,8 @@ class task extends control
     {
         $this->commonAction($taskID);
 
+        $task = $this->task->getById($taskID);
+
         if (!empty($_POST)) {
             $this->loadModel('action');
             $changes = array();
@@ -276,7 +278,7 @@ class task extends control
                 $files = $this->loadModel('file')->saveUpload('task', $taskID);
             }
 
-            $task = $this->task->getById($taskID);
+            //$task = $this->task->getById($taskID);
             if ($this->post->comment != '' or !empty($changes) or !empty($files)) {
                 $action = !empty($changes) ? 'Edited' : 'Commented';
                 $fileAction = !empty($files) ? $this->lang->addFiles . join(',', $files) . "\n" : '';
@@ -309,6 +311,14 @@ class task extends control
         $this->view->users = $this->loadModel('user')->getPairs('nodeleted', "{$this->view->task->openedBy},{$this->view->task->canceledBy},{$this->view->task->closedBy}");
         $this->view->modules = $this->tree->getTaskOptionMenu($this->view->task->project);
         $this->view->depts = $this->dept->getOptionMenu(); //oscar:
+
+        // oscar
+        $milestones = $this->dao->select('id, name')->from(TABLE_TASKMILESTONE)
+            ->where('project')->eq($this->view->project->id)
+            ->orderBy('id desc')
+            ->fetchPairs('id');
+        $this->view->milestones = $milestones;
+        // oscar
 
         $this->display();
     }
@@ -671,6 +681,14 @@ class task extends control
         $this->view->product = $this->tree->getProduct($task->module);
         $this->view->modulePath = $this->tree->getParents($task->module);
         $this->view->depts = $this->dept->getOptionMenu(); //oscar:
+
+        // oscar
+        $milestone = $this->dao->select('id, name')->from(TABLE_TASKMILESTONE)
+            ->where('id')->eq($task->milestone)
+            ->fetch('name');
+        $this->view->milestone = $milestone;
+        // oscar
+
         $this->display();
     }
 

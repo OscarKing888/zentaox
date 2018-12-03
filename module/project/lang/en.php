@@ -294,3 +294,13 @@ if($config->global->flow == 'onlyTask')
     unset($lang->project->groups['story']);
     unset($lang->project->featureBar['task']['needconfirm']);
 }
+$lang->project->versionend = "结束";
+$lang->project->version = "版本计划";$lang->gametaskinternal->closeStat = "验收情况";
+$lang->project->closed = "已验收";
+$lang->project->unclose = "未验收";
+$lang->project->close = "验收";
+$lang->project->status              = "状态";
+$lang->project->active              = "激活";
+$lang->project->deadline     = '截止日期';
+$lang->project->update     = '更新';
+$lang->project->batchChangeVersion = '批量里程碑';

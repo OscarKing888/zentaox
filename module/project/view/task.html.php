@@ -78,7 +78,7 @@ js::set('browseType', $browseType);
                 <tr class='text-center' data-id='<?php echo $task->id; ?>' data-status='<?php echo $task->status ?>'
                     data-estimate='<?php echo $task->estimate ?>' data-consumed='<?php echo $task->consumed ?>'
                     data-left='<?php echo $task->left ?>'>
-                    <?php foreach ($customFields as $field) $this->task->printCell($field, $task, $users, $browseType, $branchGroups, $modulePairs, $useDatatable ? 'datatable' : 'table', false, $depts); ?>
+                    <?php foreach ($customFields as $field) $this->task->printCell($field, $task, $users, $browseType, $branchGroups, $modulePairs, $useDatatable ? 'datatable' : 'table', false, $depts, $pipeline, $versions); ?>
                 </tr>
                 <?php if (!empty($task->children)): ?>
                     <?php foreach ($task->children as $key => $child): ?>
@@ -89,7 +89,7 @@ js::set('browseType', $browseType);
                             data-estimate='<?php echo $child->estimate ?>'
                             data-consumed='<?php echo $child->consumed ?>' data-left='<?php echo $child->left ?>'>
                             <?php //echo html::select('batchCreateChildTask', $pipeline, '', 'class="hidden"');?>
-                            <?php foreach ($customFields as $field) $this->task->printCell($field, $child, $users, $browseType, $branchGroups, $modulePairs, $useDatatable ? 'datatable' : 'table', true, $depts, $pipeline); ?>
+                            <?php foreach ($customFields as $field) $this->task->printCell($field, $child, $users, $browseType, $branchGroups, $modulePairs, $useDatatable ? 'datatable' : 'table', true, $depts, $pipeline, $versions); ?>
                         </tr>
                     <?php endforeach; ?>
                 <?php endif; ?>
@@ -102,7 +102,7 @@ js::set('browseType', $browseType);
                     <div class='table-actions clearfix'>
                         <?php
 
-                        $tools = array('batchAssignTo' => true, 'batchAssignToDept' => true, 'batchClose' => true, 'batchComplete' => true, 'batchComplete' => true, 'batchSetWorkhour' => true, 'batchDelete' => true);
+                        $tools = array('batchAssignTo' => true, 'batchAssignToDept' => true, 'batchClose' => true, 'batchComplete' => true, 'batchComplete' => true, 'batchSetWorkhour' => true, 'batchDelete' => true, 'batchChangeVersion' => true);
 
                         $memberPairs = array();
                         foreach ($deptUsers as $key => $member) {
@@ -289,10 +289,10 @@ js::set('browseType', $browseType);
 
 
                             if ($tools['batchChangeVersion']) {
-                                $actionLink = $this->createLink('task', 'batchChangeVersion', "");
+                                $actionLink = $this->createLink('project', 'batchChangeVersion', "");
 
                                 echo "<div class='btn-group dropup'>";
-                                echo "<button id='taskbatchChangeVersion' type='button' class='btn dropdown-toggle' data-toggle='dropdown'>" . $lang->task->changeVersion . "<span class='caret'></span></button>";
+                                echo "<button id='taskbatchChangeVersion' type='button' class='btn dropdown-toggle' data-toggle='dropdown'>" . $lang->task->batchChangeVersion . "<span class='caret'></span></button>";
                                 echo "<ul class='dropdown-menu' id='taskbatchChangeVersionMenu'>";
                                 echo html::select('changeVersion', $versionPairs, '', 'class="hidden"');
 
