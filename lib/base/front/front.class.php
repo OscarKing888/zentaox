@@ -245,6 +245,7 @@ class baseHTML
             if($isBlock) $string .= "<div class='radio'><label>";
             else $string .= "<label class='radio-inline'>";
             $string .= "<input type='radio' name='$name' value='$key' ";
+            //$string .= ($key == $checked) ? " checked ='checked'" : "";
             $string .= ($key == $checked) ? " checked ='checked'" : "";
             $string .= $attrib;
             $string .= " id='$name$key' /> ";

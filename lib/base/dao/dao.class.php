@@ -26,6 +26,10 @@ class baseDAO
     const ORDERBY = 'oRdEr bY';
     const LIMIT   = 'lImiT';
 
+
+    static public $debug_log_sql = false;
+    static public $debug_log_sql_all = false;
+
     /**
      * 全局对象$app
      * The global app object.
@@ -627,7 +631,11 @@ class baseDAO
         }
 
         self::$querys[] = $this->processKeywords($sql);
-        //error_log("=======oscar:$sql");
+        if(dao::$debug_log_sql_all || dao::$debug_log_sql)
+        {
+            error_log("=======[processSQL]:$sql");
+            dao::$debug_log_sql = false;
+        }
         return $sql;
     }
 
