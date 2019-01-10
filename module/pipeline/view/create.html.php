@@ -57,7 +57,7 @@ include '../../common/view/datepicker.html.php';
 
                                         <span class="input-group-addon step-type-toggle">
                                           <input type='hidden' name='stepType[]' value='group' class='step-type'>
-                                          <label class="checkbox-inline"><input tabindex='-1' type="checkbox" class='step-group-toggle'> <?php echo "子阶段" ?></label>
+                                          <label class="checkbox-inline"><input tabindex='-1' type="checkbox" class='step-group-toggle' checked> <?php echo "子阶段" ?></label>
                                         </span>
                                     </div>
                                 </td>
@@ -102,7 +102,7 @@ include '../../common/view/datepicker.html.php';
                                                 <input type='hidden' name='stepType[]' value='<?php echo $step->type;?>' class='step-type'>
 
                                                 <label class="checkbox-inline">
-                                                    <input tabindex='-1' type="checkbox" class='step-group-toggle'<?php if($step->type === 'group') echo ' checked' ?>
+                                                    <input tabindex='-1' type="checkbox" class='step-group-toggle'<?php if($step->type === 'group') echo ' checked' ?>>
                                                     <?php echo "子阶段" ?>
                                                 </label>
                                         </div>

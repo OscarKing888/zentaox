@@ -14,7 +14,6 @@ $lang->blog->menu->searchbydepartment        = '部门查询|blog|searchbydepart
 $lang->blog->menu->view        = '用户查询|blog|view';
 
 /* blog menu order. */
-$lang->menuOrder[0]  = 'blog';
 $lang->blog->menuOrder[5]  = 'index';
 $lang->blog->menuOrder[10] = 'restore';
 $lang->blog->menuOrder[15] = 'reportmyteam';

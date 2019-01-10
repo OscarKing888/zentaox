@@ -414,6 +414,7 @@ function loadAssignedTo(projectID)
 function notice()
 {
     $('#buildBoxActions').empty().hide();
+    /*
     if($('#openedBuild').find('option').length <= 1) 
     {
         var html = '';
@@ -449,4 +450,5 @@ function notice()
             }
         }
     }
+    //*/
 }

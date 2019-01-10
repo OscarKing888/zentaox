@@ -29,7 +29,7 @@ js::set('productID' , $bug->product);
   <table class='table table-form'>
     <tr>
       <th class='w-100px'><?php echo $lang->bug->resolution;?></th>
-      <td class='w-p35-f'><?php echo html::select('resolution', $lang->bug->resolutionList, 'fixed', 'class=form-control onchange=setDuplicate(this.value)');?></td>
+      <td class='w-p35-f'><?php echo html::select('resolution', $lang->bug->resolutionList, '', 'class=form-control onchange=setDuplicate(this.value)');?></td>
       <td></td>
     </tr>
     <tr id='duplicateBugBox' class='hide'>
@@ -46,8 +46,11 @@ js::set('productID' , $bug->product);
       </td>
       <td>
         <div class='input-group'>
-            <?php echo html::input('resolvedBuild', '', "class='form-control'");?>
-            <div class="required required-wrapper"/>
+          <span id='resolvedBuildBox'><?php echo html::select('resolvedBuild', $builds, '', "class='form-control chosen'");?></span>
+          <?php if(common::hasPriv('build', 'create')):?>
+          <span id='newBuildBox' class='hidden'><?php echo html::input('buildName', '', "class='form-control' placeholder='{$lang->bug->placeholder->newBuildName}'");?></span>
+          <span class='input-group-addon'><label class="checkbox-inline"><input name="createBuild" value="1" id="createBuild" type="checkbox"> <?php echo $lang->bug->createBuild?></label></span>
+          <?php endif;?>
         </div>
       </td>
     </tr>

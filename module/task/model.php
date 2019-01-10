@@ -2820,8 +2820,12 @@ class taskModel extends model
         return $members;
     }
 
-    public function ajaxGetBlueprintTasks()
+    public function ajaxGetBlueprintTasks($dept, $milestone)
     {
+        //DAO::$debug_log_sql = true;
+
+        //error_log("ajaxGetBlueprintTasks dept:$dept milestone:$milestone");
+
         $tasks = $this->dao->select('t1.*, t2.id AS storyID, t2.title AS storyTitle, t2.product, t2.branch, t2.version AS latestStoryVersion, t2.status AS storyStatus, t3.realname AS assignedToRealName')
             ->from(TABLE_TASK)->alias('t1')
             ->leftJoin(TABLE_STORY)->alias('t2')->on('t1.story = t2.id')
@@ -2829,6 +2833,8 @@ class taskModel extends model
             ->where('t1.project')->eq((int)$this->app->user->currentPrj)
             //->beginIF($moduleIdList)->andWhere('t1.module')->in($moduleIdList)->fi()
             ->andWhere('t1.deleted')->eq(0)
+            ->beginIF($dept != 0)->andWhere('t1.dept')->eq($dept)->fi()
+            ->beginIF($milestone != 0)->andWhere('t1.milestone')->eq($milestone)->fi()
             //->andWhere('t1.id')->lt(1200)
             //->andWhere('t1.status')->eq('doing')
             //->groupBy('assignedTo')
@@ -2837,7 +2843,7 @@ class taskModel extends model
             //->page($pager)
             ->fetchAll();
 
-        //*
+        /*
         foreach ($tasks as $k => $taskGroup) {
             error_log("==== task: $k -> $taskGroup->id $taskGroup->name");
         }

@@ -12,6 +12,5 @@ $lang->meeting->menu->index        = '首页|meeting|index';
 
 
 /* meeting menu order. */
-$lang->menuOrder[0]  = 'meeting';
 $lang->meeting->menuOrder[5]  = 'index';
 //$lang->meeting->menuOrder[10] = 'restore';

@@ -11,32 +11,41 @@
  */
 ?>
 <?php include '../../common/view/header.html.php'; ?>
-<div id='titlebar'>
-    <div class='heading'>
-        <span class='prefix'><?php echo html::icon($lang->icons['project']); ?>
-            <strong><?php echo $project->id; ?></strong></span>
-        <strong><?php echo $project->name; ?></strong>
-        <?php if ($project->deleted): ?>
-            <span class='label label-danger'><?php echo $lang->project->deleted; ?></span>
-        <?php endif; ?>
-    </div>
-    <div class='actions'>
-        <div class='btn-group'>
 
-            <button type="select" onclick="onShowDelayOnly()">延</button>
-            <button onclick="onZoomDay()">日</button>
-            <button onclick="onZoomWeek()">周</button>
-            <button onclick="onZoomMonth()">月</button>
+<div id="featurebar">
 
-            <button onclick="onOrigi()">O</button>
-        </div>
-        <?php
-        echo "<div class='btn-group'>";
-        //common::printIcon('project', 'close', "projectID=$project->id", $project, 'button', '', '', 'iframe', true);
-        echo '</div>';
+    <ul class="nav">
+        <li id="dept">
+            <?php
+            echo html::select("dept", $depts, 0, 'class=form-control chosen');
+            ?>
+        </li>
+        <li id="sep1">&nbsp;</li>
+        <li id="milestonelst">
+            <?php
+            echo html::select("milestone", $milestones, 0, 'class=form-control chosen');
+            ?>
+        </li>
+        <li id="sep1">&nbsp;</li>
 
-        ?>
-    </div>
+        <li id="delay">
+            <a id="delayLabel" href="javascript:void(0)" onclick="onShowDelayOnly()">已延期</a></input>
+        </li>
+
+        <li id="zoom_day">
+            <a href="javascript:void(0)" onclick="onZoomDay()">日单位</a>
+        </li>
+        <li id="zoom_week">
+            <a href="javascript:void(0)" onclick="onZoomWeek()">周单位</a>
+        </li>
+        <li id="zoom_month">
+            <a href="javascript:void(0)" onclick="onZoomMonth()">月单位</a>
+        </li>
+        <li id="zoom_origi">
+            <a href="javascript:void(0)" onclick="onOrigi()">重置</a>
+        </li>
+
+    </ul>
 </div>
 
 <div class='canvas-wrapper'>

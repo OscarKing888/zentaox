@@ -117,6 +117,7 @@ js::set('browseType', $browseType);
                         }
 
                         $versionPairs = array();
+                        $versionPairs[0] = '无';
                         foreach ($versions as $key => $val) {
                             $versionPairs[$key] = $val;
                             //echo "dept $key -> $val <br>";
@@ -298,7 +299,7 @@ js::set('browseType', $browseType);
 
                                 echo '<ul class="dropdown-list">';
                                 foreach ($versionPairs as $key => $value) {
-                                    if (empty($key)) continue;
+                                    //if (empty($key)) continue;
                                     echo "<li class='option' data-key='$key'>" . html::a("javascript:$(\"#changeVersion\").val(\"$key\");setFormAction(\"$actionLink\", \"hiddenwin\", \"#moreAction\")", $value, '', '') . '</li>';
                                 }
                                 echo "</ul>";

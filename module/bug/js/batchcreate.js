@@ -48,6 +48,8 @@ function setBranchRelated(branchID, productID, num)
  */
 function setOpenedBuilds(link, index)
 {
+    // oscar
+    /*
     $.get(link, function(builds)
     {
         var row = $('#buildBox' + index).closest('tbody').find('tr').size()
@@ -67,6 +69,7 @@ function setOpenedBuilds(link, index)
             if($('#projects' + index).val() != 'ditto') break;
         }while(index < row)
     });
+    //*/
 }
 
 /**

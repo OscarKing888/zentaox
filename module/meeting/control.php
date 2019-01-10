@@ -29,6 +29,8 @@ class meeting extends control
 
     public function index($type = 'all', $account = '', $status = 'all', $orderBy = "createDate_desc", $recTotal = 0, $recPerPage = 20, $pageID = 1)
     {
+        //dao::$debug_log_sql = false;
+
         /* Save session. */
         $uri = $this->app->getURI(true);
         $this->session->set('meetingList', $uri);

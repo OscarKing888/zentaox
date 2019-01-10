@@ -29,8 +29,8 @@
     <tr>
       <th><?php echo $lang->bug->openedBuild;?></th>
       <td>
+          <?php echo html::select('openedBuild[]', $builds, $bug->openedBuild, 'size=4 multiple=multiple class="form-control chosen"');?>
           <?php echo html::input('openedBuild', '', "class='form-control'");?>
-          <div class="required required-wrapper"/>
       </td>
     </tr>
     <tr>

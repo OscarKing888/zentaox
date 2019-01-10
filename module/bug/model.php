@@ -70,8 +70,8 @@ class bugModel extends model
             ->setIF($this->post->story != false, 'storyVersion', $this->loadModel('story')->getVersion($this->post->story))
             ->stripTags($this->config->bug->editor->create['id'], $this->config->allowedTags)
             ->cleanInt('product, module, severity')
-            ->join('openedBuild', ',')
-            ->join('mailto', ',')
+            //->join('openedBuild', ',')
+            //->join('mailto', ',')
             ->remove('files, labels,uid,oldTaskID')
             ->get();
 
@@ -80,6 +80,9 @@ class bugModel extends model
         if($result['stop']) return array('status' => 'exists', 'id' => $result['duplicate']);
 
         $bug = $this->loadModel('file')->processImgURL($bug, $this->config->bug->editor->create['id'], $this->post->uid);
+
+        //error_log("oscar: bug openedBuild:$bug->openedBuild");
+
         $this->dao->insert(TABLE_BUG)->data($bug)->autoCheck()->batchCheck($this->config->bug->create->requiredFields, 'notempty')->exec();
         if(!dao::isError())
         {
@@ -131,6 +134,8 @@ class bugModel extends model
         $pri     = 0;
         $os      = '';
         $browser = '';
+        $openedBuild = '';
+
         for($i = 0; $i < $batchNum; $i++)
         {
             if($data->modules[$i]  != 'ditto') $module  = (int)$data->modules[$i];
@@ -139,6 +144,7 @@ class bugModel extends model
             if($data->pris[$i]     != 'ditto') $pri     = $data->pris[$i];
             if($data->oses[$i]     != 'ditto') $os      = $data->oses[$i];
             if($data->browsers[$i] != 'ditto') $browser = $data->browsers[$i];
+            if($data->openedBuilds[$i] != 'ditto') $openedBuild = $data->openedBuilds[$i];
 
             $data->modules[$i]  = (int)$module;
             $data->projects[$i] = (int)$project;
@@ -146,6 +152,7 @@ class bugModel extends model
             $data->pris[$i]     = $pri;
             $data->oses[$i]     = $os;
             $data->browsers[$i] = $browser;
+            $data->openedBuilds[$i] = $openedBuild;
         }
 
         if(isset($data->uploadImage)) $this->loadModel('file');
@@ -170,6 +177,7 @@ class bugModel extends model
             $bug->os          = $data->oses[$i];
             $bug->browser     = $data->browsers[$i];
             $bug->keywords    = $data->keywords[$i];
+            $bug->openedBuild    = $data->openedBuilds[$i];
 
             if(!empty($data->uploadImage[$i]))
             {
@@ -201,6 +209,13 @@ class bugModel extends model
                 $bug->assignedTo   = $moduleOwners[$bug->module];
                 $bug->assignedDate = $now;
             }
+
+            /*
+            foreach ($bug as $k => $v)
+            {
+                error_log("batchBug: $k -> $v");
+            }
+            //*/
 
             $this->dao->insert(TABLE_BUG)->data($bug)->autoCheck()->batchCheck($this->config->bug->create->requiredFields, 'notempty')->exec();
             $bugID = $this->dao->lastInsertID();
@@ -581,7 +596,9 @@ class bugModel extends model
                 if($data->resolvedBys[$bugID] == 'ditto') $data->resolvedBys[$bugID] = isset($prev['resolvedBy']) ? $prev['resolvedBy'] : ''; 
                 if($data->resolutions[$bugID] == 'ditto') $data->resolutions[$bugID] = isset($prev['resolution']) ? $prev['resolution'] : ''; 
                 if($data->os[$bugID]          == 'ditto') $data->os[$bugID]          = isset($prev['os'])         ? $prev['os'] : ''; 
-                if($data->browsers[$bugID]    == 'ditto') $data->browsers[$bugID]    = isset($prev['browser'])    ? $prev['browser'] : ''; 
+                if($data->browsers[$bugID]    == 'ditto') $data->browsers[$bugID]    = isset($prev['browser'])    ? $prev['browser'] : '';
+
+                if($data->openedBuilds[$bugID]    == 'ditto') $data->openedBuilds[$bugID]    = isset($prev['openedBuild'])    ? $prev['openedBuild'] : '';
 
                 $prev['type']       = $data->types[$bugID];
                 $prev['severity']   = $data->severities[$bugID];
@@ -593,6 +610,8 @@ class bugModel extends model
                 $prev['resolution'] = $data->resolutions[$bugID];
                 $prev['os']         = $data->os[$bugID];
                 $prev['browser']    = $data->browsers[$bugID];
+
+                $prev['openedBuild']    = $data->openedBuilds[$bugID];
             }
 
             /* Initialize bugs from the post data.*/
@@ -620,6 +639,8 @@ class bugModel extends model
                 $bug->browser        = $data->browsers[$bugID];
                 $bug->resolution     = $data->resolutions[$bugID];
                 $bug->duplicateBug   = $data->duplicateBugs[$bugID] ? $data->duplicateBugs[$bugID] : $oldBug->duplicateBug;
+
+                $bug->openedBuild   = $data->openedBuilds[$bugID] ? $data->openedBuilds[$bugID] : $oldBug->openedBuild;
 
                 if($bug->assignedTo  != $oldBug->assignedTo)           $bug->assignedDate = $now;
                 if(($bug->resolvedBy != '' or $bug->resolution != '') and $oldBug->status != 'resolved') $bug->resolvedDate = $now;
@@ -678,10 +699,14 @@ class bugModel extends model
         $now  = helper::now();
         $data = fixer::input('post')->get();
 
+        //error_log("batchActive 1");
+
         $activateBugs = array();
         $bugIDList    = $data->bugIDList ? $data->bugIDList : array();
 
         if(empty($bugIDList)) return $activateBugs;
+
+        ///error_log("batchActive 2", var_export($bugIDList));
 
         foreach($bugIDList as $bugID)
         {
@@ -704,6 +729,9 @@ class bugModel extends model
             $activateBugs[$bugID]['toStory']        = 0;
             $activateBugs[$bugID]['lastEditedBy']   = $this->app->user->account;
             $activateBugs[$bugID]['lastEditedDate'] = $now;
+
+            $activateBugs[$bugID]['openedBuild']    = $data->openedBuildList[$bugID];
+            ///error_log("openedBuildList:" . $data->openedBuildList[$bugID]);
         }
 
         /* Update bugs. */
@@ -831,6 +859,7 @@ class bugModel extends model
             ->get();
 
         /* Can create build when resolve bug. */
+        /* oscar
         if(isset($bug->createBuild))
         {
             if(empty($bug->buildName)) dao::$errors['buildName'][] = sprintf($this->lang->error->notempty, $this->lang->bug->placeholder->newBuildName);
@@ -852,11 +881,13 @@ class bugModel extends model
             $this->loadModel('action')->create('build', $buildID, 'opened');
             $bug->resolvedBuild = $buildID;
         }
+        //*/
+
         unset($bug->buildName);
         unset($bug->createBuild);
         unset($bug->buildProject);
 
-        if($bug->resolvedBuild != 'trunk') $bug->testtask = (int) $this->dao->select('id')->from(TABLE_TESTTASK)->where('build')->eq($bug->resolvedBuild)->orderBy('id_desc')->limit(1)->fetch('id');
+        //oscar if($bug->resolvedBuild != 'trunk') $bug->testtask = (int) $this->dao->select('id')->from(TABLE_TESTTASK)->where('build')->eq($bug->resolvedBuild)->orderBy('id_desc')->limit(1)->fetch('id');
 
         $this->dao->update(TABLE_BUG)->data($bug)
             ->autoCheck()
@@ -867,7 +898,7 @@ class bugModel extends model
             ->exec();
         if(!dao::isError()) $this->loadModel('score')->create('bug', 'resolve', $oldBug);
         /* Link bug to build and release. */
-        $this->linkBugToBuild($bugID, $bug->resolvedBuild);
+        //oscar $this->linkBugToBuild($bugID, $bug->resolvedBuild);
     }
 
     /**
@@ -1025,11 +1056,14 @@ class bugModel extends model
             ->add('lastEditedBy',   $this->app->user->account)
             ->add('lastEditedDate', $now)
             ->add('activatedDate', $now)
-            ->join('openedBuild', ',')
+            //->join('openedBuild', ',')
             ->remove('comment,files,labels')
             ->get();
 
-        $this->dao->update(TABLE_BUG)->data($bug)->autoCheck()->where('id')->eq((int)$bugID)->exec();
+        $this->dao->update(TABLE_BUG)->data($bug)->autoCheck()->where('id')->eq((int)$bugID)
+            ->autoCheck()
+            ->batchCheck($this->config->bug->activate->requiredFields, 'notempty')
+            ->exec();
         $this->dao->update(TABLE_BUG)->set('activatedCount = activatedCount + 1')->where('id')->eq((int)$bugID)->exec();
     }
 

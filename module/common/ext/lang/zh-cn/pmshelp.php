@@ -9,5 +9,4 @@ $lang->pmshelp->menu->index        = '首页|pmshelp|index';
 
 
 /* pipeline menu order. */
-$lang->menuOrder[-1]  = 'pmshelp';
 $lang->pmshelp->menuOrder[5]  = 'index';

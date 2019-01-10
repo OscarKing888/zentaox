@@ -92,7 +92,13 @@ function onShowDelayOnly()
 {
     g_showDelayOnly = !g_showDelayOnly;
     console.log("show delay:", g_showDelayOnly);
+    refreshDelayCheck();
     redraw();
+}
+
+function refreshDelayCheck()
+{
+    $('#delayLabel').text(g_showDelayOnly  ? '✔已延期' : ' 已延期');
 }
 
 function onZoomIn()
@@ -324,11 +330,26 @@ function print_call_stack() {
 }
 
 //*
-$(function()
+$(document).ready(function()
 {
     //alert("init()");
     //console.log($("#tasks"));
     //drawProjectBlueprint($("#tasks"));
+
+    refreshDelayCheck();
+
+    $('#dept').change(function()
+    {
+        onDeptChange();
+        ajaxGetTasks();
+    });
+
+    $('#milestone').change(function()
+    {
+        onMilestoneChange();
+        ajaxGetTasks();
+    });
+
     canvas = document.getElementById("projectCanvas");
     context = canvas.getContext('2d');
 
@@ -343,6 +364,18 @@ $(function()
     onOrigi();
 });
 //*/
+
+function onDeptChange()
+{
+    selectedDept = $('#dept option:selected').val();
+    //alert("onDeptChange:" + selectedDept + " " + $('#dept option:selected').text());
+}
+
+function onMilestoneChange()
+{
+    selectedMilestone = $('#milestone option:selected').val();
+    //alert("onMilestoneChange:" + selectedMilestone + " " + $('#milestone option:selected').text());
+}
 
 function resizeCanvas() {
     var captionBarHeight = 165 + 32;
@@ -483,8 +516,13 @@ $(document).ready(function()
 
 function ajaxGetTasks()
 {
-    url = createLink('task', 'ajaxGetBlueprintTasks');
-    //alert("on_createUserAbsent userid:" + userid + " day:" + day + " url:" + url);
+    selectedDept = $('#dept option:selected').val();
+    selectedMilestone = $('#milestone option:selected').val();
+
+    //alert("ajaxGetTasks selectedDept:" + selectedDept + " selectedMilestone:" + selectedMilestone);
+
+    url = createLink('task', 'ajaxGetBlueprintTasks', 'dept=' + selectedDept + "&milestone=" + selectedMilestone);
+    //alert("ajaxGetTasks userid:" + " url:" + url);
 
     var tasks = null;
 

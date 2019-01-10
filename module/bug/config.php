@@ -8,7 +8,8 @@ $config->bug->edit    = new stdclass();
 $config->bug->resolve = new stdclass();
 $config->bug->create->requiredFields  = 'title,openedBuild,module';
 $config->bug->edit->requiredFields    = $config->bug->create->requiredFields;
-$config->bug->resolve->requiredFields = 'resolution';
+$config->bug->resolve->requiredFields = 'resolution,resolvedBuild';
+$config->bug->activate->requiredFields = 'openedBuild';
 
 $config->bug->list = new stdclass();
 $config->bug->list->allFields = 'id, module, project, story, task, 
@@ -43,7 +44,8 @@ $config->bug->list->customBatchEditFields   = 'type,severity,pri,productplan,ass
 
 $config->bug->custom = new stdclass();
 $config->bug->custom->createFields      = $config->bug->list->customCreateFields;
-$config->bug->custom->batchCreateFields = 'module,project,steps,type,severity,os,browser';
+//$config->bug->custom->batchCreateFields = 'module,project,steps,type,severity,os,browser';
+$config->bug->custom->batchCreateFields = 'module,steps,type,severity,os,browser';
 $config->bug->custom->batchEditFields   = 'type,severity,pri,branch,assignedTo,deadline,status,resolvedBy,resolution';
 
 if($config->global->flow == 'onlyTest')

@@ -317,6 +317,7 @@ class task extends control
             ->where('project')->eq($this->view->project->id)
             ->orderBy('id desc')
             ->fetchPairs('id');
+        $milestones[0] = '无';
         $this->view->milestones = $milestones;
         // oscar
 
@@ -686,6 +687,8 @@ class task extends control
         $milestone = $this->dao->select('id, name')->from(TABLE_TASKMILESTONE)
             ->where('id')->eq($task->milestone)
             ->fetch('name');
+
+        $milestone[0] = '无';
         $this->view->milestone = $milestone;
         // oscar
 
@@ -1595,9 +1598,9 @@ class task extends control
         die(json_encode($task));
     }
 
-    public function ajaxGetBlueprintTasks()
+    public function ajaxGetBlueprintTasks($dept = 0, $milestone = 0)
     {
-        $tasks = $this->task->ajaxGetBlueprintTasks();
+        $tasks = $this->task->ajaxGetBlueprintTasks($dept, $milestone);
         $depts = $this->dept->getOptionMenu(); //oscar:
         foreach ($tasks as $task) {
             $task->deptName = $depts[$task->dept];

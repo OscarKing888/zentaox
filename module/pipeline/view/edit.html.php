@@ -55,8 +55,8 @@ $steps = $article->steps;
                                         <span class='input-group-addon step-item-id'></span>
                                         <?php echo html::select("steps[]", $depts, 0, 'class=form-control chosen'); ?>
                                         <span class="input-group-addon step-type-toggle">
-                                          <input type='hidden' name='stepType[]' value='step' class='step-type'>
-                                          <label class="checkbox-inline"><input tabindex='-1' type="checkbox" class='step-group-toggle'> <?php echo "子阶段" ?></label>
+                                          <input type='hidden' name='stepType[]' value='group' class='step-type'>
+                                          <label class="checkbox-inline"><input tabindex='-1' type="checkbox" class='step-group-toggle' checked> <?php echo "子阶段" ?></label>
                                         </span>
                                     </div>
                                 </td>

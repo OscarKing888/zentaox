@@ -96,7 +96,7 @@ function hideXIcon(templateID)
 
 $(function()
 {
-    if($('#project').val()) loadProjectRelated($('#project').val());
+    //if($('#project').val()) loadProjectRelated($('#project').val());
     $('#saveTplModal').on('hide.zui.modal', function(){$(this).find('#title').val('');});
     $('#saveTplBtn').click(function(){$('#saveTplModal').modal('show');});
     $('#saveTplModal #submit').click(function()

@@ -2145,7 +2145,18 @@ class project extends control
         $this->view->actions = $this->loadModel('action')->getList('project', $projectID);
         $this->view->users = $this->loadModel('user')->getPairs('noletter');
 
+        $this->view->depts = $this->loadModel('dept')->getOptionMenu();
+
         $this->app->user->currentPrj = $projectID;
+
+        // oscar
+        $milestones = $this->dao->select('id, name')->from(TABLE_TASKMILESTONE)
+            ->where('project')->eq($this->view->project->id)
+            ->orderBy('id desc')
+            ->fetchPairs('id');
+        $milestones[0] = '无';
+        $this->view->milestones = $milestones;
+        // oscar
 
         /*
         $tasks = $this->dao->select()

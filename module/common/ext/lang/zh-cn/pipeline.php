@@ -12,6 +12,5 @@ $lang->pipeline->menu->autostory        = '设置自动需求关联|pipeline|aut
 
 
 /* pipeline menu order. */
-$lang->menuOrder[8]  = 'pipeline';
 $lang->pipeline->menuOrder[5]  = 'index';
 $lang->pipeline->menuOrder[10] = 'restore';

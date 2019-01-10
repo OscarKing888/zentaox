@@ -14,7 +14,6 @@ $lang->blog->menu->searchbydepartment        = 'Search by Department|blog|search
 $lang->blog->menu->view        = 'Search by User|blog|view';
 
 /* blog menu order. */
-$lang->menuOrder[0]  = 'blog';
 $lang->blog->menuOrder[5]  = 'index';
 $lang->blog->menuOrder[10] = 'restore';
 $lang->blog->menuOrder[15] = 'reportmyteam';

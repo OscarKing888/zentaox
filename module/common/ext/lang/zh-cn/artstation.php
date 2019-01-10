@@ -9,7 +9,6 @@ $lang->artstation->menu->my       = '我的作品|artstation|my';
 $lang->artstation->menu->search       = '分类查询|artstation|search';
 $lang->artstation->menu->restore        = '恢复|artstation|restore';
 
-$lang->menuOrder[1]  = 'artstation';
 $lang->artstation->menuOrder[5]  = 'index';
 $lang->artstation->menuOrder[10] = 'my';
 $lang->artstation->menuOrder[15] = 'search';

@@ -5,7 +5,7 @@
 .step-actions {width: 100px;}
 #steps .active td {transition: background-color .5s;}
 #steps .step-group .step-steps {resize: none; max-height: 30px;}
-#steps .step-group .step-expects {display: none;}
+/*#steps .step-group .step-expects {display: none;}*/
 #steps .step-item .step-item-id {display: table-cell; min-width: 40px;}
 #steps .step-item .step-id {color: transparent}
 #steps .step-group .step-id {font-weight: bold}

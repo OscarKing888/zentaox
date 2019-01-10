@@ -1,6 +1,17 @@
 <?php
 /* Sort of main menu. */
-$lang->menuOrder[5]  = 'my';
+
+$lang->menuOrder[-1]  = 'pmshelp';
+$lang->menuOrder[1]  = 'my';
+$lang->menuOrder[2]  = 'blog';
+$lang->menuOrder[3]  = 'meeting';
+$lang->menuOrder[4]  = 'artstation';
+$lang->menuOrder[5]  = 'pipeline';
+$lang->menuOrder[6]  = 'timeline';
+$lang->menuOrder[7]  = 'books';
+$lang->menuOrder[8]  = 'gametaskinternal';
+
+
 $lang->menuOrder[10] = 'product';
 $lang->menuOrder[15] = 'project';
 $lang->menuOrder[20] = 'qa';
