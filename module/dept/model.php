@@ -414,6 +414,46 @@ class deptModel extends model
     }
 
     //oscar:
+    public function setupDeptWithUsers($view)
+    {
+        $depts = $this->dao->select('id,name')->from(TABLE_DEPT)->fetchPairs();
+
+        $deptUsers = array();
+
+        $this->loadModel('user');
+        $allUsers = $this->user->getPairs('nodeleted|noclosed');
+
+        foreach($depts as $k => $v)
+        {
+            $deptUserList = $this->dao->select('account, realname')->from(TABLE_USER)
+                ->where('deleted')->eq(0)
+                ->andWhere('dept')->eq($k)
+                ->orderBy('account')
+                ->fetchPairs('account');
+
+            foreach($deptUserList as $account => $user)
+            {
+                $firstLetter = ucfirst(substr($account, 0, 1)) . ':';
+                //if(strpos($params, 'noletter') !== false) $firstLetter =  '';
+                $deptUserList[$account] =  $firstLetter . $user;
+            }
+
+            $deptUsers[$k] = $deptUserList;
+        }
+
+        $view->deptWithUsers = $deptUsers;
+
+        /*
+        foreach ($deptUsers as $k => $values) {
+            error_log("=== dump dept users:$k values:$values");
+            foreach($values as $ku => $u)
+            {
+                error_log(" k:$ku u:$u");
+            }
+        }
+        //*/
+    }
+
     public function setupDeptUsers($view, $account, $dept)
     {
         $myDepts = array($dept);

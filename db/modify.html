@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+*指定动作按钮图标
+$lang->icons['checkByGD']              = 'review';
+
+*icon定义位置
+zh-cn.blackberry.css
+
+*如何让动作按钮变灰
+public static function isClickable($task, $action)
+if($action == 'checkbygd')   return $task->status == 'done'; // 注意要小写
+
+*子菜单
+$lang->project->featureBar['task']['checkByMe']   = $lang->project->checkByMe;
+
+*激活子菜单
+
+
+*显示到权限设置表
+$lang->resource->project->productMilestone = 'productMilestone';
+
+*修改搜索字段
+$config->project->search['fields']['checkBy']        = $lang->task->checkBy;
+$config->project->search['fields']['dept']           = $lang->task->dept; // oscar
+$config->project->search['params']['dept']           = array('operator' => '=', 'control' => 'select',  'values' => $lang->task->deptList); // oscar
+$config->project->search['params']['checkBy']        = array('operator' => '=', 'control' => 'select',  'values' => 'users'); // oscar
+
+
+*如何修改显示表头相关：
+$config->story->datatable->fieldList['taskCount']['title']    = 'T';
+
+printHeader
+printCell
+
+*header/footer
+public static function printModuleMenu($moduleName)
+
+</body>
+</html>

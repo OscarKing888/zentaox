@@ -43,7 +43,7 @@ class taskModel extends model
             ->remove('after,files,labels,assignedTo,uid,storyEstimate,storyDesc,storyPri,qq,team,teamEstimate,teamMember,multiple,teams')
             ->get();
 
-        error_log("oscar createTask start:$task->estStarted deadline:$task->deadline");
+        //error_log("oscar createTask start:$task->estStarted deadline:$task->deadline");
 
         $task = $this->file->processImgURL($task, $this->config->task->editor->create['id'], $this->post->uid);
         $this->dao->insert(TABLE_TASK)->data($task)
@@ -774,9 +774,11 @@ class taskModel extends model
      * @access public
      * @return void
      */
-    public function assign($taskID)
+    public function assign($taskID, $account = -1)
     {
         $oldTask = $this->getById($taskID);
+
+        //error_log("task assign id:$taskID acc:$account oldAcc:" . $oldTask->assignedTo);
 
         $now  = helper::now();
         $pst = fixer::input('post')
@@ -788,11 +790,16 @@ class taskModel extends model
             ->get();
 
         $task = new stdClass();
-        $task->assignedTo = $pst->assignedTo;
+        $task->assignedTo = $account != -1 ? $account : $pst->assignedTo;
         $task->lastEditedBy = $pst->lastEditedBy;
         $task->lastEditedDate = $pst->lastEditedDate;
         $task->assignedDate = $pst->assignedDate;
 
+        $task->dept = $this->dao->select('dept')->from(TABLE_USER)
+            ->where('account')->eq($task->assignedTo)
+            ->fetch('dept');
+
+        //error_log("task.assign dept:" . $task->dept . " assignedTo:" . $pst->assignedTo . " assignToCheckByGD:" . $pst->assignToCheckByGD);
         /*
         error_log("task::assign taskID:$taskID");
         foreach ($task as $k => $v)
@@ -809,6 +816,85 @@ class taskModel extends model
 
         if(!dao::isError()) return common::createChanges($oldTask, $task);
     }
+
+    // oscar[
+    // todo assign to check by gd
+    public function assignCheckByGD($taskID, $account)
+    {
+        $oldTask = $this->getById($taskID);
+
+        $now  = helper::now();
+        $pst = fixer::input('post')
+            //->cleanFloat('left')
+            //->setDefault('lastEditedBy', $this->app->user->account)
+            //->setDefault('lastEditedDate', $now)
+            //->setDefault('checkDate', $now)
+            ->remove('comment,showModule,assignedToDept,batchChangeModule,workHour') //oscar:
+            ->get();
+
+        $task = new stdClass();
+        //$task->assignedTo = $pst->assignedTo;
+        //$task->lastEditedBy = $this->app->user->account;
+        //$task->lastEditedDate = $pst->lastEditedDate;
+
+        $task->checkBy = $account;//$pst->checkByGD;
+
+        //error_log("checkByGD:" . $task->checkBy . " assignedTo:" . $pst->assignedTo);
+        /*
+        error_log("task::assign taskID:$taskID");
+        foreach ($task as $k => $v)
+        {
+            error_log("==== tk:$k tv:$v");
+        }
+        //*/
+
+        $this->dao->update(TABLE_TASK)
+            ->data($task)
+            ->autoCheck()
+            ->check('left', 'float')
+            ->where('id')->eq($taskID)->exec();
+
+        if(!dao::isError()) return common::createChanges($oldTask, $task);
+    }
+
+    public function checkBy($taskID)
+    {
+        $oldTask = $this->getById($taskID);
+
+        $now  = helper::now();
+
+        $task = new stdClass();
+        $task->checkDate = $now;
+        $task->checked = 1;
+
+        $this->dao->update(TABLE_TASK)
+            ->data($task)
+            ->autoCheck()
+            ->check('left', 'float')
+            ->where('id')->eq($taskID)->exec();
+
+        if(!dao::isError()) return common::createChanges($oldTask, $task);
+    }
+
+    public function uncheckBy($taskID)
+    {
+        $oldTask = $this->getById($taskID);
+
+        $now  = helper::now();
+
+        $task = new stdClass();
+        $task->checkDate = $now;
+        $task->checked = 0;
+
+        $this->dao->update(TABLE_TASK)
+            ->data($task)
+            ->autoCheck()
+            ->check('left', 'float')
+            ->where('id')->eq($taskID)->exec();
+
+        if(!dao::isError()) return common::createChanges($oldTask, $task);
+    }
+    // oscar]
 
     /**
      * Start a task.
@@ -1326,7 +1412,7 @@ class taskModel extends model
         $estimate->left = 0;
         if($estimate->consumed) $this->addTaskEstimate($estimate);
 
-        error_log("oscar task consumed:$task->consumed est:$oldTask->estimate");
+        //error_log("oscar task consumed:$task->consumed est:$oldTask->estimate");
 
         $this->dao->update(TABLE_TASK)->data($task)
             ->autoCheck()
@@ -1584,6 +1670,8 @@ class taskModel extends model
      */
     public function getProjectTasks($projectID, $productID = 0, $type = 'all', $modules = 0, $orderBy = 'status_asc, id_desc', $pager = null)
     {
+        //error_log("getProjectTasks: type:$type queryID:$queryID orderBy:$orderBy me:" . $this->app->user->account);
+
         //oscar:
         $this->loadModel('dept');
 
@@ -1611,7 +1699,6 @@ class taskModel extends model
         $deptUsers = array_unique($deptUsers);
         $myDepts = array_unique($myDepts);
         //*/
-
         /*
         error_log("### dept:" . $this->view->depts[$this->app->user->dept]);
         foreach ($deptUsers as $deptUser) {
@@ -1624,7 +1711,9 @@ class taskModel extends model
         }
         //*/
 
-        //oscar:
+
+
+        //oscar: error_log("getProjTasks type:" . $type);
 
 
         //baseDAO::dumpsql(true);
@@ -1644,7 +1733,20 @@ class taskModel extends model
             ->where('t1.project')->eq((int)$projectID)
             ->beginIF(!in_array($type, array('assignedtome', 'myinvolved')))->andWhere('t1.parent')->eq(0)->fi()
 
+
             // oscar:
+
+            ->beginIF($type == 'checkbyme')
+                ->andWhere('t1.checkBy', true)->eq($this->app->user->account)
+                ->andWhere('t1.checked')->eq(0)
+                ->markRight(1)
+            ->fi()
+
+            ->beginIF($type == 'checkedbyme')
+            ->andWhere('t1.checkBy', true)->eq($this->app->user->account)
+            ->andWhere('t1.checked')->eq(1)
+            ->markRight(1)
+            ->fi()
 
             ->beginIF($type == 'mydept')
                 ->andWhere('t1.dept', true)->in(array_values($myDepts))
@@ -1672,7 +1774,7 @@ class taskModel extends model
             ->beginIF($type == 'assignedtome')->andWhere('t1.assignedTo')->eq($this->app->user->account)->fi()
             ->beginIF($type == 'finishedbyme')->andWhere('t1.finishedby')->eq($this->app->user->account)->fi()
             ->beginIF($type == 'delayed')->andWhere('t1.deadline')->gt('1970-1-1')->andWhere('t1.deadline')->lt(date(DT_DATE1))->andWhere('t1.status')->in('wait,doing')->fi()
-            ->beginIF($type != 'mydept' and $type != 'milestone' and (is_array($type) or strpos(',all,undone,needconfirm,assignedtome,delayed,finishedbyme,myinvolved,', ",$type,") === false))->andWhere('t1.status')->in($type)->fi()
+            ->beginIF($type != 'mydept' and $type != 'milestone' and $type != 'checkbyme' and $type != 'checkedbyme' and (is_array($type) or strpos(',all,undone,needconfirm,assignedtome,delayed,finishedbyme,myinvolved,', ",$type,") === false))->andWhere('t1.status')->in($type)->fi()
             ->beginIF($modules)->andWhere('t1.module')->in($modules)->fi()
             ->andWhere('t1.deleted')->eq(0)
             ->orderBy('t1.`parent`,' . $orderBy)
@@ -1714,6 +1816,7 @@ class taskModel extends model
             ->beginIF($type == 'finishedbyme')->andWhere('t1.finishedby')->eq($this->app->user->account)->fi()
             ->beginIF($type == 'delayed')->andWhere('t1.deadline')->gt('1970-1-1')->andWhere('t1.deadline')->lt(date(DT_DATE1))->andWhere('t1.status')->in('wait,doing')->fi()
             ->beginIF($type != 'mydept' and (is_array($type) or strpos(',all,undone,needconfirm,assignedtome,delayed,finishedbyme,myinvolved,', ",$type,") === false))->andWhere('t1.status')->in($type)->fi()
+            ->beginIF($type == 'checkbyme')->andWhere('t1.checkBy')->eq($this->app->user->account)->fi() // oscar
             ->beginIF($modules)->andWhere('t1.module')->in($modules)->fi()
             ->orderBy('t1.`id`,' . $orderBy)
             ->fetchAll('id');
@@ -1841,6 +1944,8 @@ class taskModel extends model
             {
                 $task->progress = round($task->consumed / ($task->consumed + $task->left), 2) * 100;
             }
+
+            //$this->console_log("    getStoryTasks:" . $task->progress);
         }
 
         return $tasks;
@@ -2413,6 +2518,8 @@ class taskModel extends model
     {
         $action = strtolower($action);
 
+        //error_log("isCLickable:" . $task->name . " action:" . $action);
+
         if($action == 'start'          and !empty($task->children)) return false;
         if($action == 'recordestimate' and !empty($task->children)) return false;
         if($action == 'finish'         and !empty($task->children)) return false;
@@ -2434,6 +2541,11 @@ class taskModel extends model
         if($action == 'activate') return $task->status == 'done'   or  $task->status == 'closed'  or $task->status  == 'cancel';
         if($action == 'finish')   return $task->status != 'done'   and $task->status != 'closed'  and $task->status != 'cancel';
         if($action == 'cancel')   return $task->status != 'done'   and $task->status != 'closed'  and $task->status != 'cancel';
+
+        // oscar[
+        if($action == 'checkbygd')   return $task->status == 'done';
+        // oscar]
+
 
         return true;
     }
@@ -2483,6 +2595,8 @@ class taskModel extends model
      */
     public function printCell($col, $task, $users, $browseType, $branchGroups, $modulePairs = array(), $mode = 'datatable', $child = false, $depts = array(), $pipeline=array(), $milestones=array())
     {
+        //error_log("task printCell browseType:" . $browseType);
+
         $canView  = common::hasPriv('task', 'view');
         $taskLink = helper::createLink('task', 'view', "taskID=$task->id");
         $account  = $this->app->user->account;
@@ -2548,8 +2662,26 @@ class taskModel extends model
 
                 case 'status':
                     $storyChanged = (!empty($task->storyStatus) and $task->storyStatus == 'active' and $task->latestStoryVersion > $task->storyVersion);
-                    $storyChanged ? print("<span class='warning'>{$this->lang->story->changed}</span> ") : print($this->lang->task->statusList[$task->status]);
+                    // oscar[
+                    if(!$task->checked)
+                    {
+                        //$storyChanged ? print("<span class='warning'>{$this->lang->story->changed}</span> ") :
+                        print($this->lang->task->statusList[$task->status]);
+                    }
+                    else
+                    {
+                        print($this->lang->task->statusList['checked']);
+                    }
+                    // oscar]
                     break;
+
+                // oscar[
+                case 'checkBy':
+                    //print($task->checkBy);
+                    echo zget($users, $task->checkBy);
+                    break;
+                // oscar]
+
                 case 'estimate':
                     echo round($task->estimate, 1);
                     break;
@@ -2643,6 +2775,20 @@ class taskModel extends model
                         common::printIcon('task', 'confirmStoryChange', "taskid=$task->id", '', 'list', '', 'hiddenwin');
                     }
                     common::printIcon('task', 'finish', "taskID=$task->id", $task, 'list', '', '', 'iframe', true);
+
+                    //common::hasPriv()
+                    //self::console_log("app account:" . $this->app->user->account);
+                    //self::console_log("app account obj:" . $this->app->user);
+                    if($task->checkBy == $this->app->user->account && !$task->checked)// && $task->status == 'done')
+                    {
+                        common::printIcon('task', 'checkByGD', "taskID=$task->id", $task, 'list', '', '', 'iframe', true);
+                    }
+
+                    if($task->checkBy == $this->app->user->account && $task->checked)
+                    {
+                        common::printIcon('task', 'uncheckByGD', "taskID=$task->id", $task, 'list', '', '', 'iframe', true);
+                    }
+
                     //common::printIcon('task', 'close',  "taskID=$task->id", $task, 'list', '', '', 'iframe', true);
                     //common::printIcon('task', 'edit',   "taskID=$task->id", $task, 'list');
                     if(empty($task->team) or empty($task->children)) {
@@ -2822,9 +2968,23 @@ class taskModel extends model
 
     public function ajaxGetBlueprintTasks($dept, $milestone)
     {
+        if($milestone != 0)
+        {
+            //error_log("ajaxGetBlueprintTasks:" . $milestone);
+            return $this->ajaxGetBlueprintTasksWithmilestone($dept, $milestone);
+        }
+
         //DAO::$debug_log_sql = true;
 
         //error_log("ajaxGetBlueprintTasks dept:$dept milestone:$milestone");
+
+        //$projectM = $this->loadModel('project');
+
+        $storieIds = $this->dao->select('id, story')->from(TABLE_PRODUCTMILESTONESTORY)
+            ->where('productMilestone')->eq($milestone)
+            //->andWhere('project')->eq($projectID)
+            ->fetchPairs('id');
+
 
         $tasks = $this->dao->select('t1.*, t2.id AS storyID, t2.title AS storyTitle, t2.product, t2.branch, t2.version AS latestStoryVersion, t2.status AS storyStatus, t3.realname AS assignedToRealName')
             ->from(TABLE_TASK)->alias('t1')
@@ -2834,12 +2994,12 @@ class taskModel extends model
             //->beginIF($moduleIdList)->andWhere('t1.module')->in($moduleIdList)->fi()
             ->andWhere('t1.deleted')->eq(0)
             ->beginIF($dept != 0)->andWhere('t1.dept')->eq($dept)->fi()
-            ->beginIF($milestone != 0)->andWhere('t1.milestone')->eq($milestone)->fi()
+            ->beginIF($milestone != 0)->andWhere('t1.story')->in(array_values($storieIds))->fi()
             //->andWhere('t1.id')->lt(1200)
             //->andWhere('t1.status')->eq('doing')
             //->groupBy('assignedTo')
             ->orderBy('dept_asc,assignedTo_asc,estStarted_asc')
-            ->limit(200)
+            //->limit(200)
             //->page($pager)
             ->fetchAll();
 
@@ -2877,5 +3037,145 @@ class taskModel extends model
         }
 
         return array();
+    }
+
+    public function ajaxGetBlueprintTasksWithmilestone($dept, $milestone)
+    {
+        //DAO::$debug_log_sql = true;
+
+        //error_log("ajaxGetBlueprintTasks dept:$dept milestone:$milestone");
+
+        //$projectM = $this->loadModel('project');
+
+        $objPairList = new stdClass();
+        //  objPair
+        //          story
+        //          tasks
+
+        //error_log("ajaxGetBlueprintTasks being");
+
+        $objPairList = array();
+
+        $storieIds = $this->dao->select('id, story')->from(TABLE_PRODUCTMILESTONESTORY)
+            ->where('productMilestone')->eq($milestone)
+            //->andWhere('project')->eq($projectID)
+            ->fetchPairs('id');
+
+        $stories = $this->dao->select('*')->from(TABLE_STORY)->alias('t1')
+            ->where('t1.id')->in(array_values($storieIds))
+            //->orderBy($orderBy)
+            ->orderBy('t1.id')
+            //->page($pager, 't1.id')
+            ->fetchAll('id');
+
+        //$this->loadModel('user');
+        //$allUsers = $this->user->getPairs('nodeleted|noclosed|noletter');
+        $allUsers = $this->dao->select()->from(TABLE_USER)
+            ->where('deleted')->eq('0')->fi()
+            ->orderBy('account')
+            ->fetchAll('account');
+
+        foreach ($stories as $story) {
+
+            $storyTasks = $this->dao->select('t1.*, t2.id AS storyID, t2.title AS storyTitle, t2.product, t2.branch, t2.version AS latestStoryVersion, t2.status AS storyStatus, t3.realname AS assignedToRealName')
+                ->from(TABLE_TASK)->alias('t1')
+                ->leftJoin(TABLE_STORY)->alias('t2')->on('t1.story = t2.id')
+                ->leftJoin(TABLE_USER)->alias('t3')->on('t1.assignedTo = t3.account')
+                ->where('t1.project')->eq((int)$this->app->user->currentPrj)
+                //->beginIF($moduleIdList)->andWhere('t1.module')->in($moduleIdList)->fi()
+                ->andWhere('t1.deleted')->eq(0)
+                ->beginIF($dept != 0)->andWhere('t1.dept')->eq($dept)->fi()
+                //->beginIF($milestone != 0)->andWhere('t1.story')->in(array_values($storieIds))->fi()
+                ->andWhere('t1.story')->eq($story->id)
+                //->andWhere('t1.id')->lt(1200)
+                //->andWhere('t1.status')->eq('doing')
+                //->groupBy('assignedTo')
+                ->orderBy('dept_asc,assignedTo_asc,estStarted_asc')
+                //->limit(200)
+                //->page($pager)
+                ->fetchAll();
+
+            $stPair = new stdClass();
+            $stPair->story = $story;
+
+            $storyTasks = $this->processTasks($storyTasks);
+            $stPair->tasks  = $storyTasks;
+            $taskCnt = count($storyTasks);
+
+            if ($taskCnt > 0) {
+                $stPair->story->assignedToRealName = $allUsers[$story->assignedTo]->realname;
+
+                $stPair->story->dept = $allUsers[$story->assignedTo]->dept;
+
+                $taskBeginDateMin = $storyTasks[0]->estStarted;
+                $taskDeadlineMax = $storyTasks[0]->deadline;
+
+                foreach ($storyTasks as $tt)
+                {
+                    if($tt->deadline > $taskDeadlineMax)
+                    {
+                        $taskDeadlineMax = $tt->deadline;
+                    }
+
+                    if($tt->estStarted < $taskBeginDateMin)
+                    {
+                        $taskBeginDateMin = $tt->estStarted;
+                    }
+                }
+
+                //$endTask = $storyTasks[$taskCnt - 1];
+                $stPair->story->taskBeginDate = $taskBeginDateMin;
+                $stPair->story->taskEndDate = $taskDeadlineMax;//$endTask->deadline;//helper::hoursafter($endTask->deadline, $endTask->estimate);
+                //$stPair->story->taskEndEstimate = $storyTasks[$taskCnt - 1]->estimate;
+            } else {
+                $stPair->story->taskBeginDate = $story->openedDate;
+                $stPair->story->taskEndDate = $story->openedDate;
+                $stPair->story->taskEndEstimate = 5;
+            }
+
+            //$objPairList->tasks[$story->id] = $stPair;
+            array_push($objPairList, $stPair);
+        }
+        /*
+        foreach ($tasks as $k => $taskGroup) {
+            error_log("==== task: $k -> $taskGroup->id $taskGroup->name");
+        }
+        //*/
+
+        /*
+        $procTasks = array();
+
+        error_log(" gggggggggggg:" . var_dump($tasks));
+
+        $idx = 0;
+        foreach ($tasks as $k => $taskGroup)
+        {
+            error_log("task:", $k, $taskGroup);
+
+            foreach ($taskGroup as $k2 => $task)
+            {
+                error_log(" task2:", $k2);
+                $procTasks[$idx] = $task;
+                $idx++;
+            }
+
+        }
+        //*/
+
+        //return $tasks;
+
+
+
+//        if($objPair->tasks)
+//        {
+//            $objPair->tasks = $this->processTasks($tasks);
+//        }
+//        else
+//        {
+//            $objPair->tasks = array();
+//        }
+
+        //  error_log("ajaxGetBlueprintTasks:" . $objPairList);
+        return $objPairList;
     }
 }

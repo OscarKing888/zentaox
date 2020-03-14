@@ -202,6 +202,11 @@ class pipeline extends control
         }
 
 
+        $this->loadModel('dept');
+        $leaders = $this->dao->select('dept,username')->from(TABLE_GAMEGROUPLEADERS)
+            ->orderBy('dept asc')
+            ->fetchPairs();
+
         //error_log("oscar: batchCreateRootTask projectID:$projectID pipelineID:$pipelineID storyID:$storyID");
 
         $pipeline = $this->pipeline->getById($pipelineID);
@@ -222,13 +227,14 @@ class pipeline extends control
 
         $preEstimate = 0;
         foreach ($pipeline->steps as $step) {
-            error_log("oscar: batchCreateRootTask step:$step $step->type dept:$step->dept");
+            //error_log("oscar: batchCreateRootTask step:$step $step->type dept:$step->dept");
             if($step->type == 'group')
             {
-                error_log("oscar: create root task step:$step dept:$step->dept est:$step->estimate");
+                //error_log("oscar: create root task step:$step dept:$step->dept est:$step->estimate");
 
                 $task = new stdClass();
                 $task->dept = $step->dept;
+                $task->assignedTo = $leaders[$step->dept];
                 $task->estimate = (float)$step->estimate;
                 $task->name = $story->title;
 
@@ -263,7 +269,7 @@ class pipeline extends control
                 $task->deadline =  helper::nowafter($preEstimate + 5 + $workHour);
                 $preEstimate = $preEstimate + $workHour + 1;
 
-                error_log("oscar: create task with pipeline - workHour:$workHour preEstimate:$preEstimate");
+                //error_log("oscar: create task with pipeline - workHour:$workHour preEstimate:$preEstimate");
 
                 $task->openedBy = $this->app->user->account;
                 $task->openedDate = helper::now();
@@ -303,8 +309,8 @@ class pipeline extends control
 
             //var_dump($leader);
 
-            for ($i = 0; $i < $batchNum; $i++) {
-                //error_log("oscar: groupleaders $i dept;$depts[$i]  username:$leader->username[$i]");
+            for ($i = 0; $i <= $batchNum; $i++) {
+                //error_log("oscar: groupleaders $i dept;$depts[$i]  username:" . $leader->username[$i]);
 
                 if (empty($leader->username[$i])) {
                     continue;
@@ -318,7 +324,7 @@ class pipeline extends control
                     ->where('dept')->eq($dat->dept)
                     ->count();
 
-                //error_log("oscar: groupleaders  select count:$c $dat->dept $dat->username" );
+                //error_log("oscar: groupleaders  select count:$c $dat->dept" .  $dat->username);
 
                 if ($c == 0) {
                     //error_log("oscar: groupleaders  insert count:$c $dat->dept $dat->username");
@@ -327,7 +333,7 @@ class pipeline extends control
                         //->batchCheck('dept,username', 'notempty')
                         ->exec();
                 } else {
-                    //error_log("oscar: groupleaders  update count:$c $dat->dept $dat->username");
+                    //error_log("oscar: groupleaders  update count:$c $dat->dept" .  $dat->username);
                     $this->dao->update(TABLE_GAMEGROUPLEADERS)->data($dat)
                         ->where('dept')->eq($dat->dept)
                         //->autoCheck()

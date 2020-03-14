@@ -954,6 +954,8 @@ function selectItem(SelectID)
  */
 function ajaxDelete(url, replaceID, notice)
 {
+    //alert("ajaxDelete:" + notice);
+
     if(confirm(notice))
     {
         $.ajax(

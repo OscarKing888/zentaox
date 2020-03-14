@@ -53,6 +53,7 @@ $config->story->custom->batchCreateFields = 'module,spec,assignedTo,pri';
 $config->story->custom->batchEditFields   = 'branch,module,plan,estimate,pri,source,stage,closedBy,closedReason';
 
 $config->story->datatable = new stdclass();
+//$config->story->datatable->defaultField = array('id', 'pri', 'title', 'plan', 'openedBy', 'assignedTo', 'estimate', 'status', 'stage', 'taskCount', 'bugCount', 'caseCount', 'progress', 'actions');
 $config->story->datatable->defaultField = array('id', 'pri', 'title', 'plan', 'openedBy', 'assignedTo', 'estimate', 'status', 'stage', 'taskCount', 'bugCount', 'caseCount', 'actions');
 
 $config->story->datatable->fieldList['id']['title']    = 'idAB';
@@ -201,3 +202,11 @@ $config->story->datatable->fieldList['actions']['title']    = 'actions';
 $config->story->datatable->fieldList['actions']['fixed']    = 'right';
 $config->story->datatable->fieldList['actions']['width']    = '140';
 $config->story->datatable->fieldList['actions']['required'] = 'yes';
+
+// oscar[
+//$config->story->datatable->fieldList['progress']['title']    = 'progress';
+//$config->story->datatable->fieldList['progress']['fixed']    = 'right';
+//$config->story->datatable->fieldList['progress']['width']    = '120';
+//$config->story->datatable->fieldList['progress']['required'] = 'yes';
+
+// oscar]

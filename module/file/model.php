@@ -431,7 +431,7 @@ class fileModel extends model
                 $files[] = $file;
             }
         } else {
-            error_log("     ======== !is_array");
+            //error_log("     ======== !is_array");
             if (empty($_FILES[$htmlTagName]['name'])) return $files;
             extract($_FILES[$htmlTagName]);
             if (!validater::checkFileName($name)) return array();;

@@ -78,8 +78,8 @@ $lang->task->assignTo         = $lang->task->assign;
 $lang->task->batchAssignTo    = '批量指派';
 $lang->task->assignedToDept   = '转部门';
 
-$lang->task->batchChangeVersion     = '里程碑';
-$lang->task->milestone     = '里程碑';
+$lang->task->batchChangeVersion     = '标签';
+$lang->task->milestone     = '标签';
 
 $lang->task->assignedTo       = '指派给';
 $lang->task->assignedToAB     = '指派给';
@@ -161,6 +161,7 @@ $lang->task->statusList['done']   = '已完成';
 $lang->task->statusList['pause']  = '已暂停';
 $lang->task->statusList['cancel'] = '已取消';
 $lang->task->statusList['closed'] = '已关闭';
+$lang->task->statusList['checked'] = '已验收'; // oscar
 
 $lang->task->typeList['']        = '';
 $lang->task->typeList['design']  = '设计';
@@ -303,3 +304,10 @@ $lang->task->report->finishedTasksPerDay->type             = 'bar';
 $lang->task->report->finishedTasksPerDay->graph->xAxisName = '日期';
 
 $lang->task->batchCreateChildTask = '🚅‍';
+
+// oscar[
+$lang->task->checkByGD        = "验收";
+$lang->task->checkBy        = "验收";
+$lang->task->uncheckByGD = '取消验收';
+$lang->task->batchAssignToCheckByGD = '指定验收';
+// oscar]

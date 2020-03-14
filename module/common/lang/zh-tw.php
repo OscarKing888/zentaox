@@ -219,6 +219,7 @@ $lang->project->menu = new stdclass();
 $lang->project->menu->list      = array('link' => '%s', 'fixed' => true);
 $lang->project->menu->task      = array('link' => '任務|project|task|projectID=%s', 'subModule' => 'task,tree', 'alias' => 'grouptask,importtask,burn,importbug,kanban,printkanban,tree');
 $lang->project->menu->story     = array('link' => '需求|project|story|projectID=%s', 'subModule' => 'story', 'alias' => 'linkstory,storykanban');
+$lang->project->menu->productMilestone      = '里程碑|project|productMilestone|projectID=%s';
 $lang->project->menu->bug       = 'Bug|project|bug|projectID=%s';
 $lang->project->menu->dynamic   = '動態|project|dynamic|projectID=%s';
 $lang->project->menu->build     = array('link' => '版本|project|build|projectID=%s', 'subModule' => 'build');
@@ -584,6 +585,10 @@ $lang->icons['manage']             = 'cog';
 $lang->icons['unlock']             = 'unlock-alt';
 $lang->icons['confirmStoryChange'] = 'search';
 $lang->icons['score']              = 'tint';
+
+// oscar[
+$lang->icons['checkByGD']              = 'review';
+// oscar]
 
 include (dirname(__FILE__) . '/menuOrder.php');
 

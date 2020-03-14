@@ -60,9 +60,9 @@
 
             var data = dataList[i].replace(/(^\s*)|(\s*$)/g, "");
             data = data.replace(/ 工时/g, "");
-            data = data.replace(/年/g, "-");
-            data = data.replace(/月/g, "-");
-            data = data.replace(/日/g, "");
+            //data = data.replace(/年/g, "-");
+            //data = data.replace(/月/g, "-");
+            //data = data.replace(/日/g, "");
             data = data.replace("[子]", "");
             //data = data.replace(/\//g, "-");
 
@@ -131,14 +131,23 @@
 
             idField = $('form tbody tr').eq(index).find("input[id*='estStarted']");
             var datStr = fields[idx_estStarted];
-            datStr = datStr.replace(/\//g, "-");
-            var datStrLst = datStr.split('-');
-            var newDatStr = datStrLst[0] + "-" + ("0" + datStrLst[1]).slice(-2) + "-" + ("0" + datStrLst[2]).slice(-2);
+            //datStr = datStr.replace(/\//g, "-");
+            //var datStrLst = datStr.split('-');
+            //var newDatStr = datStrLst[0] + "-" + ("0" + datStrLst[1]).slice(-2) + "-" + ("0" + datStrLst[2]).slice(-2);
             //console.warn("date -> local", datStr, newDatStr);
-            $(idField).val(newDatStr);
+
+            datStr = datStr.replace(/年/g, "-");
+            datStr = datStr.replace(/月/g, "-");
+            datStr = datStr.replace(/日/g, "");
+            datStr = datStr.replace(/\//g, "-");
+            //console.log("datastr:", datStr);
+            $(idField).val(datStr);
 
             idField = $('form tbody tr').eq(index).find("input[id*='deadline']");
             var datStr = fields[idx_deadline];
+            datStr = datStr.replace(/年/g, "-");
+            datStr = datStr.replace(/月/g, "-");
+            datStr = datStr.replace(/日/g, "");
             datStr = datStr.replace(/\//g, "-");
             $(idField).val(datStr);
 

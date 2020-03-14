@@ -599,13 +599,15 @@ class task extends control
      * @access public
      * @return void
      */
-    public function batchAssignTo($project)
+    public function batchAssignTo($project, $account)
     {
         if (!empty($_POST)) {
-            error_log("batchAssignTo proj:$project");
+            /*
+            error_log("batchAssignTo proj:$project acc:$account");
             foreach ($_POST as $k => $v) {
-                error_log("==== k:$k v:$v");
+                error_log("==== post data k:$k v:$v");
             }
+            //*/
 
 
             $taskIDList = $this->post->taskIDList;
@@ -615,8 +617,8 @@ class task extends control
             //$taskIDList = array_unique($taskIDList);
             foreach ($taskIDList as $taskID) {
                 $this->loadModel('action');
-                $changes = $this->task->assign($taskID);
-                error_log("batchAssignTo task:$taskID");
+                $changes = $this->task->assign($taskID, $account);
+                //error_log("batchAssignTo task:$taskID");
                 if (dao::isError()) die(js::error(dao::getError()));
                 $actionID = $this->action->create('task', $taskID, 'Assigned', $this->post->comment, $this->post->assignedTo);
                 $this->action->logHistory($actionID, $changes);
@@ -626,6 +628,41 @@ class task extends control
             die(js::reload('parent'));
         }
     }
+
+    public static function __callStatic($name, $arguments)
+    {
+        // TODO: Implement __callStatic() method.
+    }// oscar[
+    public function batchAssignToCheckByGD($project, $account)
+    {
+        if (!empty($_POST)) {
+            /*
+             error_log("batchAssignToCheckByGD proj:$project acc$account");
+            foreach ($_POST as $k => $v) {
+                error_log("==== k:$k v:$v");
+            }
+            //*/
+
+
+            $taskIDList = $this->post->taskIDList;
+            //$taskIDList = array_unique($taskIDList);
+            unset($_POST['taskIDList']);
+            if (!is_array($taskIDList)) die(js::locate($this->createLink('project', 'task', "projectID=$project"), 'parent'));
+            //$taskIDList = array_unique($taskIDList);
+            foreach ($taskIDList as $taskID) {
+                $this->loadModel('action');
+                $changes = $this->task->assignCheckByGD($taskID, $account);
+                //error_log("batchAssignToCheckByGD task:$taskID");
+                if (dao::isError()) die(js::error(dao::getError()));
+                $actionID = $this->action->create('task', $taskID, 'Assigned To Check By GD', $this->post->comment, $this->post->assignToCheckByGD);
+                $this->action->logHistory($actionID, $changes);
+                $this->task->sendmail($taskID, $actionID);
+            }
+            if (!dao::isError()) $this->loadModel('score')->create('ajax', 'batchOther');
+            die(js::reload('parent'));
+        }
+    }
+    // oscar]
 
     /**
      * View a task.
@@ -1602,8 +1639,12 @@ class task extends control
     {
         $tasks = $this->task->ajaxGetBlueprintTasks($dept, $milestone);
         $depts = $this->dept->getOptionMenu(); //oscar:
-        foreach ($tasks as $task) {
-            $task->deptName = $depts[$task->dept];
+        foreach($tasks as $dat)
+        {
+            $dat->story->deptName = $depts[$dat->story->dept];
+            foreach ($dat->tasks as $task) {
+                $task->deptName = $depts[$task->dept];
+            }
         }
         //$retTasks = new stdClass();
         //$retTasks->tasks = $tasks;
@@ -1750,6 +1791,118 @@ class task extends control
         $this->view->deptUsers = $this->user->getPairs('nodeleted|noclosed|noletter');
 
         $this->display();
+    }
+
+    public function checkByGD($taskID)
+    {
+        $this->commonAction($taskID);
+
+        //if (!empty($_POST))
+        {
+            $this->loadModel('action');
+            $changes = $this->task->checkBy($taskID);
+            if (dao::isError()) die(js::error(dao::getError()));
+            //$files = $this->loadModel('file')->saveUpload('task', $taskID);
+
+            $task = $this->task->getById($taskID);
+            //if ($this->post->comment != '' or !empty($changes))
+            if (!empty($changes))
+            {
+                $fileAction = !empty($files) ? $this->lang->addFiles . join(',', $files) . "\n" : '';
+                $actionID = $this->action->create('task', $taskID, 'Finished', $fileAction);
+                $this->action->logHistory($actionID, $changes);
+                $this->task->sendmail($taskID, $actionID);
+            }
+
+//            if ($this->task->needUpdateBugStatus($task)) {
+//                foreach ($changes as $change) {
+//                    if ($change['field'] == 'status') {
+//                        $confirmURL = $this->createLink('bug', 'view', "id=$task->fromBug");
+//                        unset($_GET['onlybody']);
+//                        $cancelURL = $this->createLink('task', 'view', "taskID=$taskID");
+//                        die(js::confirm(sprintf($this->lang->task->remindBug, $task->fromBug), $confirmURL, $cancelURL, 'parent', 'parent.parent'));
+//                    }
+//                }
+//            }
+            if (isonlybody()) die(js::closeModal('parent.parent', 'this'));
+            die(js::locate($this->createLink('task', 'view', "taskID=$taskID"), 'parent'));
+        }
+
+        $task = $this->view->task;
+        $members = $this->loadModel('user')->getPairs('noletter');
+
+        $this->view->users = $members;
+//        if (!empty($task->team)) {
+//            $teams = array_keys($task->team);
+//
+//            $task->nextBy = $this->task->getNextUser($teams, $task->assignedTo);
+//            $task->myConsumed = $this->dao->select('consumed')->from(TABLE_TEAM)->where('task')->eq($taskID)->andWhere('account')->eq($task->assignedTo)->fetch('consumed');
+//
+//            $lastAccount = end($teams);
+//            if ($lastAccount != $task->assignedTo) {
+//                $members = $this->task->getMemberPairs($task);
+//            } else {
+//                $task->nextBy = $task->openedBy;
+//            }
+//        }
+
+        die(js::reload('parent'));
+    }
+
+    public function uncheckByGD($taskID)
+    {
+        $this->commonAction($taskID);
+
+        //if (!empty($_POST))
+        {
+            $this->loadModel('action');
+            $changes = $this->task->uncheckBy($taskID);
+            if (dao::isError()) die(js::error(dao::getError()));
+            //$files = $this->loadModel('file')->saveUpload('task', $taskID);
+
+            $task = $this->task->getById($taskID);
+            //if ($this->post->comment != '' or !empty($changes))
+            if (!empty($changes))
+            {
+                $fileAction = !empty($files) ? $this->lang->addFiles . join(',', $files) . "\n" : '';
+                $actionID = $this->action->create('task', $taskID, 'Finished', $fileAction);
+                $this->action->logHistory($actionID, $changes);
+                $this->task->sendmail($taskID, $actionID);
+            }
+
+            if ($this->task->needUpdateBugStatus($task)) {
+                foreach ($changes as $change) {
+                    if ($change['field'] == 'status') {
+                        $confirmURL = $this->createLink('bug', 'view', "id=$task->fromBug");
+                        unset($_GET['onlybody']);
+                        $cancelURL = $this->createLink('task', 'view', "taskID=$taskID");
+                        die(js::confirm(sprintf($this->lang->task->remindBug, $task->fromBug), $confirmURL, $cancelURL, 'parent', 'parent.parent'));
+                    }
+                }
+            }
+            if (isonlybody()) die(js::closeModal('parent.parent', 'this'));
+            die(js::locate($this->createLink('task', 'view', "taskID=$taskID"), 'parent'));
+        }
+
+        $task = $this->view->task;
+        $members = $this->loadModel('user')->getPairs('noletter');
+
+        $this->view->users = $members;
+//        if (!empty($task->team)) {
+//            $teams = array_keys($task->team);
+//
+//            $task->nextBy = $this->task->getNextUser($teams, $task->assignedTo);
+//            $task->myConsumed = $this->dao->select('consumed')->from(TABLE_TEAM)->where('task')->eq($taskID)->andWhere('account')->eq($task->assignedTo)->fetch('consumed');
+//
+//            $lastAccount = end($teams);
+//            if ($lastAccount != $task->assignedTo) {
+//                $members = $this->task->getMemberPairs($task);
+//            } else {
+//                $task->nextBy = $task->openedBy;
+//            }
+//        }
+
+        die(js::reload('parent'));
     }
     // oscar]
 }

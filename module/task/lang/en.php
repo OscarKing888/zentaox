@@ -127,6 +127,7 @@ $lang->task->statusList['done']    = 'Done';
 $lang->task->statusList['pause']   = 'Paused';
 $lang->task->statusList['cancel']  = 'Cancelled';
 $lang->task->statusList['closed']  = 'Closed';
+$lang->task->statusList['checked'] = '已验收';
 
 $lang->task->typeList['']        = '';
 $lang->task->typeList['design']  = 'Design';

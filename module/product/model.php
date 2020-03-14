@@ -474,6 +474,41 @@ class productModel extends model
         if($browseType == 'willclose')    $stories = $this->story->get2BeClosed($productID, $branch, $modules, $sort, $pager);
         if($browseType == 'closedstory')  $stories = $this->story->getByStatus($productID, $branch, $modules, 'closed', $sort, $pager);
 
+        /*
+	// oscar[
+        // todo add task progress
+        self::console_log("product-getStories browseType:" . $browseType);
+
+        $this->loadModel('task');
+        $projects = $this->getProjectPairs($productID, $branch = 0, $param = 'all');
+        foreach($projects as $k => $proj) {
+            foreach ($stories as $ks => $story) {
+                $tasks = $this->task->getStoryTasks($story->id, $k);
+                $taskProgress = 0;
+                foreach ($tasks as $t) {
+                    $taskProgress += $t->progress;
+                    //$this->console_log( "taskprog:" . $val->title  . " " . $t->progress . "%");
+                }
+                $taskCnt = count($tasks);
+                $taskProgress = $taskCnt > 0 ? $taskProgress / $taskCnt : 0;
+                $taskProgress = round($taskProgress);
+                $taskProgress = max(0, min(100, $taskProgress));
+
+                $story->taskProgress = $taskProgress;
+                $stories[$ks] = $story;
+                //self::console_log("stor k:" . $ks . " proj：" . $k . " projName:" . $proj->id);
+                //$this->console_log( "product stroy taskprog:" . $story->title  . " " . $taskProgress . "% tskCnt:" . $taskCnt . " s:" . $story->id . " p:" . $story->taskProgress);
+            }
+        }
+        // oscar]
+	//*/
+	
+        /*
+        foreach ($stories as $s) {
+            self::console_log("s:" . $s->taskProgress);
+        }
+        //*/
+
         return $stories;
     }
 
@@ -943,5 +978,23 @@ class productModel extends model
             ->orderBy('t2.begin desc')
             ->limit(1)
             ->fetch();
+    }
+
+    public function getMilestonePairs($productID)
+    {
+        //$projectList  = array_keys($this->loadModel('project')->getPairs());
+        $milestones = array();
+        $datas = $this->dao->select('*')->from(TABLE_PRODUCTMILESTONE)
+            ->where('product')->eq((int)$productID)
+            ->orderBy('product desc')
+            ->fetchAll();
+
+        foreach($datas as $data)
+        {
+            //if($param == 'nodeleted' and $data->deleted) continue;
+            $milestones[$data->id] = $data;
+        }
+        $milestones = array('' => '') +  $milestones;
+        return $milestones;
     }
 }

@@ -209,12 +209,59 @@ js::set('browseType', $browseType);
                                 //$actionLink = $this->createLink('task', 'batchAssignTo', "");
                                 $actionLink = $this->createLink('task', 'batchAssignTo', "projectID=$projectID");
 
+                                /*
+                                {
+                                    echo "<div class='btn-group dropup'>";
+                                    echo "<button id='taskbatchAssignToDept' type='button' class='btn dropdown-toggle' data-toggle='dropdown'>" . $lang->task->assignedToDept . "<span class='caret'></span></button>";
+                                    echo "<ul class='dropdown-menu' id='taskbatchAssignToDeptMenu'>";
+                                    echo html::select('assignedToDept', $deptPairs, '', 'class="hidden"');
+
+                                    echo '<li class="dropdown-submenu">';
+                                    foreach ($deptPairs as $key => $value) {
+                                        if (empty($key)) continue;
+                                        echo html::a('javascript:;', $lang->story->review, '', "id='reviewItem'");
+                                        echo '<ul class="dropdown-list">';
+                                        $actionLink = $this->createLink('task', 'batchAssignToDept', "dept=$key");
+                                        echo "<li class='option' data-key='$key'>" . html::a("javascript:$(\"#assignedToDept\").val(\"$key\");setFormAction(\"$actionLink\", \"hiddenwin\", \"#moreAction\")", $value, '', '') . '</li>';
+                                        echo "</ul>";
+                                    }
+                                    echo "</li>";
+                                    echo "</div></li>";
+                                    echo "</ul>";
+                                    //echo "</div>";
+                                }
+
+                                //*/
+
+
+
                                 echo "<div class='btn-group dropup'>";
                                 echo "<button id='taskBatchAssignTo' type='button' class='btn dropdown-toggle' data-toggle='dropdown'>" . $lang->task->assignedTo . "<span class='caret'></span></button>";
                                 echo "<ul class='dropdown-menu' id='taskBatchAssignToMenu'>";
                                 echo html::select('assignedTo', $memberPairs, '', 'class="hidden"');
 
-                                echo '<ul class="dropdown-list">';
+                                //*
+
+                                foreach ($deptWithUsers as $key => $value) {
+                                    if (empty($key)) continue;
+                                    echo '<li class="dropdown-submenu">';
+                                    echo html::a('javascript:;', $deptPairs[$key], '', "id='dept-id-$key'");
+                                    echo '<ul class="dropdown-menu">';
+                                    foreach($value as $account => $realName)
+                                    {
+                                        $actionLink = $this->createLink('task', 'batchAssignTo', "projectID=$projectID&account=$account");
+                                        echo "<li class='option' data-key='$account'>" . html::a("javascript:$(\"#assignedTo\").val(\"$account\");setFormAction(\"$actionLink\", \"hiddenwin\");", $realName, '', '') . '</li>';
+                                    }
+                                    echo '</li>';
+                                    echo '</ul>';
+                                }
+
+                                //if (true || $withSearch) echo "<div class='menu-search'><div class='input-group input-group-sm'><input type='text' class='form-control' placeholder=''><span class='input-group-addon'><i class='icon-search'></i></span></div></div>";
+                                echo "</ul>";
+                                //*/
+
+                                /*
+                                echo '<ul class="dropdown-menu">';
                                 foreach ($memberPairs as $key => $value) {
                                     if (empty($key)) continue;
                                     //echo "<li class='option' data-key='$key'>" . html::a("javascript:$(\".table-actions #assignedTo\").val(\"$key\");setFormAction(\"$actionLink\", \"hiddenwin\", \"#moreAction\")", $value, '', '') . '</li>';
@@ -222,14 +269,58 @@ js::set('browseType', $browseType);
                                     echo "<li class='option' data-key='$key'>" . html::a("javascript:$(\"#assignedTo\").val(\"$key\");setFormAction(\"$actionLink\", \"hiddenwin\")", $value, '', '') . '</li>';
                                 }
                                 echo "</ul>";
-                                if ($withSearch) echo "<div class='menu-search'><div class='input-group input-group-sm'><input type='text' class='form-control' placeholder=''><span class='input-group-addon'><i class='icon-search'></i></span></div></div>";
+                                //*/
+
+
                                 echo "</div></li>";
                                 echo "</ul>";
                                 //echo "</div>";
                             }
 
+                            //if ($tools['batchAssignToCheckByGD'])
+                            {
 
-                            //if ($tools['batchChangeModule'])
+                                //$actionLink = $this->createLink('task', 'batchAssignTo', "");
+                                $actionLink = $this->createLink('task', 'batchAssignToCheckByGD', "projectID=$projectID");
+
+                                echo "<div class='btn-group dropup'>";
+                                echo "<button id='taskBatchAssignToCheckByGD' type='button' class='btn dropdown-toggle' data-toggle='dropdown'>" . $lang->task->batchAssignToCheckByGD . "<span class='caret'></span></button>";
+                                echo "<ul class='dropdown-menu' id='taskBatchAssignToCheckByGDMenu'>";
+                                echo html::select('checkByGD', $memberPairs, '', 'class="hidden"');
+
+                                foreach ($deptWithUsers as $key => $value) {
+                                    if (empty($key)) continue;
+                                    echo '<li class="dropdown-submenu">';
+                                    echo html::a('javascript:;', $deptPairs[$key], '', "id='checkByGD-dept-id-$key'");
+                                    echo '<ul class="dropdown-menu">';
+                                    foreach($value as $account => $realName)
+                                    {
+                                        $actionLink = $this->createLink('task', 'batchAssignToCheckByGD', "projectID=$projectID&account=$account");
+                                        echo "<li class='option' data-key='$account'>" . html::a("javascript:$(\"#checkByGD\").val(\"$account\");setFormAction(\"$actionLink\", \"hiddenwin\");", $realName, '', '') . '</li>';
+                                    }
+                                    echo '</li>';
+                                    echo '</ul>';
+                                }
+
+                                /*
+                                echo '<ul class="dropdown-list">';
+                                foreach ($memberPairs as $key => $value) {
+                                    if (empty($key)) continue;
+                                    //echo "<li class='option' data-key='$key'>" . html::a("javascript:$(\".table-actions #assignedTo\").val(\"$key\");setFormAction(\"$actionLink\", \"hiddenwin\", \"#moreAction\")", $value, '', '') . '</li>';
+                                    $actionLink = $this->createLink('task', 'batchAssignToCheckByGD', "projectID=$projectID");
+                                    echo "<li class='option' data-key='$key'>" . html::a("javascript:$(\"#assignToCheckByGD\").val(\"$key\");setFormAction(\"$actionLink\", \"hiddenwin\")", $value, '', '') . '</li>';
+                                }
+                                //*/
+
+
+                                echo "</ul>";
+                                //if ($withSearch) echo "<div class='menu-search'><div class='input-group input-group-sm'><input type='text' class='form-control' placeholder=''><span class='input-group-addon'><i class='icon-search'></i></span></div></div>";
+                                echo "</div></li>";
+                                echo "</ul>";
+                                //echo "</div>";
+                            }
+
+                            //if (false && $tools['batchChangeModule'])
                             {
                                 echo "<div class='btn-group dropup'>";
                                 echo "<button id='taskbatchChangeModule' type='button' class='btn dropdown-toggle' data-toggle='dropdown'>" . $lang->task->moduleAB . "<span class='caret'></span></button>";
@@ -249,7 +340,7 @@ js::set('browseType', $browseType);
                             }
 
 
-                            if ($tools['batchAssignToDept'])
+                            if (false && $tools['batchAssignToDept'])
                             {
                                 echo "<div class='btn-group dropup'>";
                                 echo "<button id='taskbatchAssignToDept' type='button' class='btn dropdown-toggle' data-toggle='dropdown'>" . $lang->task->assignedToDept . "<span class='caret'></span></button>";

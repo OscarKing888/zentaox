@@ -306,3 +306,7 @@ $lang->story->pipelineType[1] = '角色';
 $lang->story->pipelineType[2] = '场景';
 $lang->story->pipelineType[3] = '技能';
 $lang->story->pipelineType[4] = '关卡';
+
+$lang->story->action->linked2milestone      = array('main' => '$date, 由 <strong>$actor</strong> 关联到里程碑' . $lang->projectCommon . ' <strong>$extra</strong>。');
+
+//$lang->story->progress = '进度';

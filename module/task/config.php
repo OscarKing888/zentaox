@@ -70,7 +70,8 @@ if($config->global->flow == 'onlyTask')
 
 $config->task->datatable = new stdclass();
 //$config->task->datatable->defaultField = array('id', 'pri', 'name', 'dept', 'status', 'deadline', 'openedDate', 'openedBy', 'assignedTo', 'finishedBy', 'estimate', 'consumed', 'left', 'actions');
-$config->task->datatable->defaultField = array('id', 'pri', 'name', 'milestone', 'status', 'deadline', 'openedDate', 'openedBy', 'assignedTo', 'finishedBy', 'estimate', 'actions');
+// oscar todo modify this to change project-task view table header
+$config->task->datatable->defaultField = array('id', 'pri', 'name', 'status', 'deadline', 'openedDate', 'openedBy', 'assignedTo', 'finishedBy', 'estimate', 'checkBy', 'actions');
 
 $config->task->datatable->fieldList['id']['title']    = 'idAB';
 $config->task->datatable->fieldList['id']['fixed']    = 'left';
@@ -227,5 +228,10 @@ $config->task->datatable->fieldList['lastEditedDate']['required'] = 'no';
 
 $config->task->datatable->fieldList['actions']['title']    = 'actions';
 $config->task->datatable->fieldList['actions']['fixed']    = 'right';
-$config->task->datatable->fieldList['actions']['width']    = 'auto'; // oscar:180
+$config->task->datatable->fieldList['actions']['width']    = '180'; // oscar:180
 $config->task->datatable->fieldList['actions']['required'] = 'yes';
+
+$config->task->datatable->fieldList['checkBy']['title']    = 'checkBy';
+$config->task->datatable->fieldList['checkBy']['fixed']    = 'right';
+$config->task->datatable->fieldList['checkBy']['width']    = '90';
+$config->task->datatable->fieldList['checkBy']['required'] = 'yes';

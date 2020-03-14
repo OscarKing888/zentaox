@@ -917,6 +917,8 @@ class projectModel extends model
                 unset($queryStatus['closed']);
                 $queryStatus = array_keys($queryStatus);
             }
+
+            //$this->console_log("task getProjectTasks");
             $tasks = $this->task->getProjectTasks($projectID, $productID, $queryStatus, $modules, $sort, $pager);
         }
         else
@@ -950,6 +952,7 @@ class projectModel extends model
             $this->session->set('taskOnlyCondition', true);
             $this->session->set('taskOrderBy', $sort);
 
+            //$this->console_log("this getSearchTasks");
             $tasks = $this->getSearchTasks($taskQuery, $pager, $sort);
         }
 
@@ -1455,6 +1458,33 @@ class projectModel extends model
             $this->action->create('story', $storyID, 'linked2project', '', $projectID);
         }        
     }
+
+    public function linkMilestoneStory($projectID, $milestone, $stories = array())
+    {
+        if(empty($stories)) $stories = $this->post->stories;
+        if(empty($stories)) return false;
+
+        //$this->console_log($stories);
+
+        $this->loadModel('action');
+        $versions  = $this->loadModel('story')->getVersions($stories);
+        $lastOrder = (int)$this->dao->select('*')->from(TABLE_PROJECTSTORY)->where('project')->eq($projectID)->orderBy('order_desc')->limit(1)->fetch('order');
+        foreach($stories as $key => $storyID)
+        {
+            //$productID = (int)$this->post->products[$storyID];
+            $data = new stdclass();
+            $data->project = $projectID;
+            $data->productMilestone = $milestone;
+            $data->story   = $storyID;
+
+            //$this->console_log('proj:' . $projectID . ' milestone:' . $milestone . ' story:' . $storyID);
+
+            $this->dao->insert(TABLE_PRODUCTMILESTONESTORY)->data($data)->exec();
+            //$this->story->setStage($storyID);
+            $this->action->create('story', $storyID, 'linked2milestone', '', $projectID);
+        }
+    }
+
 
     /**
      * Unlink story. 
@@ -2534,5 +2564,60 @@ class projectModel extends model
         }
         if(isset($fullTrees[0]) and empty($fullTrees[0]->children)) array_shift($fullTrees);
         return array_values($fullTrees);
+    }
+
+    public function getMilestonesPairs($projectID, $mode='')
+    {
+        $milestones = $this->dao->select('id, name')->from(TABLE_PRODUCTMILESTONE)
+            ->where('project')->eq($projectID)
+            ->beginIf(strpos($mode, 'all') === false)->andWhere('active')->eq(1)->fi()
+            ->orderBy('id desc')
+            ->fetchPairs('id');
+
+        if(strpos($mode, 'none') !== false) {
+            $milestones[0] = '无';
+        }
+
+        return $milestones;
+    }
+
+    public function getMilestonesStories($projectID, $milestone, $mode='')
+    {
+        $milestoneStories = $this->dao->select('id, story')->from(TABLE_PRODUCTMILESTONESTORY)
+            ->where('project')->eq($projectID)
+            ->beginIf(strpos($mode, 'all') === false)->andWhere('productMilestone')->eq($milestone)->fi()
+            ->orderBy('id desc')
+            ->fetchPairs('story');
+
+        return $milestoneStories;
+    }
+
+    public function unlinkMilestoneStory($projectID, $milestone, $storyID)
+    {
+        $this->dao->delete()->from(TABLE_PRODUCTMILESTONESTORY)
+            ->where('project')->eq($projectID)
+            ->andWhere('productMilestone')->eq($milestone)
+            ->andWhere('story')->eq($storyID)
+            ->limit(1)->exec();
+
+//        $order  = 1;
+//        $storys = $this->dao->select('*')->from(TABLE_PROJECTSTORY)->where('project')->eq($projectID)->orderBy('order')->fetchAll();
+//        foreach($storys as $projectstory)
+//        {
+//            if($projectstory->order != $order) $this->dao->update(TABLE_PROJECTSTORY)->set('`order`')->eq($order)->where('project')->eq($projectID)->andWhere('story')->eq($projectstory->story)->exec();
+//            $order++;
+//        }
+
+        $this->loadModel('story')->setStage($storyID);
+        $this->loadModel('action')->create('milestoneStory', $storyID, 'unlinkedfrommilestone', '', $milestone);
+
+        //$tasks = $this->dao->select('id')->from(TABLE_TASK)->where('story')->eq($storyID)->andWhere('project')->eq($projectID)->andWhere('status')->in('wait,doing')->fetchPairs('id');
+        //$this->dao->update(TABLE_TASK)->set('status')->eq('cancel')->where('id')->in($tasks)->exec();
+//        foreach($tasks as $taskID)
+//        {
+//            $changes  = $this->loadModel('task')->cancel($taskID);
+//            $actionID = $this->action->create('task', $taskID, 'Canceled');
+//            $this->action->logHistory($actionID, $changes);
+//        }
     }
 }

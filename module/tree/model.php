@@ -98,6 +98,24 @@ class treeModel extends model
                 }
             }
         }
+        // oscar[
+        else if(strpos('milestones', $type) !== false)
+        {
+            $product = $this->loadModel('product')->getById($rootID);
+            if($product and $product->type != 'normal')
+            {
+                $branches = array('null' => '') + $this->loadModel('branch')->getPairs($rootID, 'noempty');
+                if($branch)
+                {
+                    $newBranches['null']  = '';
+                    $newBranches[$branch] = $branches[$branch];
+                    $branches = $newBranches;
+                }
+            }
+        }
+        // oscar]
+
+
 
         $treeMenu = array();
         foreach($branches as $branchID => $branch)
@@ -625,6 +643,70 @@ class treeModel extends model
         return $menu;
     }
 
+    // oscar[
+    public function getProductMilestoneTreeMenu($rootID, $startModule = 0, $userFunc)
+    {
+        $extra['projectID'] = $rootID;
+        $menu = "<ul class='tree tree-lines'>";
+        $startModulePath = '';
+        if($startModule > 0)
+        {
+            $startModule = $this->getById($startModule);
+            if($startModule) $startModulePath = $startModule->path . '%';
+        }
+
+        $projectModules  = $this->getTaskTreeModules($rootID, true);
+        $projectBranches = $this->dao->select('DISTINCT t2.branch')->from(TABLE_PROJECTSTORY)->alias('t1')
+            ->leftJoin(TABLE_STORY)->alias('t2')->on('t1.story = t2.id')
+            ->where('t1.project')->eq($rootID)
+            ->andWhere('t2.deleted')->eq(0)
+            ->fetchPairs();
+
+        /* Get module according to product. */
+        $products     = $this->loadModel('product')->getProductsByProject($rootID);
+        $branchGroups = $this->loadModel('branch')->getByProducts(array_keys($products));
+        $productNum   = count($products);
+        foreach($products as $id => $product)
+        {
+            $extra['productID'] = $id;
+            $link  = helper::createLink('project', 'story', "project=$rootID&ordery=&status=byProduct&praram=$id");
+            if($productNum > 1) $menu .= "<li>" . html::a($link, $product, '_self', "id='product$id'");
+
+            /* tree menu. */
+            $tree = '';
+            if(empty($branchGroups[$id])) $branchGroups[$id]['0'] = '';
+            foreach($branchGroups[$id] as $branch => $branchName)
+            {
+                $treeMenu = array();
+                $query = $this->dao->select('*')->from(TABLE_MODULE)->where("(root = $id and type = 'story')")
+                    ->beginIF(count($branchGroups[$id]) > 1)->andWhere('branch')->eq($branch)->fi()
+                    ->beginIF($startModulePath)->andWhere('path')->like($startModulePath)->fi()
+                    ->andWhere('deleted')->eq(0)
+                    ->orderBy('grade desc, branch, type, `order`')
+                    ->get();
+                $stmt = $this->dbh->query($query);
+                while($module = $stmt->fetch())
+                {
+                    /* if not manage, ignore unused modules. */
+                    if(isset($projectModules[$module->id])) $this->buildTree($treeMenu, $module, 'task', $userFunc, $extra);
+                }
+                if((isset($treeMenu[0]) and $branch) or isset($projectBranches[$branch]))
+                {
+                    $childMenu = isset($treeMenu[0]) ? "<ul>{$treeMenu[0]}</ul>" : '';
+                    $link      = helper::createLink('project', 'story', "project=$rootID&ordery=&status=byBranch&praram=$branch");
+                    if($branchName) $treeMenu[0] = "<li>" . html::a($link, $branchName, '_self', "id='branch$branch'") . "{$childMenu}</li>";
+                }
+                $tree .= isset($treeMenu[0]) ? $treeMenu[0] : '';
+            }
+            if($productNum > 1) $tree = "<ul>" . $tree . "</ul>\n</li>";
+            $menu .= $tree;
+        }
+
+        $menu .= '</ul>';
+        return $menu;
+    }
+    // oscar]
+
     /**
      * Build tree.
      * 
@@ -831,6 +913,16 @@ class treeModel extends model
         $productID = $extra['productID'];
         return html::a(helper::createLink('project', 'story', "root={$projectID}&orderBy=&type=byModule&param={$module->id}"), $module->name, '_self', "id='module{$module->id}'");
     }
+
+    // oscar[
+    public function createProjectMilestoneStoryLink($type, $module, $extra)
+    {
+        $projectID = $extra['projectID'];
+        $productID = $extra['productID'];
+        return html::a(helper::createLink('project', 'story', "root={$projectID}&orderBy=&type=byModule&param={$module->id}"), $module->name, '_self', "id='module{$module->id}'");
+    }
+    // oscar]
+
 
     /**
      * Create link of a doc.

@@ -296,7 +296,7 @@ if($config->global->flow == 'onlyTask')
 }
 
 $lang->project->versionend = "结束";
-$lang->project->version = "里程碑";
+$lang->project->version = "标签";
 $lang->project->closeStat = "验收情况";
 $lang->project->closed = "已验收";
 $lang->project->unclose = "未验收";
@@ -305,4 +305,9 @@ $lang->project->status              = "状态";
 $lang->project->active              = "激活";
 $lang->project->deadline     = '截止日期';
 $lang->project->update     = '更新';
-$lang->project->batchChangeVersion = '批量里程碑';
+$lang->project->batchChangeVersion = '批量标签';
+
+$lang->project->manageMilestones = '维护里程碑';
+$lang->project->milestone = '里程碑';
+$lang->project->productMilestoneStories  = "请<a href='%s'>创建里程碑</a>。";
+$lang->project->linkMilestoneStory        = '里程碑关联需求';

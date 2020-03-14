@@ -143,6 +143,9 @@ $lang->project->allTasks     = '所有';
 $lang->project->assignedToMe = '指派给我';
 $lang->project->myInvolved   = '由我参与';
 $lang->project->mydept   = '我的部门';
+$lang->project->checkByMe   = '待我验收';
+$lang->project->checkedByMe   = '我已验收';
+
 
 $lang->project->statusSelects['']             = '更多';
 $lang->project->statusSelects['wait']         = '未开始';
@@ -280,9 +283,14 @@ $lang->printKanban->typeList['increment'] = '增量';
 
 $lang->project->featureBar['task']['mydept']   = $lang->project->mydept;
 $lang->project->featureBar['task']['assignedtome'] = $lang->project->assignedToMe;
+// oscar[
+$lang->project->featureBar['task']['checkByMe']   = $lang->project->checkByMe;
+$lang->project->featureBar['task']['checkedByMe']   = $lang->project->checkedByMe;
+// oscar]
 $lang->project->featureBar['task']['myinvolved']   = $lang->project->myInvolved;
 
-$lang->project->featureBar['task']['milestone']       =  '里程碑';
+
+$lang->project->featureBar['task']['milestone']       =  '标签';
 
 $lang->project->featureBar['task']['unclosed']     = $lang->project->unclosed;
 $lang->project->featureBar['task']['all']          = $lang->project->allTasks;
@@ -303,7 +311,7 @@ if($config->global->flow == 'onlyTask')
     unset($lang->project->featureBar['task']['needconfirm']);
 }
 $lang->project->versionend = "结束";
-$lang->project->version = "里程碑";
+$lang->project->version = "标签";
 $lang->project->closeStat = "验收情况";
 $lang->project->closed = "已验收";
 $lang->project->unclose = "未验收";
@@ -312,4 +320,23 @@ $lang->project->status              = "状态";
 $lang->project->active              = "激活";
 $lang->project->deadline     = '截止日期';
 $lang->project->update     = '更新';
-$lang->project->batchChangeVersion = '批量里程碑';
+$lang->project->batchChangeVersion = '批量标签';
+
+$lang->project->manageMilestones = '维护里程碑';
+$lang->project->milestone = '里程碑';
+$lang->project->productMilestoneStories  = "请<a href='%s'>创建里程碑</a>。";
+
+
+$lang->project->productMilestone = '里程碑查看';
+$lang->project->productMilestonesManage = '里程碑维护';
+$lang->project->activeMilestone = '里程碑激活';
+$lang->project->closeMilestone = '里程碑关闭';
+$lang->project->updateMilestoneDeadline = '里程碑更新截止日期';
+$lang->project->linkMilestoneStory        = '里程碑关联需求';
+$lang->project->unlinkMilestoneStory = '里程碑取消关联需求';
+$lang->project->batchUnlinkMilestoneStory = '里程碑批量取消关联';
+
+$lang->project->checkBy = '验收';
+
+$lang->project->unlinkMilestoneStory    = "从里程碑中移除该需求";
+$lang->project->unlinkMilestoneStoryConfirm    = "您确定从该里程碑中移除该需求吗？";

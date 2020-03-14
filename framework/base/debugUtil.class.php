@@ -1,9 +1,11 @@
 <?php
 /**
- * ZenTaoPHP的control类。
- * The control class file of ZenTaoPHP framework.
+ * ZenTaoPHP的baseHelper类。
+ * The baseHelper class file of ZenTaoPHP framework.
  *
- * The author disclaims copyright to this source code.  In place of
+ * @package framework
+ *
+ * The author disclaims copyright to this source code. In place of
  * a legal notice, here is a blessing:
  *
  *  May you do good and not evil.
@@ -11,14 +13,7 @@
  *  May you share freely, never taking more than you give.
  */
 
-/**
- * control基类继承与baseControl，所有模块的control类都派生于它。
- * The base class of control extends baseControl.
- *
- * @package framework
- */
-include dirname(__FILE__) . '/base/control.class.php';
-class control extends baseControl
+class debugUtil
 {
     // oscar[
     static public function console_log( $data ){

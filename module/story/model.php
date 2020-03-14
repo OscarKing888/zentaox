@@ -1762,6 +1762,77 @@ class storyModel extends model
                 ->page($pager, 't2.id')
                 ->fetchAll('id');
         }
+        // oscar[
+        elseif($type == 'byMilestone')
+        {
+            $storieIds = $this->dao->select('id, story')->from(TABLE_PRODUCTMILESTONESTORY)
+                ->where('productMilestone')->eq($param)
+                ->andWhere('project')->eq($projectID)
+                ->fetchPairs('id');
+
+            if(empty($storieIds))
+            {
+                //array_push($storieIds, 0);
+                //$this->console_log("stories is emtpy for the milestone:" . $param);
+                $storieIds[0] = 0;
+                //$this->view->debugMsg = "stories is emtpy for the milestone:" . $param;
+            }
+
+            //$stories = $this->dao->select('distinct t1.*, t2.*, t3.branch as productBranch, t4.type as productType, t2.version as version')->from(TABLE_PROJECTSTORY)->alias('t1')
+//            $stories = $this->dao->select('distinct t1.*, t2.*')->from(TABLE_PROJECTSTORY)->alias('t1')
+//                ->leftJoin(TABLE_STORY)->alias('t2')->on('t1.story = t2.id')
+//                //->leftJoin(TABLE_PROJECTPRODUCT)->alias('t3')->on('t1.project = t3.project')
+//                //->leftJoin(TABLE_PRODUCT)->alias('t4')->on('t2.product = t4.id')
+//                //->where($storyQuery)
+//                ->markLeft()
+//                ->andWhere('t1.project', true)->eq((int)$projectID)
+//                ->andWhere('t2.id')->in(array_keys($storieIds))
+//                ->markRight(1)
+//                ->orderBy($orderBy)
+//                ->page($pager, 't2.id')
+//                ->fetchAll('id');
+
+            $stories = $this->dao->select('*')->from(TABLE_STORY)->alias('t1')
+                ->where('t1.id')->in(array_values($storieIds))
+                //->orderBy($orderBy)
+                ->orderBy('t1.id')
+                ->page($pager, 't1.id')
+                ->fetchAll('id');
+
+            $query    = $this->dao->get();
+            //$this->console_log($query);
+
+
+            // oscar[
+            // todo add task progress
+            $this->loadModel('task');
+            //$storyProgress = array();
+            foreach($stories as $story => $val)
+            {
+                $tasks = $this->task->getStoryTasks($story, $projectID);
+                $taskProgress = 0;
+                foreach($tasks as $t)
+                {
+                    $taskProgress += $t->progress;
+
+                    //$this->console_log( "taskprog:" . $val->title  . " " . $t->progress . "%");
+                }
+                $taskCnt = count($tasks);
+                $taskProgress = $taskCnt > 0 ? $taskProgress / $taskCnt : 0;
+                $taskProgress = round($taskProgress);
+                $taskProgress = max(0, min(100, $taskProgress));
+                $progressDat = $stories[$story];
+                $progressDat->taskProgress = $taskProgress;
+                //$storyProgress[$story] = $progressDat;
+                //$this->console_log( "story taskprog:" . $val->title . " cnt:" . $taskCnt . " " . $taskProgress . "%");
+            }
+
+            //$this->view->storyProgress = $storyProgress;
+            // oscar]
+
+            return $stories;
+        }
+        // oscar]
         else
         {
             $modules = ($type == 'byModule' and $param) ? $this->dao->select('*')->from(TABLE_MODULE)->where('path')->like("%,$param,%")->andWhere('type')->eq('story')->andWhere('deleted')->eq(0)->fetchPairs('id', 'id') : array();
@@ -1780,6 +1851,8 @@ class storyModel extends model
         }
 
         $query    = $this->dao->get();
+        //$this->console_log($query);
+
         $branches = array();
         foreach($stories as $story)
         {
@@ -1792,6 +1865,31 @@ class storyModel extends model
         }
 
         $this->dao->sqlobj->sql = $query;
+
+        // oscar[
+        // todo add task progress
+        $this->loadModel('task');
+        //$storyProgress = array();
+        foreach($stories as $story => $val)
+        {
+            $tasks = $this->task->getStoryTasks($story, $projectID);
+            $taskProgress = 0;
+            foreach($tasks as $t)
+            {
+                $taskProgress += $t->progress;
+
+                //$this->console_log( "taskprog:" . $val->title  . " " . $t->progress . "%");
+            }
+            $taskCnt = count($tasks);
+            $taskProgress = $taskCnt > 0 ? $taskProgress / $taskCnt : 0;
+            $taskProgress = round($taskProgress);
+            $taskProgress = max(0, min(100, $taskProgress));
+            $progressDat = $stories[$story];
+            $progressDat->taskProgress = $taskProgress;
+            //$storyProgress[$story] = $progressDat;
+            //$this->console_log( "story taskprog:" . $val->title . " cnt:" . $taskCnt . " " . $taskProgress . "%");
+        }
+
         return $stories;
     }
 
@@ -2450,6 +2548,8 @@ class storyModel extends model
      */
     public function printCell($col, $story, $users, $branches, $storyStages, $modulePairs = array(), $storyTasks = array(), $storyBugs = array(), $storyCases = array(), $mode = 'datatable')
     {
+        //error_log("task printCell mode:" . $mode);
+
         $canView   = common::hasPriv('story', 'view');
         $storyLink = helper::createLink('story', 'view', "storyID=$story->id");
         $account   = $this->app->user->account;
@@ -2581,6 +2681,17 @@ class storyModel extends model
                 common::printIcon('story', 'edit',       $vars, $story, 'list', 'pencil');
                 if($this->config->global->flow != 'onlyStory') common::printIcon('story', 'createCase', "productID=$story->product&branch=$story->branch&module=0&from=&param=0&$vars", $story, 'list', 'sitemap');
                 break;
+
+                /*
+                // ocar[
+                case 'progress':
+                    $cls = $story->taskProgress == 100 ? 'progressCompleted' : 'progressInCompleted';
+                    echo "<div class=$cls>";
+                    echo $story->taskProgress . "%";
+                    echo "</div>";
+                    break;
+                // oscar]
+                //*/
             }
             echo '</td>';
         }

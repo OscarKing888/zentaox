@@ -17,8 +17,13 @@ myDate.toLocaleString( ); //获取日期与时间
 
  */
 
+const C_TaskColor_StoryTitle = "darkorange";
+const C_TaskColor_Story = "darkorange";
+const C_StoryNameColor = "darkorange";
+
 const C_TaskColor_Pending = "#0080c8";
 const C_TaskColor_Completed = "#64c800";
+
 const C_TaskColor_Warning = "#ff8000";
 const C_TaskColor_Delay = "#AA0000";
 const C_TaskColor_ErrorStart = "#FFEE00";
@@ -58,7 +63,7 @@ var origY = C_RulerHeight * 3;
 var lastX = -1;
 var lastY = 0;
 
-var g_tasks = [];
+var g_tasks = null;
 var canvas = null;
 var context = null;
 var mouseIsDown = false;
@@ -74,6 +79,9 @@ var g_drawYIdx = 0;
 var g_boundYMax = 0;
 var g_boundXMin = 0;
 var g_boundXMax = 0;
+
+var selectedMilestone = 0;
+var selectedDept = 0;
 
 Date.prototype.addDays = function(days) {
     var dat = new Date(this.valueOf());
@@ -91,7 +99,7 @@ function onOrigi()
 function onShowDelayOnly()
 {
     g_showDelayOnly = !g_showDelayOnly;
-    console.log("show delay:", g_showDelayOnly);
+    //console.log("show delay:", g_showDelayOnly);
     refreshDelayCheck();
     redraw();
 }
@@ -278,7 +286,7 @@ function drawRuler()
         var scrollPosX =((origX) / (g_boundXMax - g_boundXMin)) * canvas.width;
         ctx.fillRect(scrollPosX, canvas.height - ruleHeight / 2, C_Taskbar_DayUnit, ruleHeight / 2);
 
-        console.warn("ox:%d oy:%d pos:%f minX:%d maxX:%d maxY:%d", origX, origY, scrollPosX, g_boundXMin, g_boundXMax, g_boundYMax);
+        //console.warn("ox:%d oy:%d pos:%f minX:%d maxX:%d maxY:%d", origX, origY, scrollPosX, g_boundXMin, g_boundXMax, g_boundYMax);
     }
     //*/
 
@@ -287,7 +295,7 @@ function drawRuler()
 
 function drawMiniMap()
 {
-
+    //roundRect(context, lastX, lastY, 100, 10, 5, true, false);
 }
 
 function test()
@@ -362,8 +370,24 @@ $(document).ready(function()
     window.addEventListener("resize", resizeCanvas, false);
     resizeCanvas();
     onOrigi();
+
+    //console.log("canSeeTest:", canSee(-1, -1), canSee(canvas.width + 1, canvas.height + 1));
+
 });
 //*/
+
+function setupCanvas()
+{
+    if(canvas == null)
+    {
+        canvas = document.getElementById("projectCanvas");
+    }
+
+    if(context == null)
+    {
+        context = canvas.getContext('2d');
+    }
+}
 
 function onDeptChange()
 {
@@ -374,7 +398,7 @@ function onDeptChange()
 function onMilestoneChange()
 {
     selectedMilestone = $('#milestone option:selected').val();
-    //alert("onMilestoneChange:" + selectedMilestone + " " + $('#milestone option:selected').text());
+    //  alert("onMilestoneChange    " + selectedMilestone + ":" + $('#milestone option:selected').text());
 }
 
 function resizeCanvas() {
@@ -421,11 +445,27 @@ function clampMinMaxOrigXY()
     //console.warn("ox:%d oy:%d minX:%d maxX:%d maxY:%d", origX, origY, g_boundXMin, g_boundXMax, g_boundYMax);
 }
 
+function canSee(x, y)
+{
+    if(x >= origX && x <= origX + canvas.width)
+    {
+        return true;
+    }
+
+    if(y >= origY && y <= origY + canvas.height)
+    {
+        return true;
+    }
+
+    return false;
+}
+
 function onCanvasMouseMove(evt)
 {
     var mousePos = getMousePos(canvas, evt);
     var message = 'Mouse move position: ' + mousePos.x + ',' + mousePos.y;
     //console.log(message);
+
 
     //writeMessage(canvas, message, mousePos);
 
@@ -478,20 +518,33 @@ function writeMessage(canvas, message, mousePos) {
 
 function redraw()
 {
+    //  alert("redraw");
+
+    setupCanvas();
+
     context.clearRect(0, 0, canvas.width, canvas.height);
 
+    //alert("drawBg");
     //context.translate(0, 0);
     drawBg();
 
+    //alert("drawProjectBlueprintGlobal");
     //context.translate(0, 0);
     drawProjectBlueprintGlobal();
 
+    //alert("drawRuler");
     drawRuler();
 
+    //alert("drawDeadline");
     //context.translate(0, 0);
     drawDeadline();
 
+    //alert("drawMiniMap");
     drawMiniMap();
+
+    context.fillStyle = C_TaskColor_StoryTitle;
+    roundRect(context, origX, origY, 5, 5, 2, true);
+    //context.rect(origX, origX, 10, 10);
 }
 
 function getMousePos(canvas, evt) {
@@ -568,11 +621,12 @@ function ajaxGetTasks()
 
     //*/
 
-    return tasks;
+    return g_tasks;
 }
 
 function drawBg()
 {
+    setupCanvas();
     //var canvas = document.getElementById("projectCanvas");
     ctx = context;
     ctx.save();
@@ -602,9 +656,89 @@ function drawDeadline()
 }
 
 
-function drawProjectBlueprintGlobal()
+function drawProjectBlueprintGlobal() {
+    if (selectedMilestone == 0) {
+        drawProjectBlueprint(g_tasks);
+    }
+    else
+    {
+        drawProjectBlueprintWithMilestone(g_tasks);
+    }
+}
+
+function drawProjectBlueprintWithMilestone(tasks)
 {
-    drawProjectBlueprint(g_tasks);
+    var ctx = context;//canvas.getContext("2d");
+
+    ctx.save();
+    ctx.translate(origX, origY);
+
+    /*
+    var idx = 0;
+    drawBar(ctx, "1 CRASH自动收集分析",  "2018-5-1", 24, 'done', idx++);
+    drawBar(ctx, "2 CRASH自动收集分析",  "2018-5-1", 32, 'doing', idx++);
+    drawBar(ctx, "3 CRASH自动收集分析",  "2018-5-2", 40, 'wait', idx++);
+    drawBar(ctx, "4 CRASH自动收集分析",  "2018-5-6", 48, 'wait', idx++);
+    //*/
+
+    ctx.fillStyle = C_TaskColor_Completed;
+
+    g_drawYIdx = 0;
+    g_boundYMax = 0;
+    g_boundXMin = 0;
+    g_boundXMax = 0;
+
+    //alert("drawProjectBlueprintWithMilestone:" + tasks);
+
+    if(tasks != null)
+    {
+        for(var i = 0; i < tasks.length; ++i) {
+            //console.log("   drawTasks:", JSON.stringify(tasks[i]));
+            var taskPair = tasks[i];
+
+            var stroy = taskPair.story;
+            var taskCount = taskPair.tasks.length;
+
+            ctx.strokeStyle = C_TaskColor_StoryTitle;
+            var xy = dateToCoord(stroy.taskBeginDate, g_drawYIdx);
+            var xyend = dateToCoord(stroy.taskEndDate, g_drawYIdx + taskCount, 1);
+            xyend[1] = (C_Taskbar_Height + C_Taskbar_VSpace) * (taskCount + 1);
+
+            //  roundRect(ctx, xy[0], xy[1], xyend[0] - xy[0], xyend[1] - xy[1] - C_Taskbar_Height, 5, true, false);
+            ctx.rect(xy[0], xy[1], xyend[0] - xy[0], xyend[1]);
+            ctx.stroke();
+
+            ctx.strokeStyle = C_TaskColor_Story;
+            //drawBar(ctx, stroy.taskEndDate, stroy.id, stroy.title, stroy.assignedToRealName, stroy.deptName + "Cnt:" + taskCount,  stroy.taskBeginDate, 'story', g_drawYIdx);
+            drawBar(ctx, stroy.taskEndDate, stroy.id, stroy.title, stroy.assignedToRealName, stroy.deptName,  stroy.taskBeginDate, 'story', g_drawYIdx);
+
+            ++g_drawYIdx;
+
+            ctx.fillStyle = C_TaskColor_Completed;
+            ctx.strokeStyle = "#000000";
+            for (var j = 0; j < taskPair.tasks.length;++j){
+                var task = taskPair.tasks[j];
+                //console.log("   drawTasks:", i, tasks.name);
+                if (!g_showDelayOnly || (g_showDelayOnly && isTaskDelay(tasks[i]))) {
+                    drawBar(ctx, task.deadline, task.id, task.name, task.assignedToRealName, task.deptName, task.estStarted, task.status, g_drawYIdx);
+                    ++g_drawYIdx;
+
+                    //if(g_drawYIdx > 100)
+                    {
+                        //console.error("break for 100 tasks");
+                        // break;
+                    }
+                }
+            }
+
+                g_drawYIdx += 5;
+        }
+            //alert("task:" + tasks[i]);
+            //console.log("task[" + tasks[i].id + "]: " + tasks[i].name + " start:" + tasks[i].realStarted + " status:" + tasks[i].status);
+    }
+    ctx.stroke();
+    ctx.restore();
+    //alert("canvas:" + canvas.id + " docW:" + document.width);
 }
 
 function drawProjectBlueprint(tasks)
@@ -624,10 +758,10 @@ function drawProjectBlueprint(tasks)
 
     /*
     var idx = 0;
-    drawTask(ctx, "1 CRASH自动收集分析",  "2018-5-1", 24, 'done', idx++);
-    drawTask(ctx, "2 CRASH自动收集分析",  "2018-5-1", 32, 'doing', idx++);
-    drawTask(ctx, "3 CRASH自动收集分析",  "2018-5-2", 40, 'wait', idx++);
-    drawTask(ctx, "4 CRASH自动收集分析",  "2018-5-6", 48, 'wait', idx++);
+    drawBar(ctx, "1 CRASH自动收集分析",  "2018-5-1", 24, 'done', idx++);
+    drawBar(ctx, "2 CRASH自动收集分析",  "2018-5-1", 32, 'doing', idx++);
+    drawBar(ctx, "3 CRASH自动收集分析",  "2018-5-2", 40, 'wait', idx++);
+    drawBar(ctx, "4 CRASH自动收集分析",  "2018-5-6", 48, 'wait', idx++);
     //*/
 
     ctx.fillStyle = C_TaskColor_Completed;
@@ -649,7 +783,7 @@ function drawProjectBlueprint(tasks)
 
             if(!g_showDelayOnly || (g_showDelayOnly && isTaskDelay(tasks[i])))
             {
-                drawTask(ctx, tasks[i], tasks[i].id, tasks[i].name, tasks[i].assignedToRealName, tasks[i].deptName,  tasks[i].estStarted, tasks[i].estimate, tasks[i].status, g_drawYIdx);
+                drawBar(ctx, tasks[i].deadline, tasks[i].id, tasks[i].name, tasks[i].assignedToRealName, tasks[i].deptName,  tasks[i].estStarted, tasks[i].status, g_drawYIdx);
                 ++g_drawYIdx;
 
                 //if(g_drawYIdx > 100)
@@ -694,7 +828,7 @@ function isTaskDelay(task)
 }
 
 //wait,doing,done,pause,cancel,closed
-function drawTask(ctx, task, id, name, user, dept, startDate, hours, status, idx) {
+function drawBar(ctx, deadline, id, name, user, dept, startDate, status, idx) {
     ctx.fillStyle = C_TaskNameColor;
     ctx.font = C_TaskNameFont;
     //ctx.fillText("auto:" + name, 10, 30);
@@ -707,7 +841,7 @@ function drawTask(ctx, task, id, name, user, dept, startDate, hours, status, idx
     var d = days_between(start, cur);
     //alert("days:" + d);
 
-    var deadline = convertStringToDate(task.deadline);
+    var deadline = convertStringToDate(deadline);
     var taskDays =  (1 + days_between(deadline, start));//Math.ceil(task.estimate / 8);
 
     //alert("taskDays:" + taskDays);
@@ -722,7 +856,7 @@ function drawTask(ctx, task, id, name, user, dept, startDate, hours, status, idx
         g_minTaskDate = start;
     }
 
-    //console.warn("==== drawTask start");
+    //console.warn("==== drawBar start");
 
     var xy = dateToCoord(start, idx);
     var xyend = dateToCoord(new Date(start).addDays(taskDays), idx);
@@ -734,10 +868,25 @@ function drawTask(ctx, task, id, name, user, dept, startDate, hours, status, idx
         return;
     }
     */
+    var cntTasksMin =  Math.round(Math.abs(origY ) / (C_Taskbar_Height + C_Taskbar_VSpace) - 10);
+    var cntTasksMax =  Math.round((Math.abs(origY) + canvas.height) / (C_Taskbar_Height + C_Taskbar_VSpace));
+    var needDraw = idx >= cntTasksMin && idx <= cntTasksMax; // xy[1] > origY && xyend[1] < origY + canvas.height;// canSee(xy[0], xy[1]) || canSee(xyend[0], xyend[1]);
+
+
+
+    if(!needDraw)
+    {
+        //console.log("skip draw idx:", idx, "oY:", origY, "cntTask:", cntTasksMin, " - ", cntTasksMax);
+        //console.log("skip draw: [", id, "]", name);
+    }
 
     ctx.fillStyle = C_TaskColor_Pending;
     if (status == 'done') {
         ctx.fillStyle = C_TaskColor_Completed;
+    }
+
+    if (status == 'story') {
+        ctx.fillStyle = C_TaskColor_Story;
     }
 
     //alert(ctx.fillStyle);
@@ -789,36 +938,64 @@ function drawTask(ctx, task, id, name, user, dept, startDate, hours, status, idx
 
     //ctx.fillRect(xy[0], xy[1], xyend[0] - xy[0], xyend[1] - xy[1] + C_Taskbar_Height);
 
-    roundRect(ctx, xy[0], xy[1], xyend[0] - xy[0], xyend[1] - xy[1] + C_Taskbar_Height, 5, true, false);
-    if(status == 'cancel')
+    if(needDraw)
+    {
+        roundRect(ctx, xy[0], xy[1], xyend[0] - xy[0], xyend[1] - xy[1] + C_Taskbar_Height, 5, true, false);
+    }
+
+    if(needDraw && status == 'cancel')
     {
         drawLine(xy[0], xy[1] + C_Taskbar_Height / 2, xyend[0] - xy[0]);
     }
 
-    ctx.stroke();
+    if(needDraw)
+    {
+        ctx.stroke();
+    }
+
     //console.warn("==== stroke");
 
     var allStr = "";
 
+    if (status == 'story') {
+        ctx.fillStyle = C_StoryNameColor;
+    }
+    else{
+        ctx.fillStyle = C_TaskNameColor;
+    }
+
     ctx.strokeStyle = "#111111";
-    ctx.fillStyle = C_TaskNameColor;
+
     ctx.lineWidth = 2;
     ctx.font = C_TaskNameFont;
     var idStr = "[" + id + "]  " + name;
-    ctx.fillText(idStr, xyend[0] + 8, xyend[1] + C_FontHeight);
+    if(needDraw)
+    {
+        ctx.fillText(idStr, xyend[0] + 8, xyend[1] + C_FontHeight);
+    }
 
     allStr += idStr;
 
     ctx.fillStyle = C_TaskUserNameColor;
     var userNameStr = "        [" + user + "]";
-    ctx.fillText(userNameStr, xyend[0] + 8 + ctx.measureText(name).width + 50, xyend[1] + C_FontHeight);
+    if(needDraw)
+    {
+        ctx.fillText(userNameStr, xyend[0] + 8 + ctx.measureText(name).width + 50, xyend[1] + C_FontHeight);
+    }
 
     allStr += userNameStr;
 
 
     ctx.fillStyle = C_TaskUserDeptColor;
     var depStr = " - " + dept;
-    ctx.fillText(depStr, xyend[0] + 8 + ctx.measureText(name).width + ctx.measureText(userNameStr).width + 50, xyend[1] + C_FontHeight);
+
+    //depStr += " [" + idx + "]";
+
+    if(needDraw)
+    {
+        ctx.fillText(depStr, xyend[0] + 8 + ctx.measureText(name).width + ctx.measureText(userNameStr).width + 50, xyend[1] + C_FontHeight);
+    }
+
     allStr += depStr;
 
 
@@ -847,12 +1024,12 @@ function drawLine(x, y, w)
     //ctx.restore();
 }
 
-function dateToCoord(startDate, idx)
+function dateToCoord(startDate, idx, offsetDays = 0)
 {
     var now = Date.now();
     //new Date(now).getTime();
 
-    var d = days_between(startDate, now);
+    var d = days_between(startDate, now) + offsetDays;
 
     var x = d * C_Taskbar_DayUnit;
     var y = (C_Taskbar_Height + C_Taskbar_VSpace) * idx;
@@ -903,6 +1080,7 @@ function roundRect(ctx, x, y, width, height, radius, fill, stroke) {
             radius[side] = radius[side] || defaultRadius[side];
         }
     }
+
     ctx.beginPath();
     ctx.moveTo(x + radius.tl, y);
     ctx.lineTo(x + width - radius.tr, y);
@@ -923,3 +1101,5 @@ function roundRect(ctx, x, y, width, height, radius, fill, stroke) {
 
     //ctx.restore();
 }
+
+onZoomMonth();

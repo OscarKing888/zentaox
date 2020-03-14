@@ -191,6 +191,13 @@ class project extends control
         /* Get tasks. */
         $tasks = $this->project->getTasks($productID, $projectID, $this->projects, $browseType, $queryID, $moduleID, $sort, $pager);
 
+        /*
+        error_log("get-project-tasks:");
+        foreach (array_keys($tasks) as $v) {
+            error_log("oscar task:" . $v->name);
+        }
+        //*/
+
         /* Build the search form. */
         $actionURL = $this->createLink('project', 'task', "projectID=$projectID&status=bySearch&param=myQueryID");
         $this->config->project->search['onMenuBar'] = 'yes';
@@ -230,6 +237,7 @@ class project extends control
         //oscar:
         $this->loadModel('dept');
         $this->dept->setupDeptUsers($this->view, $this->app->user->account, $this->app->user->dept);
+        $this->dept->setupDeptWithUsers($this->view);
 
         $this->loadModel('pipeline');
         $this->pipeline->setupOptionMenu($this->view);
@@ -532,7 +540,7 @@ class project extends control
      * @access public
      * @return void
      */
-    public function story($projectID = 0, $orderBy = 'order_desc', $type = 'byModule', $param = 0, $recTotal = 0, $recPerPage = 50, $pageID = 1)
+    public function story($projectID = 0, $orderBy = 'id_desc', $type = 'byModule', $param = 0, $recTotal = 0, $recPerPage = 50, $pageID = 1)
     {
         /* Load these models. */
         $this->loadModel('story');
@@ -589,7 +597,8 @@ class project extends control
         $position[] = $this->lang->project->story;
 
         /* Count T B C */
-        $storyIdList = array_keys($stories);;
+        $storyIdList = array_keys($stories);
+
         $storyTasks = $this->loadModel('task')->getStoryTaskCounts($storyIdList, $projectID);
         $storyBugs = $this->loadModel('bug')->getStoryBugCounts($storyIdList, $projectID);
         $storyCases = $this->loadModel('testcase')->getStoryCaseCounts($storyIdList);
@@ -620,6 +629,8 @@ class project extends control
         $this->loadModel('pipeline');
         $this->pipeline->setupOptionMenu($this->view);
         //oscar:
+
+        //error_log("project-story  orderBy:" . $orderBy);
 
         $this->display();
     }
@@ -2150,12 +2161,12 @@ class project extends control
         $this->app->user->currentPrj = $projectID;
 
         // oscar
-        $milestones = $this->dao->select('id, name')->from(TABLE_TASKMILESTONE)
-            ->where('project')->eq($this->view->project->id)
-            ->orderBy('id desc')
-            ->fetchPairs('id');
-        $milestones[0] = '无';
-        $this->view->milestones = $milestones;
+//        $milestones = $this->dao->select('id, name')->from(TABLE_TASKMILESTONE)
+//            ->where('project')->eq($this->view->project->id)
+//            ->orderBy('id desc')
+//            ->fetchPairs('id');
+//        $milestones[0] = '无';
+        $this->view->milestones = $this->project->getMilestonesPairs($projectID, 'none');
         // oscar
 
         /*
@@ -2188,24 +2199,28 @@ class project extends control
         if (!empty($_POST)) {
             $version = fixer::input('post')->get()->version;
 
-            $dat = array();
-            $dat['name'] = $version;
-            $dat['active'] = 1;
-            $dat['deadline'] = helper::today();
-            $dat['project'] = $projectID;
-
-            $c = $this->dao->select()->from(TABLE_TASKMILESTONE)
-                ->where('name')->eq($version)
-                ->count();
-
-            if ($c == 0) {
-                $this->dao->insert(TABLE_TASKMILESTONE)->data($dat)
-                    ->autoCheck()
-                    ->batchCheck('name', 'notempty')
-                    ->exec();
-                $this->view->msg = "版本[$version]添加成功!";
+            if (empty($version) || $version == '') {
+                $this->view->msg = "不能添加空的里程碑";
             } else {
-                $this->view->msg = "版本[$version]已经存在!";
+                $dat = array();
+                $dat['name'] = $version;
+                $dat['active'] = 1;
+                $dat['deadline'] = helper::today();
+                $dat['project'] = $projectID;
+
+                $c = $this->dao->select()->from(TABLE_TASKMILESTONE)
+                    ->where('name')->eq($version)
+                    ->count();
+
+                if ($c == 0) {
+                    $this->dao->insert(TABLE_TASKMILESTONE)->data($dat)
+                        ->autoCheck()
+                        ->batchCheck('name', 'notempty')
+                        ->exec();
+                    $this->view->msg = "版本[$version]添加成功!";
+                } else {
+                    $this->view->msg = "版本[$version]已经存在!";
+                }
             }
         }
 
@@ -2325,4 +2340,370 @@ class project extends control
     }
 
 
+
+    public function productMilestone($projectID = 0, $orderBy = 'order_desc', $type = 'byMilestone', $param = 0, $recTotal = 0, $recPerPage = 50, $pageID = 1)
+    {
+//        $this->task($projectID);
+//        return;
+        // oscar
+        $milestones = $this->project->getMilestonesPairs($projectID);
+        $this->view->milestones = $milestones;
+        // oscar
+
+        /* Load these models. */
+        $this->loadModel('story');
+        $this->loadModel('user');
+        $this->app->loadLang('testcase');
+
+        $this->project->getLimitedProject();
+
+        /* Save session. */
+        $this->app->session->set('storyList', $this->app->getURI(true));
+
+        /* Process the order by field. */
+        if (!$orderBy) $orderBy = $this->cookie->projectStoryOrder ? $this->cookie->projectStoryOrder : 'pri';
+        setcookie('projectStoryOrder', $orderBy, $this->config->cookieLife, $this->config->webRoot);
+
+        /* Append id for secend sort. */
+        $sort = $this->loadModel('common')->appendOrder($orderBy);
+
+        $queryID = ($type == 'bySearch') ? (int)$param : 0;
+        $project = $this->commonAction($projectID);
+        $projectID = $project->id;
+
+        /* Load pager. */
+        $this->app->loadClass('pager', $static = true);
+        $pager = new pager($recTotal, $recPerPage, $pageID);
+
+        $stories = $this->story->getProjectStories($projectID, $sort, $type, $param, $pager);
+        $this->loadModel('common')->saveQueryCondition($this->dao->get(), 'story', false);
+        $users = $this->user->getPairs('noletter');
+
+        /* Get project's product. */
+        $productID = 0;
+        $productPairs = $this->loadModel('product')->getProductsByProject($projectID);
+        if ($productPairs) $productID = key($productPairs);
+
+        /* Build the search form. */
+        $modules = array();
+        $projectModules = $this->loadModel('tree')->getTaskTreeModules($projectID, true);
+        $products = $this->project->getProducts($projectID);
+        foreach ($products as $product) {
+            $productModules = $this->tree->getOptionMenu($product->id);
+            foreach ($productModules as $moduleID => $moduleName) {
+                if ($moduleID and !isset($projectModules[$moduleID])) continue;
+                $modules[$moduleID] = ((count($products) >= 2 and $moduleID) ? $product->name : '') . $moduleName;
+            }
+        }
+        $actionURL = $this->createLink('project', 'story', "projectID=$projectID&orderBy=$orderBy&type=bySearch&queryID=myQueryID");
+        $branchGroups = $this->loadModel('branch')->getByProducts(array_keys($products), 'noempty');
+        $this->project->buildStorySearchForm($products, $branchGroups, $modules, $queryID, $actionURL, 'projectStory');
+
+        /* Header and position. */
+        $title = $project->name . $this->lang->colon . $this->lang->project->story;
+        $position[] = html::a($this->createLink('project', 'browse', "projectID=$projectID"), $project->name);
+        $position[] = $this->lang->project->story;
+
+        /* Count T B C */
+        $storyIdList = array_keys($stories);;
+        $storyTasks = $this->loadModel('task')->getStoryTaskCounts($storyIdList, $projectID);
+        $storyBugs = $this->loadModel('bug')->getStoryBugCounts($storyIdList, $projectID);
+        $storyCases = $this->loadModel('testcase')->getStoryCaseCounts($storyIdList);
+
+        if($type == 'byMilestone')
+        {
+            $this->view->milestone = $param;
+        }
+        else
+        {
+            $this->view->milestone = 0;
+        }
+
+        /* Assign. */
+        $this->view->title = $title;
+        $this->view->position = $position;
+        $this->view->productID = $productID;
+        $this->view->project = $project;
+        $this->view->stories = $stories;
+        $this->view->summary = $this->product->summary($stories);
+        $this->view->orderBy = $orderBy;
+        $this->view->type = $type;
+        $this->view->param = $param;
+        //$this->view->moduleTree = $this->loadModel('tree')->getProductMilestoneTreeMenu($projectID, $startModuleID = 0, array('treeModel', 'createProjectMilestoneStoryLink'));
+        $this->view->tabID = 'story';
+        $this->view->storyTasks = $storyTasks;
+        $this->view->storyBugs = $storyBugs;
+        $this->view->storyCases = $storyCases;
+        $this->view->users = $users;
+        $this->view->pager = $pager;
+        $this->view->branchGroups = $branchGroups;
+
+        //oscar:
+        $this->loadModel('dept');
+        $this->dept->setupDeptUsers($this->view, $this->app->user->account, $this->app->user->dept);
+
+        $this->loadModel('pipeline');
+        $this->pipeline->setupOptionMenu($this->view);
+        //oscar:
+
+        $this->display();
+    }
+
+
+    public function productMilestonesManage($projectID = 0)
+    {
+        $project = $this->project->getById($projectID, true);
+        if (!$project) die(js::error($this->lang->notFound) . js::locate('back'));
+        $this->project->setMenu($this->projects, $project->id);
+        $this->view->project = $project;
+
+        $this->view->msg = "";
+
+        if (!empty($_POST)) {
+            $milestone = fixer::input('post')->get()->milestone;
+
+            if(empty($milestone) || $milestone === '')
+            {
+                $this->msg = "不能添加空的里程碑";
+            }
+            else {
+                $dat = array();
+                $dat['name'] = $milestone;
+                $dat['active'] = 1;
+                $dat['deadline'] = helper::dayafter(helper::today(), 7);
+                $dat['project'] = $projectID;
+
+                $c = $this->dao->select()->from(TABLE_PRODUCTMILESTONE)
+                    ->where('name')->eq($milestone)
+                    ->count();
+
+                if ($c == 0) {
+                    $this->dao->insert(TABLE_PRODUCTMILESTONE)->data($dat)
+                        ->autoCheck()
+                        ->batchCheck('name', 'notempty')
+                        ->exec();
+                    $this->view->msg = "里程碑[$milestone]添加成功!";
+                } else {
+                    $this->view->msg = "里程碑[$milestone]已经存在!";
+                }
+            }
+        }
+
+        $milestones = $this->dao->select()->from(TABLE_PRODUCTMILESTONE)
+            ->where('project')->eq($projectID)
+            ->orderBy('id desc')
+            ->fetchAll();
+
+        $this->view->milestones = ($milestones);
+
+        $this->display();
+    }
+
+
+
+    public function activeMilestone()
+    {
+        if (!empty($_POST)) {
+
+            $postVals = fixer::input('post')
+                ->get();
+
+            $id = $postVals->id;
+
+            //error_log("oscar: active_version $id");
+            $this->dao->update(TABLE_PRODUCTMILESTONE)
+                ->set('active')->eq(1)
+                ->where('id')->eq($id)
+                ->exec();
+        } else {
+            return false;
+        }
+    }
+
+    public function closeMilestone()
+    {
+        if (!empty($_POST)) {
+
+            $postVals = fixer::input('post')
+                ->get();
+
+            $id = $postVals->id;
+
+            //error_log("oscar: close_version $id");
+            $this->dao->update(TABLE_PRODUCTMILESTONE)
+                ->set('active')->eq(0)
+                ->where('id')->eq($id)
+                ->exec();
+        } else {
+            return false;
+        }
+    }
+
+    public function updateMilestoneDeadline()
+    {
+        if (!empty($_POST)) {
+
+            $postVals = fixer::input('post')
+                ->get();
+
+            $deadline = $postVals->deadline;
+            $id = $postVals->id;
+
+            //error_log("oscar: updateVersionDeadline $id deadline:$deadline");
+            $this->dao->update(TABLE_PRODUCTMILESTONE)
+                ->set('deadline')->eq($deadline)
+                ->where('id')->eq($id)
+                ->exec();
+        } else {
+            return false;
+        }
+    }
+
+
+    /**
+     * Link stories to a Milestone.
+     *
+     * @param  int $projectID
+     * @access public
+     * @return void
+     */
+    public function linkMilestoneStory($projectID = 0, $milestone, $browseType = '', $param = 0)
+    {
+        $this->loadModel('story');
+        $this->loadModel('product');
+
+        $milestoneName = $this->dao->select('name')->from(TABLE_PRODUCTMILESTONE)
+            ->where('id')->eq($milestone)
+            ->fetch('name');
+
+        //$query = $this->dao->get();
+        //$this->console_log($query);
+
+        /* Get projects and products. */
+        $project = $this->project->getById($projectID);
+        $products = $this->project->getProducts($projectID);
+        $browseLink = $this->createLink('project', 'linkMilestoneStory', "projectID=$projectID&milestone=$milestone");
+
+        //$this->session->set('storyList', $this->app->getURI(true)); // Save session.
+        $this->project->setMenu($this->projects, $project->id);     // Set menu.
+
+        if (empty($products)) {
+            echo js::alert($this->lang->project->errorNoLinkedProducts);
+            die(js::locate($this->createLink('project', 'manageproducts', "projectID=$projectID")));
+        }
+
+        if (!empty($_POST)) {
+            $this->project->linkMilestoneStory($projectID, $milestone);
+            die(js::locate($browseLink));
+        }
+
+        $queryID = ($browseType == 'bySearch') ? (int)$param : 0;
+
+        /* Set modules and branches. */
+        $modules = array();
+        $branches = array();
+        $productType = 'normal';
+        $this->loadModel('tree');
+        $this->loadModel('branch');
+        foreach ($products as $product) {
+            $productModules = $this->tree->getOptionMenu($product->id);
+            foreach ($productModules as $moduleID => $moduleName) $modules[$moduleID] = ((count($products) >= 2 and $moduleID != 0) ? $product->name : '') . $moduleName;
+            if ($product->type != 'normal') {
+                $productType = $product->type;
+                $branches[$product->branch] = $product->branch;
+                if ($product->branch == 0) {
+                    foreach ($this->branch->getPairs($product->id, 'noempty') as $branchID => $branchName) $branches[$branchID] = $branchID;
+                }
+            }
+        }
+
+        /* Build the search form. */
+        $actionURL = $this->createLink('project', 'linkMilestoneStory', "projectID=$projectID&browseType=bySearch&queryID=myQueryID");
+        $branchGroups = $this->loadModel('branch')->getByProducts(array_keys($products), 'noempty');
+        $this->project->buildStorySearchForm($products, $branchGroups, $modules, $queryID, $actionURL, 'linkMilestoneStory');
+
+        if ($browseType == 'bySearch') {
+            $allStories = $this->story->getBySearch('', $queryID, 'id', null, $projectID);
+        } else {
+            $allStories = $this->story->getProductStories(array_keys($products), $branches, $moduleID = '0', $status = 'active');
+        }
+        $prjStories = $this->story->getProjectStories($projectID);
+
+        /* Assign. */
+        $title = '工程：' . $project->name . "   里程碑：" . $milestoneName . '  ' . $this->lang->project->linkMilestoneStory;
+        $position[] = html::a($browseLink, $project->name);
+        $position[] = $this->lang->project->linkMilestoneStory;
+
+        $milestoneStories = $this->project->getMilestonesStories($projectID, $milestone, 'all');
+        $this->view->milestoneStories = $milestoneStories;
+
+        $this->view->title = $title;
+        $this->view->position = $position;
+        $this->view->project = $project;
+        $this->view->products = $products;
+        $this->view->allStories = $allStories;
+        $this->view->prjStories = $prjStories;
+        $this->view->browseType = $browseType;
+        $this->view->productType = $productType;
+        $this->view->modules = $modules;
+        $this->view->users = $this->loadModel('user')->getPairs('noletter');
+        $this->view->branchGroups = $branchGroups;
+        $this->display();
+    }
+
+    /**
+     * Unlink a story from Milestone.
+     *
+     * @param  int $projectID
+     * @param  int $storyID
+     * @param  string $confirm yes|no
+     * @access public
+     * @return void
+     */
+    public function unlinkMilestoneStory($projectID, $storyID, $milestone, $confirm = 'no')
+    {
+        if ($confirm == 'no') {
+            die(js::confirm($this->lang->project->confirmUnlinkStory, $this->createLink('project', 'unlinkstory', "projectID=$projectID&storyID=$storyID&confirm=yes")));
+        } else {
+            $this->project->unlinkStory($projectID, $storyID);
+
+            /* if kanban then reload and if ajax request then send result. */
+            if (isonlybody()) {
+                die(js::reload('parent'));
+            } elseif (helper::isAjaxRequest()) {
+                if (dao::isError()) {
+                    $response['result'] = 'fail';
+                    $response['message'] = dao::getError();
+                } else {
+                    $response['result'] = 'success';
+                    $response['message'] = '';
+                }
+                $this->send($response);
+            }
+            die(js::locate($this->app->session->storyList, 'parent'));
+        }
+    }
+
+    /**
+     * batch unlink story.
+     *
+     * @param  int $projectID
+     * @access public
+     * @return void
+     */
+    public function batchUnlinkMilestoneStory($projectID, $milestone)
+    {
+        if (isset($_POST['storyIDList'])) {
+            $storyIDList = $this->post->storyIDList;
+            $_POST = array();
+            foreach ($storyIDList as $storyID) {
+                $this->project->unlinkMilestoneStory($projectID, $milestone, $storyID);
+            }
+        }
+
+        //if (!dao::isError()) $this->loadModel('score')->create('ajax', 'batchOther');
+        // productMilestone-2-1-byMilestone-2.html
+        //public function productMilestone($projectID = 0, $orderBy = 'order_desc', $type = 'byMilestone', $param = 0, $recTotal = 0, $recPerPage = 50, $pageID = 1)
+        die(js::locate($this->createLink('project', 'productMilestone', "projectID=$projectID&orderby=desc&type=byMilestone&param=$milestone")));
+    }
 }

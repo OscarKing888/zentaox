@@ -28,14 +28,21 @@ include '../../common/view/chart.html.php';
         <?php foreach($tasks as $key => $task):?>
         <tr class='text-center'>
           <td><?php echo $task->id;?></td>
-          <td class='text-left' title="<?php echo $task->name?>"><?php echo $task->name;?></td>
+          <td class='text-left' title="<?php echo $task->name?>">
+              <?php
+              //echo $task->name;
+              //$this->task->printCell('name', $task)
+              $taskLink = helper::createLink('task', 'view', "taskID=$task->id");
+              echo html::a($taskLink, $task->name, '_blank', "class='iframe' style='color: $task->color'");
+              ?>
+          </td>
           <td><span class='<?php echo 'pri' . zget($lang->task->priList, $task->pri, $task->pri)?>'><?php echo $task->pri == '0' ? '' : zget($lang->task->priList, $task->pri, $task->pri);?></span></td>
           <td><?php echo $lang->task->statusList[$task->status];?></td>
           <td><?php echo zget($users, $task->assignedTo, $task->assignedTo);?></td>
           <td><?php echo $task->estimate;?></td>
           <td><?php echo $task->consumed;?></td>
           <td><?php echo $task->left;?></td>
-          <td><div class='progress-pie' title="<?php echo $task->progress?>%" data-value='<?php echo $task->progress;?>'></div></td>
+          <td><div class='progress-pie22' title="<?php echo $task->progress?>%" data-value='<?php echo $task->progress;?>'></div><?php echo $task->progress . '%';?></td>
         </tr>
         <?php endforeach;?>
       </tbody>

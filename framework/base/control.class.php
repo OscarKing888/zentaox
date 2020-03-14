@@ -11,7 +11,7 @@
  *  May you find forgiveness for yourself and forgive others.
  *  May you share freely, never taking more than you give.
  */
-class baseControl
+class baseControl// extends  debugUtil
 {
     /**
      * 全局对象 $app。
