@@ -899,7 +899,37 @@ class bugModel extends model
         if(!dao::isError()) $this->loadModel('score')->create('bug', 'resolve', $oldBug);
         /* Link bug to build and release. */
         //oscar $this->linkBugToBuild($bugID, $bug->resolvedBuild);
+
+        $this->autoCreateBlog("解决", $bugID);
     }
+
+    // oscar[
+    // todo auto create blog
+    public function autoCreateBlog($action, $bugID)
+    {
+        $bug = $this->dao->select()->from(TABLE_BUG)
+            ->where('id')->eq($bugID)
+            ->fetch();
+
+        //error_log("task autoCreateBlog sql:" . $this->dao->get() . " task:" . $task);
+
+        $this->loadModel('blog');
+        //$this->loadModel('product');
+
+        //$task->project = $this->dao->select('project')->from(TABLE_TASK)
+        //    ->where('id')->eq($task->id)
+        //    ->fetch('project');
+
+        $taskLink = helper::createLink('bug', 'view', "bugID=$bugID");
+        $blogContent = html::aQ2($taskLink, $bug->title, "class=\"auto-action-blog iframe\"") ;
+
+        $bugProduct = $bug->product;
+
+        //error_log("task autoCreateBlog select product:$taskProduct sql:" . $this->dao->get());
+
+        $this->blog->createOrUpdate($action . "BUG：$blogContent", $bugProduct);
+    }
+    // oscar]
 
     /**
      * Batch change branch.

@@ -135,7 +135,7 @@ include '../../common/view/datepicker.html.php';
                         <?php
                         if ($showstat) {
                             //$cnt = str_replace("\n", "<br>", $article->content);
-                            $cnt = nl2br($article->content);
+                            $cnt = nl2br(htmlspecialchars_decode($article->content));
                         } else {
                             $cnt = str_replace("\n", "/", $article->content);
                         }

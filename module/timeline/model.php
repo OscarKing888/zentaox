@@ -31,7 +31,7 @@ class timelineModel extends model
     public function getList($pager = null)
     {
         //$articles = $this->dao->select('*')
-        //->from($this->config->blog->dbname)
+        //->from(TABLE_BLOG)
         //->where('owner')->eq($this->app->user->account)
         //->andwhere('deleted')->eq(0)
         //->orderBy('date desc')->page($pager)->fetchAll();
@@ -57,7 +57,7 @@ class timelineModel extends model
     public function getDeletedList($pager = null)
     {
         $articles = $this->dao->select('*')
-            ->from($this->config->blog->dbname)
+            ->from(TABLE_BLOG)
             ->where('owner')->eq($this->app->user->account)
             ->andwhere('deleted')->eq(1)
             ->orderBy('date desc')->page($pager)->fetchAll();
@@ -75,7 +75,7 @@ class timelineModel extends model
      */
     public function getById($id)
     {
-        $content = $this->dao->findById($id)->from($this->config->blog->dbname)->fetch();
+        $content = $this->dao->findById($id)->from(TABLE_BLOG)->fetch();
 
         $art = ($content);
         $art = $this->file->replaceImgURL($art, $this->config->blog->imageContentFieldName);
@@ -141,7 +141,7 @@ class timelineModel extends model
             ->stripTags($this->config->blog->editor->edit['id'], $this->config->allowedTags)
             ->get();
 
-        $this->dao->update($this->config->blog->dbname)
+        $this->dao->update(TABLE_BLOG)
             ->data($article)->where('id')->eq($articleID)->exec();
     }
 
@@ -155,15 +155,15 @@ class timelineModel extends model
      */
     public function delete($id)
     {
-        //delete($this->config->blog->dbname, $id);
-        $this->dao->update($this->config->blog->dbname)
+        //delete(TABLE_BLOG, $id);
+        $this->dao->update(TABLE_BLOG)
             ->set('deleted')->eq(1)->where('id')->eq($id)->exec();
         //$this->dao->delete()->from($this->dbname)->where('id')->eq($id)->exec();
     }
 
     public function restore($id, $table = null)
     {
-        $this->dao->update($this->config->blog->dbname)
+        $this->dao->update(TABLE_BLOG)
             ->set('deleted')->eq(0)->where('id')->eq($id)->exec();
     }
 

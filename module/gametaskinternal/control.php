@@ -637,7 +637,7 @@ class gametaskinternal extends control
 
     public function delete($id)
     {
-        //delete($this->config->blog->dbname, $id);
+        //delete(TABLE_BLOG, $id);
         $this->dao->update(TABLE_GAMETASKINTERNAL)
             ->set('deleted')->eq(1)->where('id')->eq($id)->exec();
 

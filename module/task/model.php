@@ -866,12 +866,15 @@ class taskModel extends model
         $task = new stdClass();
         $task->checkDate = $now;
         $task->checked = 1;
+        $task->checkedBy = $this->app->user->account;
 
         $this->dao->update(TABLE_TASK)
             ->data($task)
             ->autoCheck()
             ->check('left', 'float')
             ->where('id')->eq($taskID)->exec();
+
+        $this->autoCreateBlog("验收", $taskID);
 
         if(!dao::isError()) return common::createChanges($oldTask, $task);
     }
@@ -1319,6 +1322,9 @@ class taskModel extends model
 
         if($oldTask->story) $this->loadModel('story')->setStage($oldTask->story);
         if($task->status == 'done' && !dao::isError()) $this->loadModel('score')->create('task', 'finish', $taskID);
+
+        $this->autoCreateBlog("完成", $taskID);
+
         if(!dao::isError()) return common::createChanges($oldTask, $task);
     }
 
@@ -1353,6 +1359,7 @@ class taskModel extends model
             ->get();
         //*/
         $task = new stdClass();
+        $task->id = $taskID;
         $task->left = 0;
         $task->status = 'done';
         $task->consumed = $oldTask->estimate;
@@ -1425,8 +1432,43 @@ class taskModel extends model
 
         if($oldTask->story) $this->loadModel('story')->setStage($oldTask->story);
         if($task->status == 'done' && !dao::isError()) $this->loadModel('score')->create('task', 'finish', $taskID);
+
+        //$this->autoCreateBlog("<p class=\"task-done\">完成</p>", $taskID);
+        $this->autoCreateBlog("完成", $taskID);
+
         if(!dao::isError()) return common::createChanges($oldTask, $task);
     }
+
+
+    // oscar[
+    // todo auto create blog
+    public function autoCreateBlog($action, $taskID)
+    {
+        $task = $this->dao->select()->from(TABLE_TASK)
+            ->where('id')->eq($taskID)
+            ->fetch();
+
+        //error_log("task autoCreateBlog sql:" . $this->dao->get() . " task:" . $task);
+
+        $this->loadModel('blog');
+        $this->loadModel('product');
+
+        //$task->project = $this->dao->select('project')->from(TABLE_TASK)
+        //    ->where('id')->eq($task->id)
+        //    ->fetch('project');
+
+        $taskLink = helper::createLink('task', 'view', "taskID=$task->id");
+        $blogContent = html::aQ2($taskLink, $task->name, "class=\"auto-action-blog iframe\" style=\"color: $task->color\"") ;
+
+        $taskProduct = $this->dao->select('product')->from(TABLE_PROJECTPRODUCT)
+            ->where('project')->eq($task->project)
+            ->fetch('product');
+
+        //error_log("task autoCreateBlog select product:$taskProduct sql:" . $this->dao->get());
+
+        $this->blog->createOrUpdate($action . "任务：$blogContent", $taskProduct);
+    }
+    // oscar]
 
     /**
      * Pause task

@@ -632,7 +632,11 @@ class task extends control
     public static function __callStatic($name, $arguments)
     {
         // TODO: Implement __callStatic() method.
-    }// oscar[
+    }
+
+
+    // oscar[
+
     public function batchAssignToCheckByGD($project, $account)
     {
         if (!empty($_POST)) {

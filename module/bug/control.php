@@ -402,7 +402,7 @@ class bug extends control
      */
     public function batchCreate($productID, $branch = '', $projectID = 0, $moduleID = 0)
     {
-        error_log("control batchCreate Bug");
+        //error_log("control batchCreate Bug");
 
         if(!empty($_POST))
         {

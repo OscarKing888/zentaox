@@ -37,7 +37,12 @@
                     <div class='content'>
                         <?php
                         //$cnt = str_replace("\n", "<br>", $article->content);
-                        $cnt = nl2br($article->content);
+                        $cnt = $article->content;
+                        //error_log("blog raw:$cnt");
+
+                        //$cnt = nl2br(htmlspecialchars_decode($article->content));
+                        $cnt = htmlspecialchars_decode(nl2br($article->content));
+                        //$cnt = htmlspecialchars_decode($cnt);
                         echo $cnt;
                         echo "<br>";
                         //$imgs = str_replace("<img", "<br><img", $article->contentimages);

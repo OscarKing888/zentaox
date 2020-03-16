@@ -113,7 +113,17 @@ class baseHTML
         if(empty($title)) $title = $href;
         $newline = $newline ? "\n" : '';
 
-        return "<a href='$href' $misc>$title</a>$newline";
+	    return "<a href='$href' $misc>$title</a>$newline";
+    }
+
+    static public function aQ2($href = '', $title = '', $misc = '', $newline = true)
+    {
+        global $config;
+
+        if(empty($title)) $title = $href;
+        $newline = $newline ? "\n" : '';
+
+        return "<a href=\"$href\" $misc>$title</a>$newline";
     }
 
     /**
