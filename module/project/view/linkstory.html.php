@@ -35,6 +35,7 @@
       <th class='w-80px'><?php echo $lang->product->branchName[$productType];?></th>
       <?php endif;?>
       <th class='w-user'><?php echo $lang->openedByAB;?></th>
+      <th class='w-80px'> <?php echo $lang->assignedToAB ?></th>
       <th class='w-80px'><?php echo $lang->story->estimateAB;?></th>
     </tr>
     </thead>
@@ -59,6 +60,7 @@
       <td><?php if(isset($branchGroups[$story->product][$story->branch])) echo $branchGroups[$story->product][$story->branch];?></td>
       <?php endif;?>
       <td><?php echo zget($users, $story->openedBy, $story->openedBy);?></td>
+      <td><?php echo $users[$story->assignedTo]; ?></td>
       <td><?php echo $story->estimate;?></td>
     </tr>
     <?php $storyCount ++;?>

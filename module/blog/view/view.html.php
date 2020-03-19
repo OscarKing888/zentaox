@@ -48,7 +48,9 @@
 
                     <div class='content'>
                         <?php
-                        echo $article->content;
+                        $cnt = nl2br(htmlspecialchars_decode($article->content));
+                        echo $cnt;
+
                         echo "<br>";
                         echo $article->contentimages;
                         //$steps = $article->contentimages;

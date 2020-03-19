@@ -171,15 +171,15 @@ include '../../common/view/datepicker.html.php';
                                     } else if (array_key_exists($dpuaccount, $userInfo)) { // if user has absent mark
                                         if($userInfo[$dpuaccount]->absent == 1) {
                                             echo $lang->blog->setUserAbsent;
-                                            echo html::commonButton($lang->blog->removeUserAbsent, "id='removeUserAbsent' onclick=\"on_removeUserAbsent('$dpuaccount', '$day')\"");
+                                            echo html::commonButton($lang->blog->removeUserAbsent, "id='removeUserAbsent_$dpuaccount' onclick=\"on_removeUserAbsent('$dpuaccount', '$day')\"");
                                         }
                                         else
                                         {
-                                            echo html::commonButton( $lang->blog->setUserAbsent, "id='setUserAbsent' onclick=\"on_setUserAbsent('$dpuaccount', '$day')\"");
+                                            echo html::commonButton( $lang->blog->setUserAbsent, "id='setUserAbsent_$dpuaccount' onclick=\"on_setUserAbsent('$dpuaccount', '$day')\"");
                                         }
                                         //echo html::a($this->createLink('blog', 'removeUserAbsent', "userid=$dpuaccount&day=$day"), $lang->blog->removeUserAbsent);
                                     } else { // show set absent
-                                        echo html::commonButton( $lang->blog->setUserAbsent, "id='createUserAbsent' onclick=\"on_createUserAbsent('$dpuaccount', '$day')\"");
+                                        echo html::commonButton( $lang->blog->setUserAbsent, "id='createUserAbsent_$dpuaccount' onclick=\"on_createUserAbsent('$dpuaccount', '$day')\"");
                                         //echo html::a($this->createLink('blog', 'setUserAbsent', array($dpuaccount, $day)), $lang->blog->setUserAbsent);
                                     }
 

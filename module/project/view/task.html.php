@@ -75,7 +75,24 @@ js::set('browseType', $browseType);
             </thead>
             <tbody>
             <?php foreach ($tasks as $task): ?>
-                <tr class='text-center' data-id='<?php echo $task->id; ?>' data-status='<?php echo $task->status ?>'
+                <?php
+                $taskStatus = 'wait';
+                //echo $child->status
+                if(!$task->checked)
+                {
+                    if($task->status == 'done'){
+                        $taskStatus = 'wait_check';
+                    }
+                    else {
+                        $taskStatus = $task->status;
+                    }                        }
+                else
+                {
+                    $taskStatus = 'checked';
+                }
+                ?>
+
+                <tr class='text-center' data-id='<?php echo $task->id; ?>' data-status='<?php echo $taskStatus ?>'
                     data-estimate='<?php echo $task->estimate ?>' data-consumed='<?php echo $task->consumed ?>'
                     data-left='<?php echo $task->left ?>'>
                     <?php foreach ($customFields as $field) $this->task->printCell($field, $task, $users, $browseType, $branchGroups, $modulePairs, $useDatatable ? 'datatable' : 'table', false, $depts, $pipeline, $versions); ?>
@@ -85,11 +102,31 @@ js::set('browseType', $browseType);
                         <?php $class = $key == 0 ? ' table-child-top' : ''; ?>
                         <?php $class .= ($key + 1 == count($task->children)) ? ' table-child-bottom' : ''; ?>
                         <tr class='text-center table-children<?php echo $class; ?> parent-<?php echo $task->id; ?>'
-                            data-id='<?php echo $child->id ?>' data-status='<?php echo $child->status ?>'
+                            <?php
+                            $taskStatus = 'wait';
+                            //echo $child->status
+                            if(!$child->checked)
+                            {
+                                if($child->status == 'done'){
+                                    $taskStatus = 'wait_check';
+                                }
+                                else {
+                                    $taskStatus = $child->status;
+                                }                        }
+                            else
+                            {
+                                $taskStatus = 'checked';
+                            }
+                            ?>
+
+                            data-id='<?php echo $child->id ?>' data-status='<?php echo $taskStatus; ?>'
                             data-estimate='<?php echo $child->estimate ?>'
                             data-consumed='<?php echo $child->consumed ?>' data-left='<?php echo $child->left ?>'>
                             <?php //echo html::select('batchCreateChildTask', $pipeline, '', 'class="hidden"');?>
-                            <?php foreach ($customFields as $field) $this->task->printCell($field, $child, $users, $browseType, $branchGroups, $modulePairs, $useDatatable ? 'datatable' : 'table', true, $depts, $pipeline, $versions); ?>
+                            <?php
+                            foreach ($customFields as $field)
+                                $this->task->printCell($field, $child, $users, $browseType, $branchGroups, $modulePairs, $useDatatable ? 'datatable' : 'table', true, $depts, $pipeline, $versions);
+                            ?>
                         </tr>
                     <?php endforeach; ?>
                 <?php endif; ?>

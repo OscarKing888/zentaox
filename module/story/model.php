@@ -1805,29 +1805,7 @@ class storyModel extends model
 
             // oscar[
             // todo add task progress
-            $this->loadModel('task');
-            //$storyProgress = array();
-            foreach($stories as $story => $val)
-            {
-                $tasks = $this->task->getStoryTasks($story, $projectID);
-                $taskProgress = 0;
-                foreach($tasks as $t)
-                {
-                    $taskProgress += $t->progress;
-
-                    //$this->console_log( "taskprog:" . $val->title  . " " . $t->progress . "%");
-                }
-                $taskCnt = count($tasks);
-                $taskProgress = $taskCnt > 0 ? $taskProgress / $taskCnt : 0;
-                $taskProgress = round($taskProgress);
-                $taskProgress = max(0, min(100, $taskProgress));
-                $progressDat = $stories[$story];
-                $progressDat->taskProgress = $taskProgress;
-                //$storyProgress[$story] = $progressDat;
-                //$this->console_log( "story taskprog:" . $val->title . " cnt:" . $taskCnt . " " . $taskProgress . "%");
-            }
-
-            //$this->view->storyProgress = $storyProgress;
+            $this->computeTaskProgress($stories, $projectID);
             // oscar]
 
             return $stories;
@@ -1868,14 +1846,36 @@ class storyModel extends model
 
         // oscar[
         // todo add task progress
+        $this->computeTaskProgress($stories, $projectID);
+        // oscar]
+
+        return $stories;
+    }
+
+    public function computeTaskProgress($stories, $projectID)
+    {
+        // todo add task progress
         $this->loadModel('task');
         //$storyProgress = array();
         foreach($stories as $story => $val)
         {
             $tasks = $this->task->getStoryTasks($story, $projectID);
             $taskProgress = 0;
+            $storyProgress = 0;
             foreach($tasks as $t)
             {
+                /*
+                if($story == 124)
+                {
+                    $this->console_log("story check status:" . $t->checked);
+                }
+                //*/
+
+                if($t->checked )
+                {
+                    $storyProgress += $t->progress;
+                    //$this->console_log( "storyProgress:" . $val->title  . " " . $t->progress . "%");
+                }
                 $taskProgress += $t->progress;
 
                 //$this->console_log( "taskprog:" . $val->title  . " " . $t->progress . "%");
@@ -1884,13 +1884,17 @@ class storyModel extends model
             $taskProgress = $taskCnt > 0 ? $taskProgress / $taskCnt : 0;
             $taskProgress = round($taskProgress);
             $taskProgress = max(0, min(100, $taskProgress));
+
+            $storyProgress = $taskCnt > 0 ? $storyProgress / $taskCnt : 0;
+            $storyProgress = round($storyProgress);
+            $storyProgress = max(0, min(100, $storyProgress));
+
             $progressDat = $stories[$story];
             $progressDat->taskProgress = $taskProgress;
+            $progressDat->storyProgress = $storyProgress;
             //$storyProgress[$story] = $progressDat;
-            //$this->console_log( "story taskprog:" . $val->title . " cnt:" . $taskCnt . " " . $taskProgress . "%");
+            //$this->console_log( "story $story taskprog:" . $val->title . " cnt:" . $taskCnt . " " . $storyProgress . "%");
         }
-
-        return $stories;
     }
 
     /**

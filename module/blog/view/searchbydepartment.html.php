@@ -103,7 +103,7 @@ include '../../common/view/datepicker.html.php';
                 //echo $article->content;
                 echo "<tr><td width='20%' align='right'><strong>$article->ownerrealname</strong></td>";
                 //$cnt = str_replace("\n", "<br>", $article->content);
-                $cnt = nl2br($article->content);
+                $cnt = nl2br(htmlspecialchars_decode($article->content));
                 echo"<td>$cnt</td></tr>";
                 //echo "<br>";
             }

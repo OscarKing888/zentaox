@@ -33,7 +33,7 @@ class blogModel extends model
     public function getList($pager = null)
     {
         //$articles = $this->dao->select('*')
-        //->from($this->config->blog->dbname)
+        //->from(TABLE_BLOG)
         //->where('owner')->eq($this->app->user->account)
         //->andwhere('deleted')->eq(0)
         //->orderBy('date desc')->page($pager)->fetchAll();
@@ -50,6 +50,10 @@ class blogModel extends model
             //$art = html_entity_decode($art);
             $art = $this->file->replaceImgURL($art, $this->config->blog->imageContentFieldName);
             $art->contentimages = htmlspecialchars_decode($art->contentimages);
+            //$newContent = htmlspecialchars_decode($art->content);
+            //error_log("--- $newContent\n" . $art->content);
+            //$art->content = $newContent;
+
             $artr[$i] = $art;
             $i++;
         }
@@ -59,7 +63,7 @@ class blogModel extends model
     public function getDeletedList($pager = null)
     {
         $articles = $this->dao->select('*')
-            ->from($this->config->blog->dbname)
+            ->from(TABLE_BLOG)
             ->where('owner')->eq($this->app->user->account)
             ->andwhere('deleted')->eq(1)
             ->orderBy('date desc')->page($pager)->fetchAll();
@@ -75,7 +79,7 @@ class blogModel extends model
     public function getListByUser($userid, $pager = null)
     {
         $articles = $this->dao->select('*')
-            ->from($this->config->blog->dbname)
+            ->from(TABLE_BLOG)
             ->where('owner')->eq($userid)
             ->andwhere('deleted')->eq(0)
             ->orderBy('date desc')->page($pager)->fetchAll();
@@ -92,7 +96,7 @@ class blogModel extends model
      */
     public function getById($id)
     {
-        $content = $this->dao->findById($id)->from($this->config->blog->dbname)->fetch();
+        $content = $this->dao->findById($id)->from(TABLE_BLOG)->fetch();
 
         $art = ($content);
         $art = $this->file->replaceImgURL($art, $this->config->blog->imageContentFieldName);
@@ -131,16 +135,19 @@ class blogModel extends model
             ->stripTags($this->config->blog->editor->create['id'], $this->config->allowedTags)
             ->get();
 
-        $article2 = htmlspecialchars_decode($article);
+        //$imagesContent = htmlspecialchars_decode($article->contentimages);
 
         $articleProced = $this->file->processImgURL($article, $this->config->blog->editor->create['id'], $this->post->uid);
 
+        //$articleProced->content = htmlspecialchars($articleProced->content);
 
-        $this->logBlog("\n====id:" . $this->post->uid . "\nraw:" . $article->contentimages . "\nbefore:" . $article2->contentimages . " \n after:"
-            . $articleProced->contentimages . "\ntools:" . $this->config->blog->editor->create['id']);
+        //$this->logBlog("\n====id:" . $this->post->uid . "\nraw:" . $article->contentimages . "\nbefore:" . $imagesContent . " \n after:"
+          //  . $articleProced->contentimages . "\ntools:" . $this->config->blog->editor->create['id']);
 
-        $this->dao->insert($this->config->blog->dbname)->data($articleProced)
+        $this->dao->insert(TABLE_BLOG)->data($articleProced)
             ->autoCheck()->batchCheck('owner,content', 'notempty')->exec();
+
+        //error_log('blog.create new:' . $articleProced->contentimages . ' old:' . $article->contentimages);
 
         return $this->dao->lastInsertID();
     }
@@ -154,12 +161,61 @@ class blogModel extends model
      */
     public function update($articleID)
     {
-        $article = fixer::input('post')->specialchars($this->config->blog->fields)
-            ->stripTags($this->config->blog->editor->edit['id'], $this->config->allowedTags)
+        $article = fixer::input('post')
+            //->specialchars($this->config->blog->fields)
+            //->stripTags($this->config->blog->editor->edit['id'], $this->config->allowedTags)
             ->get();
 
-        $this->dao->update($this->config->blog->dbname)
+       //$article->content = htmlspecialchars_decode($article->content);
+
+        //error_log("##### blog . update content:" . $article->content);
+        $article = $this->file->processImgURL($article, $this->config->blog->editor->create['id'], $this->post->uid);
+
+        $this->dao->update(TABLE_BLOG)
             ->data($article)->where('id')->eq($articleID)->exec();
+    }
+
+    public function createOrUpdate($text, $product)
+    {
+        //error_log("+++ blog.createOrUpdate product:$product content:$text");
+
+        $myAccount = $this->app->user->account;
+        $oldBlog = $this->dao->select('*, DATE_FORMAT(date, \'%Y-%m-%d\') ')->from(TABLE_BLOG)
+            ->where('owner')->eq($myAccount)
+            ->andWhere('DATE(date)')->eq(helper::today())
+            ->andWhere('product')->eq($product)
+            ->andWhere('deleted')->eq(0)
+            ->fetch();
+
+        //error_log("+++ blog.createOrUpdate $oldBlog 1 sql:" . $this->dao->get());
+
+        if(empty($oldBlog))
+        {
+            $newBlog = new stdClass();
+            $newBlog->owner = $myAccount;
+            $newBlog->date = helper::now();
+            //$newBlog->content = htmlspecialchars($text);
+            $newBlog->content = $text;
+            $newBlog->product = $product;
+
+            $newBlog = $this->file->processImgURL($newBlog, $this->config->blog->editor->create['id'], $this->post->uid);
+
+            $this->dao->insert(TABLE_BLOG)->data($newBlog)
+                ->autoCheck()->batchCheck('owner,content', 'notempty')->exec();
+
+            //error_log("+++ blog.createOrUpdate $oldBlog 2 sql:" . $this->dao->get());
+        }
+        else {
+            $blogDat = $oldBlog;
+            //$blogDat->content = htmlspecialchars($oldBlog->content . '' . $text);
+            $blogDat->content = ($oldBlog->content . "" . $text);
+            $blogDat = $this->file->processImgURL($blogDat, $this->config->blog->editor->create['id'], $this->post->uid);
+
+            $this->dao->update(TABLE_BLOG)
+                ->data($blogDat)->where('id')->eq($oldBlog->id)->exec();
+
+            //error_log("+++ blog.createOrUpdate $oldBlog 3 sql:" . $this->dao->get());
+        }
     }
 
     /**
@@ -172,15 +228,15 @@ class blogModel extends model
      */
     public function delete($id)
     {
-        //delete($this->config->blog->dbname, $id);
-        $this->dao->update($this->config->blog->dbname)
+        //delete(TABLE_BLOG, $id);
+        $this->dao->update(TABLE_BLOG)
             ->set('deleted')->eq(1)->where('id')->eq($id)->exec();
         //$this->dao->delete()->from($this->dbname)->where('id')->eq($id)->exec();
     }
 
     public function restore($id, $table = null)
     {
-        $this->dao->update($this->config->blog->dbname)
+        $this->dao->update(TABLE_BLOG)
             ->set('deleted')->eq(0)->where('id')->eq($id)->exec();
     }
 
@@ -200,7 +256,7 @@ class blogModel extends model
 
         //error_log("=== [getGroupReport]" . $day);
         $articles = $this->dao->select('*')
-            ->from($this->config->blog->dbname)
+            ->from(TABLE_BLOG)
             ->where('owner')->in($dptus)
             ->andwhere('deleted')->eq(0)
             ->andWhere('date')->between(date('Y-m-d 00:00:00', strtotime($day)), date('Y-m-d 23:59:59', strtotime($day)))
@@ -221,7 +277,7 @@ class blogModel extends model
     {
         //error_log("=== [getProjectReport]" . $day);
         $articles = $this->dao->select('*')
-            ->from($this->config->blog->dbname)
+            ->from(TABLE_BLOG)
             ->where('date')->between(date('Y-m-d 00:00:00', strtotime($day)), date('Y-m-d 23:59:59', strtotime($day)))
             ->andwhere('deleted')->eq(0)
             ->andwhere('product')->eq($product)
@@ -240,7 +296,7 @@ class blogModel extends model
     public function getAllReport($day)
     {
         $articles = $this->dao->select('*')
-            ->from($this->config->blog->dbname)
+            ->from(TABLE_BLOG)
             ->where('date')->between(date('Y-m-d 00:00:00', strtotime($day)), date('Y-m-d 23:59:59', strtotime($day)))
             ->andwhere('deleted')->eq(0)
             ->orderBy('date asc')

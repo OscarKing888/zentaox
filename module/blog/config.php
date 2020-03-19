@@ -17,8 +17,10 @@ $config->blog->editor->edit     = array('id' => 'contentimages', 'tools' => 'blo
 //$config->blog->editor->close      = array('id' => 'comment', 'tools' => 'bugTools');
 //$config->blog->editor->activate   = array('id' => 'comment', 'tools' => 'bugTools');
 
-$config->blog->dbname = 'gameblog';
+//$config->blog->dbname = 'gameblog';
 $config->blog->dbnameUserinfo = 'gameuserinfo';
 $config->blog->fields = 'product,content,contentimages,date';
 $config->blog->imageContentFieldName = "contentimages";
 //$config->blog->imageContentFieldName = "content";
+
+define('TABLE_BLOG', 'gameblog');

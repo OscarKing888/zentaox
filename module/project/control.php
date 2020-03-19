@@ -2405,7 +2405,7 @@ class project extends control
         $position[] = $this->lang->project->story;
 
         /* Count T B C */
-        $storyIdList = array_keys($stories);;
+        $storyIdList = array_keys($stories);
         $storyTasks = $this->loadModel('task')->getStoryTaskCounts($storyIdList, $projectID);
         $storyBugs = $this->loadModel('bug')->getStoryBugCounts($storyIdList, $projectID);
         $storyCases = $this->loadModel('testcase')->getStoryCaseCounts($storyIdList);
@@ -2636,6 +2636,17 @@ class project extends control
 
         $milestoneStories = $this->project->getMilestonesStories($projectID, $milestone, 'all');
         $this->view->milestoneStories = $milestoneStories;
+
+        /* Count T B C */
+        $storyIdList = array_keys($prjStories);
+
+        $storyTasks = $this->loadModel('task')->getStoryTaskCounts($storyIdList, $projectID);
+        $storyBugs = $this->loadModel('bug')->getStoryBugCounts($storyIdList, $projectID);
+        $storyCases = $this->loadModel('testcase')->getStoryCaseCounts($storyIdList);
+
+        $this->view->storyTasks = $storyTasks;
+        $this->view->storyBugs = $storyBugs;
+        $this->view->storyCases = $storyCases;
 
         $this->view->title = $title;
         $this->view->position = $position;

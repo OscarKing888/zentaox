@@ -70,17 +70,72 @@ class blog extends control
      */
     public function create()
     {
+        $myAccount = $this->app->user->account;
+        $product =  $this->cookie->lastProduct;
+
+        if(empty($product))
+        {
+            $product = 1;
+        }
+
+        $oldBlog = $this->dao->select('*, DATE_FORMAT(date, \'%Y-%m-%d\') ')->from(TABLE_BLOG)
+            ->where('owner')->eq($myAccount)
+            ->andWhere('DATE(date)')->eq(helper::today())
+            ->andWhere('product')->eq($product)
+            ->andWhere('deleted')->eq(0)
+            ->fetch();
+
+        //error_log("==================");
+        //error_log(var_dump($oldBlog));
+
+
         if(!empty($_POST))
         {
-            $blogID = $this->blog->create();
+            if(!empty($oldBlog))
+            {
+                $this->blog->update($oldBlog->id);
+            }
+            else
+            {
+                $blogID = $this->blog->create();
+            }
             if(dao::isError()) die(js::error(dao::getError()) . js::locate('back'));
             die(js::locate(inlink('index')));
         }
 
+
         //$products = $this->product->getPairs();
         //$this->view->products = $products;
         $this->view->allProducts   = array(0 => '') + $this->product->getPairs('noclosed|nocode');
-        $this->view->title = $this->lang->blog->add;
+
+
+        //error_log("last product:$product");
+
+
+
+        $this->view->product = $product;
+
+        if(!empty($oldBlog))
+        {
+            $this->view->title   = $this->lang->blog->edit;
+            $this->view->article = $oldBlog;
+
+            $oldBlog = $this->file->replaceImgURL($oldBlog, $this->config->blog->imageContentFieldName);
+            $oldBlog->contentimages = htmlspecialchars_decode($oldBlog->contentimages);
+        }
+        else
+        {
+            $blog = new stdClass();
+            $blog->date = helper::now();
+            $blog->content = "";
+            $blog->contentimages = "";
+
+            $this->view->title = $this->lang->blog->add;
+            $this->view->article = $blog;
+        }
+
+        //error_log("blog create title:" . $this->view->title);
+
         $this->display();
     }
 

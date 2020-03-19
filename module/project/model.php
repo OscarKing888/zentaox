@@ -2589,6 +2589,9 @@ class projectModel extends model
             ->orderBy('id desc')
             ->fetchPairs('story');
 
+        $this->loadModel('story');
+        $this->story->computeTaskProgress($milestoneStories, $projectID);
+
         return $milestoneStories;
     }
 

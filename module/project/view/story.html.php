@@ -101,6 +101,7 @@
                 <th title='<?php echo $lang->story->caseCount ?>'
                     class='w-30px'><?php echo $lang->story->caseCountAB; ?></th>
                 <th class='w-120px'>  <?php echo $lang->task->progress;?></th>
+                <th class='w-120px'>  <?php echo $lang->task->progressOfStory;?></th>
                 <th class='w-210px {sorter:false}'><?php echo $lang->actions; ?></th>
             </tr>
             </thead>
@@ -160,6 +161,12 @@
                     <td>
                         <div class=<?php echo $story->taskProgress == 100 ? 'progressCompleted' : 'progressInCompleted' ?> >
                             <?php echo $story->taskProgress . "%";?>
+                        </div>
+                    </td>
+
+                    <td>
+                        <div class=<?php echo $story->storyProgress == 100 ? 'progressCompleted' : 'progressInCompleted' ?> >
+                            <?php echo $story->storyProgress . "%";?>
                         </div>
                     </td>
                     <td>

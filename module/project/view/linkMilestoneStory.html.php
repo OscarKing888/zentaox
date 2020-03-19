@@ -35,6 +35,16 @@
       <th class='w-80px'><?php echo $lang->product->branchName[$productType];?></th>
       <?php endif;?>
       <th class='w-user'><?php echo $lang->openedByAB;?></th>
+        <th class='w-80px'> <?php echo $lang->assignedToAB ?></th>
+
+        <th title='<?php echo $lang->story->taskCount ?>'
+            class='w-30px'><?php echo $lang->story->taskCountAB; ?></th>
+        <th title='<?php echo $lang->story->bugCount ?>'
+            class='w-30px'><?php echo $lang->story->bugCountAB; ?></th>
+        <th title='<?php echo $lang->story->caseCount ?>'
+            class='w-30px'><?php echo $lang->story->caseCountAB; ?></th>
+        <th class='w-120px'>  <?php echo $lang->task->progress;?></th>
+        <th class='w-120px'>  <?php echo $lang->task->progressOfStory;?></th>
       <th class='w-80px'><?php echo $lang->story->estimateAB;?></th>
     </tr>
     </thead>
@@ -84,6 +94,35 @@
       <td><?php if(isset($branchGroups[$story->product][$story->branch])) echo $branchGroups[$story->product][$story->branch];?></td>
       <?php endif;?>
       <td><?php echo zget($users, $story->openedBy, $story->openedBy);?></td>
+        <td><?php echo $users[$story->assignedTo]; ?></td>
+        <td class='linkbox'>
+            <?php
+            $tasksLink = $this->createLink('story', 'tasks', "storyID=$story->id&projectID=$project->id");
+            $storyTasks[$story->id] > 0 ? print(html::a($tasksLink, $storyTasks[$story->id], '', 'class="iframe"')) : print(0);
+            ?>
+        <td>
+            <?php
+            $bugsLink = $this->createLink('story', 'bugs', "storyID=$story->id&projectID=$project->id");
+            $storyBugs[$story->id] > 0 ? print(html::a($bugsLink, $storyBugs[$story->id], '', 'class="iframe"')) : print(0);
+            ?>
+        </td>
+        <td>
+            <?php
+            $casesLink = $this->createLink('story', 'cases', "storyID=$story->id&projectID=$project->id");
+            $storyCases[$story->id] > 0 ? print(html::a($casesLink, $storyCases[$story->id], '', 'class="iframe"')) : print(0);
+            ?>
+        </td>
+        <td>
+            <div class=<?php echo $story->taskProgress == 100 ? 'progressCompleted' : 'progressInCompleted' ?> >
+                <?php echo $story->taskProgress . "%";?>
+            </div>
+        </td>
+
+        <td>
+            <div class=<?php echo $story->storyProgress == 100 ? 'progressCompleted' : 'progressInCompleted' ?> >
+                <?php echo $story->storyProgress . "%";?>
+            </div>
+        </td>
       <td><?php echo $story->estimate;?></td>
     </tr>
     <?php $storyCount ++;?>

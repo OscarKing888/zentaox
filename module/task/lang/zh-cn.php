@@ -38,7 +38,9 @@ $lang->task->reportChart        = "报表统计";
 $lang->task->fromBug            = '来源Bug';
 $lang->task->case               = '相关用例';
 $lang->task->confirmStoryChange = "确认需求变动";
-$lang->task->progress           = '进度';
+$lang->task->progress           = '任务进度';
+$lang->task->progressOfStory    = '验收进度';
+
 $lang->task->progressTips       = '已消耗/(已消耗+剩余)';
 $lang->task->copy               = '复制任务';
 
@@ -162,6 +164,9 @@ $lang->task->statusList['pause']  = '已暂停';
 $lang->task->statusList['cancel'] = '已取消';
 $lang->task->statusList['closed'] = '已关闭';
 $lang->task->statusList['checked'] = '已验收'; // oscar
+$lang->task->statusList['wait_check'] = '待验收'; // oscar
+$lang->task->statusList['wait_check-by-me'] = '待我验收'; // oscar
+
 
 $lang->task->typeList['']        = '';
 $lang->task->typeList['design']  = '设计';

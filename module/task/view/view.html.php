@@ -19,7 +19,7 @@
         <strong style='color: <?php echo $task->color; ?>'>
             <?php if (!empty($task->parent)) echo '<span class="label">' . $this->lang->task->childrenAB . '</span> '; ?>
             <?php if (!empty($task->team)) echo '<span class="label">' . $this->lang->task->multipleAB . '</span> '; ?>
-            <?php echo isset($task->parentName) ? $task->parentName . '/' : ''; ?><?php echo $task->name; ?>
+            <?php echo isset($task->parentName) ? $task->parentName . '/' : ''; ?><?php echo $task->name . " - " . $depts[$task->dept]; ?>
         </strong>
         <?php if ($task->deleted): ?>
             <span class='label label-danger'><?php echo $lang->task->deleted; ?></span>
@@ -292,6 +292,18 @@
                     <tr>
                         <th class='w-80px'><?php echo $lang->task->project; ?></th>
                         <td><?php if (!common::printLink('project', 'view', "projectID=$task->project", $project->name)) echo $project->name; ?></td>
+                    </tr>
+                    <tr>
+                        <th class='w-80px'><?php echo "由谁验收"; ?></th>
+                        <td><?php echo $task->checkBy; ?></td>
+                    </tr>
+                    <tr>
+                        <th class='w-80px'><?php echo "被谁验收"; ?></th>
+                        <td><?php echo $task->checkedBy; ?></td>
+                    </tr>
+                    <tr>
+                        <th class='w-80px'><?php echo "验收日期"; ?></th>
+                        <td><?php echo $task->checkDate; ?></td>
                     </tr>
                     <tr>
                         <th class='w-80px'><?php echo $lang->task->milestone; ?></th>
