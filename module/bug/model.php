@@ -1557,9 +1557,12 @@ class bugModel extends model
             ->from(TABLE_BUG)
             ->where('story')->in($stories)
             ->andWhere('deleted')->eq(0)
-            ->beginIF($projectID)->andWhere('project')->eq($projectID)->fi()
+            //->beginIF($projectID)->andWhere('project')->eq($projectID)->fi()
             ->groupBy('story')
             ->fetchPairs();
+
+        error_log("getStoryBugCounts" . $this->dao->get());
+
         foreach($stories as $storyID) if(!isset($bugCounts[$storyID])) $bugCounts[$storyID] = 0;
         return $bugCounts;
     }

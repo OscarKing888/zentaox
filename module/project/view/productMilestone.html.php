@@ -199,6 +199,14 @@
                         $param = "projectID={$project->id}&story={$story->id}&moduleID={$story->module}";
 
                         //oscar:
+                        $storyID = $story->id;
+                        $assignedTo = $story->assignedTo;
+                        $storyTitle = $story->title;
+                        $storyModuleID = $story->module;
+                        $productID = $story->product;
+                        $createBugParams = "productID=$productID&branch=$story->branch&extras=storyID=$storyID,assignedTo=$assignedTo,title=$storyTitle,moduleID=$storyModuleID";
+                        common::printIcon('bug', 'create', $createBugParams, '', 'list', 'bug', '_blank');
+
                         $lang->task->batchCreate = $lang->project->batchWBSRoot;
                         common::printIcon('task', 'batchCreateRoot', "projectID={$project->id}&story={$story->id}", '', 'list', 'flag');
                         //oscar:

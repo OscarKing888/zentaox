@@ -340,7 +340,8 @@
                         <th><?php echo $lang->task->story; ?></th>
                         <td>
                             <?php
-                            if ($task->storyTitle and !common::printLink('story', 'view', "storyID=".$task->story->id, $task->storyTitle, '', "class='iframe' data-width='80%'", true, true)) echo $task->storyTitle;
+                            $storyTitleDisplay = "#" . $task->story->id . " " . $task->storyTitle;
+                            if ($task->storyTitle and !common::printLink('story', 'view', "storyID=".$task->story->id, $storyTitleDisplay, '', "class='iframe' data-width='80%'", true, true)) echo $storyTitleDisplay;
                             if ($task->needConfirm) {
                                 echo "(<span class='warning'>{$lang->story->changed}</span> ";
                                 echo html::a($this->createLink('task', 'confirmStoryChange', "taskID=$task->id"), $lang->confirm, 'hiddenwin');

@@ -13,6 +13,13 @@
 <?php
 class taskModel extends model
 {
+    public function __construct($appName = '')
+    {
+        parent::__construct($appName);
+
+        $this->loadModel('dept');
+    }
+
     /**
      * Create a task.
      *
@@ -2852,6 +2859,19 @@ class taskModel extends model
                         //common::printIcon('task', 'batchCreate', "project=$task->project&storyID=$task->story&moduleID=$task->module&taskID=$task->id", $task, 'list', 'plus', '', '', '', '', $this->lang->task->children);
                         common::printIcon('task', 'batchCreate', "project=$task->project&storyID=$task->story&moduleID=$task->module&taskID=$task->id", $task, 'list', 'plus-sign', '', '', '', '', $this->lang->project->batchWBS);
                     }
+
+                    //oscar:
+                    $storyID = $task->story;
+                    $assignedTo = $task->assignedTo;
+                    $bugTitle = $task->name . "_" .  $this->dept->getByID($task->dept)->name;
+                    $storyModuleID = $task->module;
+                    $productID = $this->dao->select('product')->from(TABLE_PROJECTPRODUCT)
+                    ->where('project')->eq($task->project)
+                    ->fetch('product');
+                    $projectID = $task->project;
+                    $createBugParams = "productID=$productID&branch=0&extras=taskID=$task->id,projectID=$projectID,storyID=$storyID,assignedTo=$assignedTo,title=$bugTitle,moduleID=$storyModuleID";
+                    common::printIcon('bug', 'create', $createBugParams, '', 'list', 'bug', '_blank');
+                    // oscar
 
                     /*// oscar:=======================
                     //$actionLink = helper::createLink('task', 'batchCreateChildTask', "project=$task->project");

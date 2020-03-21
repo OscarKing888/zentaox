@@ -1649,9 +1649,16 @@ class task extends control
         $depts = $this->dept->getOptionMenu(); //oscar:
         foreach($tasks as $dat)
         {
-            $dat->story->deptName = $depts[$dat->story->dept];
-            foreach ($dat->tasks as $task) {
-                $task->deptName = $depts[$task->dept];
+            if($milestone == 0) // return tasks
+            {
+                $dat->deptName = $depts[$dat->dept];
+            }
+            else {
+                $dat->story->deptName = $depts[$dat->story->dept];
+
+                foreach ($dat->tasks as $task) {
+                    $task->deptName = $depts[$task->dept];
+                }
             }
         }
         //$retTasks = new stdClass();

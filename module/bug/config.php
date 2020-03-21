@@ -24,7 +24,7 @@ $config->bug->list->allFields = 'id, module, project, story, task,
     lastEditedBy,
     lastEditedDate';
 
-$config->bug->list->defaultFields = 'id,severity,pri,title,openedBy,assignedTo,resolvedBy,resolution';
+$config->bug->list->defaultFields = 'id,severity,story,pri,title,openedBy,assignedTo,resolvedBy,resolution';
 
 $config->bug->list->exportFields = 'id, product, branch, module, project, story, task, 
     title, keywords, severity, pri, type, os, browser,
@@ -39,14 +39,14 @@ $config->bug->list->exportFields = 'id, product, branch, module, project, story,
     lastEditedDate, files';
 
 $config->bug->list->customCreateFields      = 'project,story,task,pri,severity,os,browser,deadline,mailto,keywords';
-$config->bug->list->customBatchCreateFields = 'module,project,steps,type,pri,severity,os,browser,keywords';
-$config->bug->list->customBatchEditFields   = 'type,severity,pri,productplan,assignedTo,deadline,status,resolvedBy,resolution,os,browser,keywords';
+$config->bug->list->customBatchCreateFields = 'module,project,story,task,steps,type,pri,severity,os,browser,keywords';
+$config->bug->list->customBatchEditFields   = 'story,type,severity,pri,productplan,assignedTo,deadline,status,resolvedBy,resolution,os,browser,keywords';
 
 $config->bug->custom = new stdclass();
 $config->bug->custom->createFields      = $config->bug->list->customCreateFields;
 //$config->bug->custom->batchCreateFields = 'module,project,steps,type,severity,os,browser';
-$config->bug->custom->batchCreateFields = 'module,steps,type,severity,os,browser';
-$config->bug->custom->batchEditFields   = 'type,severity,pri,branch,assignedTo,deadline,status,resolvedBy,resolution';
+$config->bug->custom->batchCreateFields = 'module,story,task,steps,type,severity,os,browser';
+$config->bug->custom->batchEditFields   = 'type,story,task,severity,pri,branch,assignedTo,deadline,status,resolvedBy,resolution';
 
 if($config->global->flow == 'onlyTest')
 {
@@ -167,7 +167,7 @@ $config->bug->search['params']['lastEditedDate']= array('operator' => '=',      
 $config->bug->search['params']['deadline']      = array('operator' => '=',      'control' => 'input',  'values' => '', 'class' => 'date');
 
 $config->bug->datatable = new stdclass();
-$config->bug->datatable->defaultField = array('id', 'severity', 'pri', 'title', 'status', 'openedBy', 'openedDate', 'assignedTo', 'resolvedBy', 'resolution', 'actions');
+$config->bug->datatable->defaultField = array('id',  'severity', 'pri', 'title', 'story','status', 'openedBy', 'openedDate', 'assignedTo', 'resolvedBy', 'resolution', 'actions');
 
 $config->bug->datatable->fieldList['id']['title']    = 'idAB';
 $config->bug->datatable->fieldList['id']['fixed']    = 'left';
@@ -227,7 +227,7 @@ $config->bug->datatable->fieldList['activatedDate']['required'] = 'no';
 $config->bug->datatable->fieldList['story']['title']    = 'story';
 $config->bug->datatable->fieldList['story']['fixed']    = 'no';
 $config->bug->datatable->fieldList['story']['width']    = '120';
-$config->bug->datatable->fieldList['story']['required'] = 'no';
+$config->bug->datatable->fieldList['story']['required'] = 'yes';
 
 $config->bug->datatable->fieldList['task']['title']    = 'task';
 $config->bug->datatable->fieldList['task']['fixed']    = 'no';

@@ -213,6 +213,32 @@ js::set('confirmDeleteTemplate', $lang->bug->confirmDeleteTemplate);
                     </div>
                 </td>
             </tr>
+
+            <?php
+            $showStory = strpos(",$showFields,", ',story,') !== false;
+            $showTask  = strpos(",$showFields,", ',task,')  !== false;
+            ?>
+            <?php if(($showStory or $showTask) and $this->config->global->flow != 'onlyTest'):?>
+                <tr>
+                    <th><?php echo ($showStory) ? $lang->bug->story : $lang->bug->task;?></th>
+                    <?php if($showStory):?>
+                        <td>
+                            <span id='storyIdBox'><?php echo html::select('story', empty($stories) ? '' : $stories, $storyID, "class='form-control chosen'");?></span>
+                        </td>
+                    <?php endif;?>
+                    <?php if($showTask):?>
+                        <td>
+                            <div class='input-group'>
+                                <?php if($showTask):?>
+                                    <span class='input-group-addon w-90px'><?php echo $lang->bug->task;?></span>
+                                <?php endif;?>
+                                <span id='taskIdBox'> <?php echo html::select('task', $tasks, $taskID, "class='form-control chosen'") . html::hidden('oldTaskID', $taskID);?></span>
+                            </div>
+                        </td>
+                    <?php endif;?>
+                </tr>
+            <?php endif;?>
+
             <tr>
                 <th><?php echo $lang->bug->steps;?></th>
                 <td colspan='2'>
@@ -230,10 +256,6 @@ js::set('confirmDeleteTemplate', $lang->bug->confirmDeleteTemplate);
                     <?php echo html::textarea('steps', $steps, "rows='10' class='form-control'");?>
                 </td>
             </tr>
-            <?php
-            $showStory = strpos(",$showFields,", ',story,') !== false;
-            $showTask  = strpos(",$showFields,", ',task,')  !== false;
-            ?>
 
 
             <tr>

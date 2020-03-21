@@ -222,6 +222,8 @@ class bug extends control
      */
     public function create($productID, $branch = '', $extras = '')
     {
+        //error_log("bug.create exras:$extras");
+
         $this->view->users = $this->user->getPairs('devfirst|noclosed|nodeleted');
         if(empty($this->products)) $this->locate($this->createLink('product', 'create'));
         $this->app->loadLang('release');
@@ -292,9 +294,57 @@ class bug extends control
         $color      = '';
 
         /* Parse the extras. */
+
         $extras = str_replace(array(',', ' '), array('&', ''), $extras);
+        //error_log("bug.create exras after proc:$extras");
+        parse_str($extras, $output);
         parse_str($extras);
 
+        //error_log("bug.create output:" . var_dump($output));
+
+        // oscar[
+        if(isset($output['storyID']))
+        {
+            $storyID = $output['storyID'];
+        }
+
+        if(isset($output['assignedTo']))
+        {
+            $assignedTo = $output['assignedTo'];
+        }
+
+        if(isset($output['title']))
+        {
+            $title = $output['title'];
+        }
+
+        if(isset($output['moduleID']))
+        {
+            $moduleID = $output['moduleID'];
+        }
+
+        if(isset($output['projectID']))
+        {
+            $projectID = $output['projectID'];
+        }
+
+        if(isset($output['taskID']))
+        {
+            $taskID = $output['taskID'];
+        }
+
+        if(!$projectID && $productID)
+        {
+            $projectID = $this->dao->select('project')->from(TABLE_PROJECTPRODUCT)
+                ->where('product')->eq($productID)
+                ->fetch('project');
+        }
+
+
+        // oscar]
+
+
+        $resultID = 0;
         if($runID and $resultID) extract($this->bug->getBugInfoFromResult($resultID));// If set runID and resultID, get the result info by resultID as template.
         if(!$runID and $caseID)  extract($this->bug->getBugInfoFromResult($resultID, $caseID, $version));// If not set runID but set caseID, get the result info by resultID and case info.
 
@@ -387,6 +437,10 @@ class bug extends control
         $this->view->branch           = $branch;
         $this->view->branches         = $branches;
         $this->view->color            = $color;
+
+        // oscar[
+        $this->view->tasks            = $this->task->getProjectTaskPairs($projectID);
+        // oscar]
 
         $this->display();
     }

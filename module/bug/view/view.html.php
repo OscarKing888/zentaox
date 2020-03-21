@@ -224,7 +224,7 @@
               </tr>
               <tr>
                 <th><?php echo $lang->bug->task;?></th>
-                <td><?php if($bug->task) echo html::a($this->createLink('task', 'view', "taskID=$bug->task"), $bug->taskName);?></td>
+                <td><?php if($bug->task) echo html::a($this->createLink('task', 'view', "taskID=$bug->task"), "#$bug->task " . $bug->taskName);?></td>
               </tr>
             </table>
           </div>
