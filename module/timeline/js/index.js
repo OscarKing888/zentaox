@@ -273,8 +273,8 @@ function drawRuler()
             var curDrawYear = new Date(y, 0, 0);
             var nextDrawYear = new Date(y + 1, 0, 0);
 
-            var xy = dateToCoord(curDrawYear, 0);
-            var xy2 = dateToCoord(nextDrawYear, 0);
+            var xy = dateToCoord(curDrawYear, 0, 0);
+            var xy2 = dateToCoord(nextDrawYear, 0, 0);
 
             ctx.rect(xy[0], xy[1], xy2[0] - xy[0], ruleHeight);
             var ymStr = y.toString();// + "-" + (nextMonth + 1).toString();// + "月";// + "   cur:" + curMonth;
@@ -287,8 +287,8 @@ function drawRuler()
             var curDrawYear = new Date(y, 0, 0);
             var nextDrawYear = new Date(y + 10, 0, 0);
 
-            var xy = dateToCoord(curDrawYear, 0);
-            var xy2 = dateToCoord(nextDrawYear, 0);
+            var xy = dateToCoord(curDrawYear, 0, 0);
+            var xy2 = dateToCoord(nextDrawYear, 0, 0);
 
             ctx.rect(xy[0], xy[1], xy2[0] - xy[0], ruleHeight);
             var ymStr = y.toString();// + "-" + (nextMonth + 1).toString();// + "月";// + "   cur:" + curMonth;
@@ -301,8 +301,8 @@ function drawRuler()
             var curDrawYear = new Date(y, 0, 0);
             var nextDrawYear = new Date(y + 100, 0, 0);
 
-            var xy = dateToCoord(curDrawYear, 0);
-            var xy2 = dateToCoord(nextDrawYear, 0);
+            var xy = dateToCoord(curDrawYear, 0, 0);
+            var xy2 = dateToCoord(nextDrawYear, 0, 0);
 
             ctx.rect(xy[0], xy[1], xy2[0] - xy[0], ruleHeight);
             var ymStr = y.toString();// + "-" + (nextMonth + 1).toString();// + "月";// + "   cur:" + curMonth;
@@ -315,8 +315,8 @@ function drawRuler()
             var curDrawYear = new Date(y, 0, 0);
             var nextDrawYear = new Date(y + 1000, 0, 0);
 
-            var xy = dateToCoord(curDrawYear, 0);
-            var xy2 = dateToCoord(nextDrawYear, 0);
+            var xy = dateToCoord(curDrawYear, 0, 0);
+            var xy2 = dateToCoord(nextDrawYear, 0, 0);
 
             ctx.rect(xy[0], xy[1], xy2[0] - xy[0], ruleHeight);
             var ymStr = y.toString();// + "-" + (nextMonth + 1).toString();// + "月";// + "   cur:" + curMonth;
@@ -786,8 +786,8 @@ function drawEvent(ctx, evt, title, begindate, enddate, idx) {
 
     //var taskDays = Math.ceil(hours / 8);
 
-    var xy = dateToCoord(start, idx);
-    var xyend = dateToCoord(end, idx);
+    var xy = dateToCoord(start, idx, 0, 0);
+    var xyend = dateToCoord(end, idx, 0, 0);
 
     /*
     if(Math.abs(xy[0] - origX) > 4000)

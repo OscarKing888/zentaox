@@ -39,8 +39,7 @@ tbody > tr > td > .btn-icon {margin-right: 3px;}
 .progressInCompleted{background-color: rgba(0, 255, 14, 0)
 }
 
-.task-wait_check { color: #0056a2
-}
+.task-wait_check { color: #0056a2}
 .task-wait_check-by-me { color: #ff00e6}
-
 .task-checked { color: #229f24 }
+.task-dept { color: deepskyblue}

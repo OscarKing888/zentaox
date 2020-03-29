@@ -20,7 +20,9 @@ js::set('moduleID', $moduleID);
 js::set('productID', $productID);
 js::set('projectID', $projectID);
 js::set('browseType', $browseType);
+//echo "status:$status browseType:$browseType moduleID:$moduleID";
 ?>
+
 <div class='side' id='taskTree'>
     <a class='side-handle' data-id='projectTree'><i class='icon-caret-left'></i></a>
     <div class='side-body'>
@@ -417,7 +419,7 @@ js::set('browseType', $browseType);
                             }
 
 
-                            if ($tools['batchChangeVersion']) {
+                            if (false && $tools['batchChangeVersion']) {
                                 $actionLink = $this->createLink('project', 'batchChangeVersion', "");
 
                                 echo "<div class='btn-group dropup'>";

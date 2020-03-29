@@ -5,6 +5,9 @@
     <small class='text-muted'> <?php echo $lang->story->bugs;?></small>
   </div>
 </div>
+<?php
+include 'info_story.html.php';
+?>
 <div class='bugsList'>
   <form class='form-condensed' target='hiddenwin'>
     <table class='table table-fixed'>
@@ -24,10 +27,16 @@
         <?php foreach($bugs as $key => $bug):?>
         <tr class='text-center'>
           <td><?php echo $bug->id;?></td>
-          <td class='text-left' title="<?php echo $bug->title?>"><?php echo $bug->title;?></td>
+          <td class='text-left' title="<?php echo $bug->title?>">
+              <?php
+              $bugLink = $this->createLink('bug', 'view', "bugID=$bug->id");
+              echo html::a($bugLink, $bug->title, "_blank", "style='color: $bug->color'");
+              ?>
+          </td>
+
           <td><span class='<?php echo 'pri' . zget($lang->bug->priList, $bug->pri, $bug->pri)?>'><?php echo $bug->pri == '0' ? '' : zget($lang->bug->priList, $bug->pri, $bug->pri);?></span></td>
           <td><?php echo $lang->bug->typeList[$bug->type];?></td>
-          <td><?php echo $lang->bug->statusList[$bug->status];?></td>
+          <td <?php echo "class='bug-$bug->status'"; ?> ><?php echo $lang->bug->statusList[$bug->status];?></td>
           <td><?php echo zget($users, $bug->assignedTo, $bug->assignedTo);?></td>
           <td><?php echo zget($users, $bug->resolvedBy, $bug->resolvedBy);?></td>
           <td><?php echo $lang->bug->resolutionList[$bug->resolution];?></td>

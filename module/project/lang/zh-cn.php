@@ -137,6 +137,7 @@ $lang->project->updateOrder      = '排序';
 $lang->project->tree             = '树状图';
 $lang->project->storyKanban      = '需求看板';
 $lang->project->storySort        = '需求排序';
+$lang->project->createTestTask        = '提交测试';
 
 /* 分组浏览。*/
 $lang->project->allTasks     = '所有';
@@ -290,7 +291,7 @@ $lang->project->featureBar['task']['checkedByMe']   = $lang->project->checkedByM
 $lang->project->featureBar['task']['myinvolved']   = $lang->project->myInvolved;
 
 
-$lang->project->featureBar['task']['milestone']       =  '标签';
+//$lang->project->featureBar['task']['milestone']       =  '标签';
 
 $lang->project->featureBar['task']['unclosed']     = $lang->project->unclosed;
 $lang->project->featureBar['task']['all']          = $lang->project->allTasks;

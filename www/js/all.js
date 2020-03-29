@@ -4202,7 +4202,7 @@ function setModal() {
     };
 
     function c(h) {
-        var f = { width: 800, height: "auto", icon: "?", title: "", name: "modalIframe", cssClass: "", headerless: false, waittime: 0, center: true, backdrop: "static", show: true };
+        var f = { width: '70%', height: "auto", icon: "?", title: "", name: "modalIframe", cssClass: "", headerless: false, waittime: 0, center: true, backdrop: "static", show: true };
         if (typeof(h) == "string") { f.url = h } else { f = $.extend(f, h) }
         a(f);
         if (isNum(f.height.toString())) { f.height += "px" }

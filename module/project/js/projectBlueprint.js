@@ -83,11 +83,6 @@ var g_boundXMax = 0;
 var selectedMilestone = 0;
 var selectedDept = 0;
 
-Date.prototype.addDays = function(days) {
-    var dat = new Date(this.valueOf());
-    dat.setDate(dat.getDate() + days);
-    return dat;
-}
 
 function onOrigi()
 {
@@ -218,8 +213,8 @@ function drawRuler()
 
         var nextDate = new Date(nextYear, nextMonth, 1);
         var nextDate2 = new Date(nextYear, nextMonth + 1, 1);
-        var xy = dateToCoord(nextDate, 0);
-        var xy2 = dateToCoord(nextDate2, 0);
+        var xy = dateToCoord(nextDate, 0, 0);
+        var xy2 = dateToCoord(nextDate2, 0, 0);
 
         ctx.rect(xy[0], xy[1], xy2[0] - xy[0], ruleHeight);
         var ymStr = nextYear.toString() + "年" + (nextMonth + 1).toString() + "月";// + "   cur:" + curMonth;
@@ -232,7 +227,7 @@ function drawRuler()
     for(var i = -31 * 5; i < 31 * 7; ++i)
     {
         var nextDate = new Date(cur).addDays(i);
-        var xy = dateToCoord(nextDate, 0);
+        var xy = dateToCoord(nextDate, 0, 0);
 
         var weekDay = nextDate.getDay();
 
@@ -700,8 +695,8 @@ function drawProjectBlueprintWithMilestone(tasks)
             var taskCount = taskPair.tasks.length;
 
             ctx.strokeStyle = C_TaskColor_StoryTitle;
-            var xy = dateToCoord(stroy.taskBeginDate, g_drawYIdx);
-            var xyend = dateToCoord(stroy.taskEndDate, g_drawYIdx + taskCount, 1);
+            var xy = dateToCoord(stroy.taskBeginDate, g_drawYIdx, 0);
+            var xyend = dateToCoord(stroy.taskEndDate, g_drawYIdx + taskCount, 1, 0);
             xyend[1] = (C_Taskbar_Height + C_Taskbar_VSpace) * (taskCount + 1);
 
             //  roundRect(ctx, xy[0], xy[1], xyend[0] - xy[0], xyend[1] - xy[1] - C_Taskbar_Height, 5, true, false);
@@ -774,11 +769,17 @@ function drawProjectBlueprint(tasks)
     g_boundXMin = 0;
     g_boundXMax = 0;
 
+    //console.log("   drawTasks:================================>>");
+
     if(tasks != null)
     {
         for(var i = 0; i < tasks.length; ++i)
         {
-            //console.log("   drawTasks:", JSON.stringify(tasks[i]));
+            // if(tasks[i].id == 865)
+            // {
+            //     console.log("   drawTasks:", i, " ", JSON.stringify(tasks[i]));
+            // }
+
             //console.log("   drawTasks:", i, tasks[i].name);
 
             if(!g_showDelayOnly || (g_showDelayOnly && isTaskDelay(tasks[i])))
@@ -827,6 +828,7 @@ function isTaskDelay(task)
     return false;
 }
 
+
 //wait,doing,done,pause,cancel,closed
 function drawBar(ctx, deadline, id, name, user, dept, startDate, status, idx) {
     ctx.fillStyle = C_TaskNameColor;
@@ -835,13 +837,25 @@ function drawBar(ctx, deadline, id, name, user, dept, startDate, status, idx) {
     var cur = Date.now();
 
     var start = convertStringToDate(startDate);
+    var deadline = convertStringToDate(deadline);
+
+    if(isNaN(start))
+    {
+        start = Date.now();
+        deadline = new Date(start).addDays(5);
+    }
+
+    if(isNaN(deadline))
+    {
+        deadline = new Date(start).addDays(5);
+    }
 
     //alert(start);
 
     var d = days_between(start, cur);
     //alert("days:" + d);
 
-    var deadline = convertStringToDate(deadline);
+
     var taskDays =  (1 + days_between(deadline, start));//Math.ceil(task.estimate / 8);
 
     //alert("taskDays:" + taskDays);
@@ -858,8 +872,8 @@ function drawBar(ctx, deadline, id, name, user, dept, startDate, status, idx) {
 
     //console.warn("==== drawBar start");
 
-    var xy = dateToCoord(start, idx);
-    var xyend = dateToCoord(new Date(start).addDays(taskDays), idx);
+    var xy = dateToCoord(start, idx, 0);
+    var xyend = dateToCoord(new Date(start).addDays(taskDays), idx, 0);
 
     /*
     if(Math.abs(xy[0] - origX) > 4000)
@@ -906,10 +920,6 @@ function drawBar(ctx, deadline, id, name, user, dept, startDate, status, idx) {
         }
     }
 
-    if (status == 'closed') {
-        ctx.fillStyle = C_TaskColor_Closed;
-    }
-
     if (status == 'pause') {
         ctx.fillStyle = C_TaskColor_Pause;
     }
@@ -928,6 +938,12 @@ function drawBar(ctx, deadline, id, name, user, dept, startDate, status, idx) {
     else
     {
         ctx.setLineDash([0]);
+    }
+
+
+
+    if (status == 'closed') {
+        ctx.fillStyle = C_TaskColor_Closed;
     }
 
     //var xy = dateToCoord(start, idx);
@@ -1024,12 +1040,24 @@ function drawLine(x, y, w)
     //ctx.restore();
 }
 
-function dateToCoord(startDate, idx, offsetDays = 0)
+function dateToCoord(startDate, idx, offsetDays)
 {
+    var dateNaN = isNaN(startDate);
+    if(dateNaN)
+    {
+        //console.log("task:", idx, "date:", startDate);
+        //startDate = Date.now();
+    }
+
     var now = Date.now();
     //new Date(now).getTime();
 
     var d = days_between(startDate, now) + offsetDays;
+
+    if(dateNaN)
+    {
+        //d = Math.max(1, d);
+    }
 
     var x = d * C_Taskbar_DayUnit;
     var y = (C_Taskbar_Height + C_Taskbar_VSpace) * idx;

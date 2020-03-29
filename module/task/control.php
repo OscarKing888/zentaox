@@ -1577,6 +1577,7 @@ class task extends control
 
                 if (isset($users[$task->openedBy])) $task->openedBy = $users[$task->openedBy];
                 if (isset($users[$task->assignedTo])) $task->assignedTo = $users[$task->assignedTo];
+                if (isset($users[$task->checkBy])) $task->checkBy = $users[$task->checkBy]; // oscar
                 if (isset($users[$task->finishedBy])) $task->finishedBy = $users[$task->finishedBy];
                 if (isset($users[$task->canceledBy])) $task->canceledBy = $users[$task->canceledBy];
                 if (isset($users[$task->closedBy])) $task->closedBy = $users[$task->closedBy];
@@ -1698,6 +1699,7 @@ class task extends control
                 $task->estStarted      = $tasks->estStarted[$i];
                 $task->deadline      = $tasks->deadline[$i];
                 $task->assignedTo      = $tasks->assignedTo[$i];
+                $task->checkBy      = $tasks->checkBy[$i];
 
                 $oldTask = $this->dao->select('*')->from(TABLE_TASK)->where('id')->eq((int)$taskId)->fetch();
 

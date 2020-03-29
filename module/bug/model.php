@@ -1561,7 +1561,7 @@ class bugModel extends model
             ->groupBy('story')
             ->fetchPairs();
 
-        error_log("getStoryBugCounts" . $this->dao->get());
+        //error_log("getStoryBugCounts" . $this->dao->get());
 
         foreach($stories as $storyID) if(!isset($bugCounts[$storyID])) $bugCounts[$storyID] = 0;
         return $bugCounts;

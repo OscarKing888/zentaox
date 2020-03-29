@@ -44,6 +44,7 @@ class taskModel extends model
             ->setIF(strpos($this->config->task->create->requiredFields, 'estStarted') !== false, 'estStarted', $this->post->estStarted)
             ->setIF(strpos($this->config->task->create->requiredFields, 'deadline') !== false, 'deadline', $this->post->deadline)
             ->setDefault('openedBy',   $this->app->user->account)
+            ->setDefault('checkBy',   $this->app->user->account) // oscar
             ->setDefault('openedDate', helper::now())
             ->stripTags($this->config->task->editor->create['id'], $this->config->allowedTags)
             ->join('mailto', ',')
@@ -323,6 +324,7 @@ class taskModel extends model
             $data[$i]->deadline   = empty($tasks->deadline[$i]) ? '0000-00-00' : $tasks->deadline[$i];
             $data[$i]->status     = 'wait';
             $data[$i]->openedBy   = $this->app->user->account;
+            $data[$i]->checkBy   = $this->app->user->account; // oscar
             $data[$i]->openedDate = $now;
             $data[$i]->parent     = $tasks->parent[$i];
 
@@ -1971,7 +1973,7 @@ class taskModel extends model
      */
     public function getStoryTasks($storyID, $projectID = 0)
     {
-        $tasks = $this->dao->select('id, name, assignedTo, pri, status, estimate, consumed, closedReason, `left`, checked')
+        $tasks = $this->dao->select('id, name, assignedTo, pri, status, estimate, consumed, closedReason, `left`, checked, story, dept')
             ->from(TABLE_TASK)
             ->where('story')->eq((int)$storyID)
             ->andWhere('deleted')->eq(0)
@@ -2710,7 +2712,7 @@ class taskModel extends model
                     if(!empty($task->pipeline) or ($task->pipeline != 0)) echo "<span class=\"pri6\">P</span>";
                     $deptNames = explode('/', $depts[$task->dept]);
                     //$deptName = " [" . $deptNames[count($deptNames) - 1] . "]";
-                    $deptName = " - " . $deptNames[count($deptNames) - 1];
+                    $deptName = " - <span class='task-dept'>" . $deptNames[count($deptNames) - 1] . "</span>";
                     //oscar
 
                     echo $canView ? html::a($taskLink, $task->name . $deptName, null, "style='color: $task->color'") : "<span style='color: $task->color'>$task->name . $deptName</span>";

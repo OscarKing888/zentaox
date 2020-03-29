@@ -151,3 +151,17 @@ $lang->testtask->report->options->graph  = new stdclass();
 $lang->testtask->report->options->type   = 'pie';
 $lang->testtask->report->options->width  = 500;
 $lang->testtask->report->options->height = 140;
+
+$lang->testtask->createTestTask = '提交测试单';
+$lang->testtask->viewTestTask = '查看测试单';
+$lang->testtask->batchAssignTestStoryTo = '批量指派测试任务需求';
+$lang->testtask->batchUnlinkStoryFromTestTask = '批量取消关联测试任务需求';
+$lang->testtask->setTestTaskStoryStatus = '设置测试需求状态';
+
+$lang->testtask->setTestTaskStoryStatusFail = '失败';
+$lang->testtask->setTestTaskStoryStatusDone = '通过';
+$lang->testtask->setTestTaskStoryStatusCancel = '取消';
+
+$lang->icons['setTestTaskStoryStatusFail']             = 'bug';
+$lang->icons['setTestTaskStoryStatusDone']             = 'ok-sign';
+$lang->icons['setTestTaskStoryStatusCancel']             = 'remove-sign';

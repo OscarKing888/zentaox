@@ -26,6 +26,31 @@ class project extends control
             $this->projects = $this->project->getPairs('nocode');
             if (!$this->projects and $this->methodName != 'index' and $this->methodName != 'create' and $this->app->getViewType() != 'mhtml') $this->locate($this->createLink('project', 'create'));
         }
+
+        //unset($this->lang->task->deptList);
+
+        /*
+        error_log("task model construct get depts =======================");
+        $deptsTemp =$this->dao->select("id,name")->from(TABLE_DEPT)->fetchPairs('id');
+
+        error_log("task model construct =======================");
+        foreach ($this->lang->task->deptList as $k => $v)
+        {
+            error_log("deptList OLD: $k = $v");
+        }
+
+        error_log("task model construct setup depts from DB ======================= $deptsTemp");
+        foreach ($deptsTemp as $k2 => $v2) {
+            $this->lang->task->deptList[$k2] = $v2;
+            error_log("deptList NEW: $k2 = $v2");
+        }
+
+        error_log("task model construct =======================");
+        foreach ($this->lang->task->deptList as $k => $v)
+        {
+            error_log("deptList OLD: $k = $v");
+        }
+        //*/
     }
 
     /**
@@ -157,6 +182,13 @@ class project extends control
         $queryID = ($browseType == 'bysearch') ? (int)$param : 0;
         $moduleID = ($browseType == 'bymodule') ? (int)$param : (($browseType == 'bysearch' or $browseType == 'byproduct') ? 0 : $this->cookie->moduleBrowseParam);
         $productID = ($browseType == 'byproduct') ? (int)$param : (($browseType == 'bysearch' or $browseType == 'bymodule') ? 0 : $this->cookie->productBrowseParam);
+
+        // oscar[
+        if($browseType != 'bymodule')
+        {
+            $moduleID = 0;
+        }
+        // oscar]
 
         /* Save to session. */
         $uri = $this->app->getURI(true);

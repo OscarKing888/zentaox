@@ -952,8 +952,9 @@ class projectModel extends model
             $this->session->set('taskOnlyCondition', true);
             $this->session->set('taskOrderBy', $sort);
 
-            //$this->console_log("this getSearchTasks");
+            //error_log("this getSearchTasks =======【");
             $tasks = $this->getSearchTasks($taskQuery, $pager, $sort);
+            //error_log("this getSearchTasks =======】");
         }
 
         return $tasks;

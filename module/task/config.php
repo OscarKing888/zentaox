@@ -41,7 +41,7 @@ $config->task->exportFieldsOld = '
 $config->task->exportFields = '
     id, project, module, story,dept,
     name, pri, estimate, estStarted, deadline,     
-    assignedTo
+    assignedTo, checkBy, status
     ';
 
 $config->task->importFields = 'id,project,module,story,dept,name,pri,estimate,estStarted,deadline,assignedTo';

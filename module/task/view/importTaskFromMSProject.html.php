@@ -47,6 +47,7 @@ if ($hiddenStory and isset($visibleFields['story'])) $colspan -= 1;
             <th class='w-100px'><?php echo $lang->task->estStarted; ?><span class='required'></span></th>
             <th class='w-100px'><?php echo $lang->task->deadline; ?><span class='required'></span></th>
             <th class='w-80px'><?php echo $lang->task->assignedTo; ?> <span class='required'></span></th>
+            <th class='w-80px'><?php echo $lang->task->checkBy; ?> <span class='required'></span></th>
         </tr>
         </thead>
 
@@ -101,6 +102,7 @@ if ($hiddenStory and isset($visibleFields['story'])) $colspan -= 1;
                 <td><?php echo html::input("estStarted[$i]", '', "class='form-control text-center form-date'"); ?></td>
                 <td><?php echo html::input("deadline[$i]", helper::nowafter(5), "class='form-control text-center form-date'"); ?></td>
                 <td><?php $userList = $deptUsers; echo html::select("assignedTo[$i]", $userList, $assignedTo, 'class=form-control'); ?></td>
+                <td><?php $userList = $deptUsers; echo html::select("checkBy[$i]", $userList, $checkBy, 'class=form-control'); ?></td>
             </tr>
         <?php endfor; ?>
         <tr>
@@ -124,6 +126,7 @@ if ($hiddenStory and isset($visibleFields['story'])) $colspan -= 1;
         <td><?php echo html::input("estStarted[%s]", '', "class='form-control text-center form-date'"); ?></td>
         <td><?php echo html::input("deadline[%s]", '', "class='form-control text-center form-date'"); ?></td>
         <td><?php $userList = $deptUsers;echo html::select("assignedTo[%s]", $userList, $assignedTo, 'class=form-control'); ?></td>
+        <td><?php $userList = $deptUsers;echo html::select("checkBy[%s]", $userList, $checkBy, 'class=form-control'); ?></td>
     </tr>
     </tbody>
 </table>

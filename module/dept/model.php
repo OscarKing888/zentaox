@@ -47,6 +47,11 @@ class deptModel extends model
             ->get();
     }
 
+    public function getPairs()
+    {
+        return $this->dao->select("id,name")->from(TABLE_DEPT)->fetchPairs('id');
+    }
+
     /**
      * Get option menu of departments.
      *
@@ -414,6 +419,14 @@ class deptModel extends model
     }
 
     //oscar:
+
+    public function getDeptIDFromName($name)
+    {
+        return $this->dao->select('id')->from(TABLE_DEPT)
+            ->where('name')->eq($name)
+            ->fetch('id');
+    }
+
     public function setupDeptWithUsers($view)
     {
         $depts = $this->dao->select('id,name')->from(TABLE_DEPT)->fetchPairs();

@@ -8,6 +8,7 @@
 
 *指定动作按钮图标
 $lang->icons['checkByGD']              = 'review';
+$lang->icons['finish']             = 'ok-sign';
 
 *icon定义位置
 zh-cn.blackberry.css
@@ -16,10 +17,22 @@ zh-cn.blackberry.css
 public static function isClickable($task, $action)
 if($action == 'checkbygd')   return $task->status == 'done'; // 注意要小写
 
+*主菜单
+$lang->menu->testtask  = '测试单|testtask|index';
+$lang->menuOrder
+
+*模块菜单
+$lang->testtask->menu = new stdclass();
+$lang->menu->testtask  = '测试单|testtask|index';
+
 *子菜单
 $lang->project->featureBar['task']['checkByMe']   = $lang->project->checkByMe;
 
 *激活子菜单
+
+*设置菜单工程显示
+//$productID = $this->product->saveState($productID, $this->products);
+$this->testtask->setMenu($this->products, $productID, 0);
 
 
 *显示到权限设置表
@@ -40,6 +53,74 @@ printCell
 
 *header/footer
 public static function printModuleMenu($moduleName)
+
+*修改部门后需要检查列表配置
+$lang->task->deptList
+
+*导出CSV字段配置
+$config->task->exportFields
+
+
+*修改弹出框大小
+all.js
+ln:4205 var f = { width: '80%', height: "
+
+<p>
+    =============
+    element { property:value; property:value}
+
+    element Selector
+    h p h1
+
+    =============
+    id Selector
+    #id
+
+    =============
+    class Selector
+    .class
+    .center
+
+    p.center
+
+    =============
+    Universal Selector
+    * {
+    text-align: center;
+    color: blue;
+    }
+
+    =============
+    group selector
+    h1, h2, p {
+    text-align: center;
+    color: red;
+    }
+
+    =============
+    a:link {
+    text-decoration: none;
+    }
+
+    a:visited {
+    text-decoration: none;
+    }
+
+    a:hover {
+    text-decoration: underline;
+    }
+
+    a:active {
+    text-decoration: underline;
+    }
+
+    =============
+    descendant selector (space)
+    child selector (>)
+    adjacent sibling selector (+)
+    general sibling selector (~)
+</p>
+
 
 </body>
 </html>

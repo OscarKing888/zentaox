@@ -1,0 +1,7 @@
+.test-story-fail{color:red;}
+.test-story-done{color:green;}
+
+a iframe .task-wait_check { color: #0056a2}
+a iframe .task-wait_check-by-me { color: #ff00e6}
+a iframe .task-checked { color: #229f24 }
+a iframe .task-dept { color: deepskyblue}

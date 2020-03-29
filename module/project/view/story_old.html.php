@@ -91,6 +91,9 @@
                 <th class='{sorter:false}'>        <?php common::printOrderLink('title', $orderBy, $vars, $lang->story->title); ?></th>
                 <th class='w-user {sorter:false}'> <?php common::printOrderLink('openedBy', $orderBy, $vars, $lang->openedByAB); ?></th>
                 <th class='w-80px {sorter:false}'> <?php common::printOrderLink('assignedTo', $orderBy, $vars, $lang->assignedToAB); ?></th>
+                <th class='w-hour {sorter:false}'> <?php common::printOrderLink('estimate', $orderBy, $vars, $lang->story->estimateAB); ?></th>
+                <th class='w-hour {sorter:false}'> <?php common::printOrderLink('status', $orderBy, $vars, $lang->statusAB); ?></th>
+                <th class='w-70px {sorter:false}'> <?php common::printOrderLink('stage', $orderBy, $vars, $lang->story->stageAB); ?></th>
                 <th title='<?php echo $lang->story->taskCount ?>'
                     class='w-30px'><?php echo $lang->story->taskCountAB; ?></th>
                 <th title='<?php echo $lang->story->bugCount ?>'
@@ -135,6 +138,9 @@
                     </td>
                     <td><?php echo $users[$story->openedBy]; ?></td>
                     <td><?php echo $users[$story->assignedTo]; ?></td>
+                    <td><?php echo $story->estimate; ?></td>
+                    <td class='story-<?php echo $story->status; ?>'><?php echo zget($lang->story->statusList, $story->status); ?></td>
+                    <td><?php echo $lang->story->stageList[$story->stage]; ?></td>
                     <td class='linkbox'>
                         <?php
                         $tasksLink = $this->createLink('story', 'tasks', "storyID=$story->id&projectID=$project->id");
@@ -259,7 +265,7 @@
             </tbody>
             <tfoot>
             <tr>
-                <td colspan='<?php echo 12; ?>'>
+                <td colspan='<?php echo $canOrder ? 13 : 12; ?>'>
                     <div class='table-actions clearfix'>
                         <?php
                         $storyInfo = sprintf($lang->project->productStories, inlink('linkStory', "project={$project->id}"));

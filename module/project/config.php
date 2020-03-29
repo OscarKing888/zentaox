@@ -32,7 +32,8 @@ $config->project->editor->suspend  = array('id' => 'comment', 'tools' => 'simple
 $config->project->search['module']                   = 'task';
 $config->project->search['fields']['dept']           = $lang->task->dept; // oscar
 $config->project->search['fields']['checkBy']        = $lang->task->checkBy; // oscar
-$config->project->search['fields']['story']        = $lang->task->storyAB; // oscar
+$config->project->search['fields']['checked']        = $lang->task->checked; // oscar
+$config->project->search['fields']['story']        = $lang->task->storyIDAB; // oscar
 $config->project->search['fields']['name']           = $lang->task->name;
 $config->project->search['fields']['id']             = $lang->task->id;
 $config->project->search['fields']['status']         = $lang->task->status;
@@ -69,6 +70,7 @@ $config->project->search['fields']['lastEditedDate'] = $lang->task->lastEditedDa
 
 $config->project->search['params']['dept']           = array('operator' => '=', 'control' => 'select',  'values' => $lang->task->deptList); // oscar
 $config->project->search['params']['checkBy']        = array('operator' => '=', 'control' => 'select',  'values' => 'users'); // oscar
+$config->project->search['params']['checked']        = array('operator' => '=', 'control' => 'select',  'values' => $lang->task->statuschecked); // oscar
 $config->project->search['params']['story']        = array('operator' => '=',       'control' => 'input',  'values' => ''); // oscar
 $config->project->search['params']['name']           = array('operator' => 'include', 'control' => 'input',  'values' => '');
 $config->project->search['params']['status']         = array('operator' => '=',       'control' => 'select', 'values' => $lang->task->statusList);
@@ -120,6 +122,3 @@ $config->project->kanbanSetting->colorList['closed'] = '#777';
 
 
 define('TABLE_TASKMILESTONE',           'taskmilestone');
-
-define('TABLE_PRODUCTMILESTONE',        'productmilestone');
-define('TABLE_PRODUCTMILESTONESTORY',   'productmilestonestory');

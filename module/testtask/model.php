@@ -142,6 +142,16 @@ class testtaskModel extends model
         }
     }
 
+    public function getTestTasks($productID, $orderBy = 'id_desc', $pager = null, $scopeAndStatus = array())
+    {
+        return $this->dao->select()
+            ->from(TABLE_TESTTASKS)
+            ->where('product')->eq($productID)
+            ->orderBy($orderBy)
+            ->page($pager)
+            ->fetchAll('id');
+    }
+
     /**
      * Get test tasks of a project.
      *

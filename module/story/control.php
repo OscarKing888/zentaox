@@ -25,6 +25,7 @@ class story extends control
         $this->loadModel('tree');
         $this->loadModel('user');
         $this->loadModel('action');
+        $this->loadModel('dept'); // oscar
     }
 
     /**
@@ -1048,9 +1049,11 @@ class story extends control
     {
         $this->loadModel('task');
         $tasks = $this->task->getStoryTasks($storyID, $projectID);
+        $this->view->story = $this->story->getByID($storyID); // oscar
         $this->view->tasks   = $tasks;
         $this->view->users   = $this->user->getPairs('noletter');
         $this->view->summary = $this->loadModel('project')->summary($tasks);
+        $this->view->depts = $this->dept->getOptionMenu(); //oscar:
         $this->display();
     }
 
@@ -1064,6 +1067,7 @@ class story extends control
     public function bugs($storyID)
     {
         $this->loadModel('bug');
+        $this->view->story = $this->story->getByID($storyID); // oscar
         $this->view->bugs  = $this->bug->getStoryBugs($storyID);
         $this->view->users = $this->user->getPairs('noletter');
         $this->display();
@@ -1079,6 +1083,7 @@ class story extends control
     public function cases($storyID)
     {
         $this->loadModel('testcase');
+        $this->view->story = $this->story->getByID($storyID); // oscar
         $this->view->cases      = $this->testcase->getStoryCases($storyID);
         $this->view->users      = $this->user->getPairs('noletter');
         $this->view->resultList = array('' => '') + $this->lang->testcase->resultList;

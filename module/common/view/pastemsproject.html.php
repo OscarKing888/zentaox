@@ -72,9 +72,9 @@
             // 最后一个空行
             //if (fields.length == 1){ //continue;}
 
-            if (fields.length != 11)
+            if (fields.length != 12)
             {
-                console.error("从Microsoft Project粘贴的列数只能是11列， 列数：" + fields.length);
+                console.error("从Microsoft Project粘贴的列数只能是12列， 列数：" + fields.length);
                 continue;
             }
 
@@ -89,6 +89,7 @@
             const idx_estStarted = 8;
             const idx_deadline = 9;
             const idx_assignedTo = 10;
+            const idx_checkBy = 11;
 
 
             var v = 0;
@@ -154,6 +155,10 @@
             idField = $('form tbody tr').eq(index).find("select[id*='assignedTo']");
             v = getSelectOptionsValue(idField, fields[idx_assignedTo]);
             $(idField).val(v);
+
+            idField = $('form tbody tr').eq(index).find("select[id*='checkBy']");
+            v = getSelectOptionsValue(idField, fields[idx_checkBy]);
+            $(idField).val(v)
 
             index++;
 

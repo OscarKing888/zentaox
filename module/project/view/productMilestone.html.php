@@ -289,7 +289,7 @@
             </tbody>
             <tfoot>
             <tr>
-                <td colspan='<?php echo $canOrder ? 13 : 12; ?>'>
+                <td colspan='<?php echo 12; ?>'>
                     <div class='table-actions clearfix'>
                         <?php
                         $storyInfo = sprintf($lang->project->productMilestoneStories, inlink('productMilestonesManage', "project={$project->id}"));
@@ -307,6 +307,7 @@
                                 //echo '<li>' . html::a('#', $lang->project->unlinkMilestoneStory, '', $misc) . '</li>';
                                 echo html::linkButton($lang->project->unlinkStory, '#', '', $misc);
                             }
+
 
                             echo "<button id='moreAction' type='button' class='btn dropdown-toggle' data-toggle='dropdown'><span class='caret'></span></button>";
                             echo "<ul class='dropdown-menu' id='moreActionMenu'>";
@@ -371,6 +372,15 @@
                             echo "</div></li>";
                             echo "</ul>";
                         }
+
+
+                        if (common::hasPriv('testtask', 'createTestTask')) {
+                            $actionLink = $this->createLink('testtask', 'createTestTask', "productID=$productID&milestone=$milestone");
+                            $misc = "onclick=\"setFormAction('$actionLink')\"";
+                            echo html::linkButton($lang->project->createTestTask, '#', '', $misc);
+                            echo html::select('createTestTaskTag', $priList, '', 'class="hidden"');
+                        }
+
 
                         echo "<div class='text'>{$storyInfo}</div>";
                         ?>

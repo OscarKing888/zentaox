@@ -51,6 +51,7 @@ $lang->task->module           = '所属模块';
 $lang->task->moduleAB         = '模块';
 $lang->task->story            = '相关需求';
 $lang->task->storyAB          = '需求';
+$lang->task->storyIDAB          = '需求ID'; // oscar
 $lang->task->storySpec        = '需求描述';
 $lang->task->storyVerify      = '验收标准';
 $lang->task->name             = '任务名称';
@@ -129,21 +130,27 @@ $lang->task->noFinished    = '未完成';
 $lang->task->noClosed      = '未关闭';
 
 // oscar[
+
+//error_log("====== deptList config<");
+//debug_print_backtrace();
+//error_log("====== deptList config>");
 $lang->task->deptList['']       = '';
-$lang->task->deptList['1']   = '策划';
-$lang->task->deptList['2']  = '程序-引擎';
-$lang->task->deptList['3']   = '美术-原画';
-$lang->task->deptList['4']  = '美术-LA';
-$lang->task->deptList['5'] = '美术-特效';
-$lang->task->deptList['6'] = '美术-音效';
-$lang->task->deptList['7']  = '美术-动画';
-$lang->task->deptList['8']   = '美术-3D';
-$lang->task->deptList['9']  = '程序-客户端';
-$lang->task->deptList['10'] = '程序-服务器';
-$lang->task->deptList['11'] = '美术-UI';
-$lang->task->deptList['12']  = '美术';
-$lang->task->deptList['13']   = 'PM';
-$lang->task->deptList['18'] = '孵化部';
+$lang->task->deptList['1']   = '孵化部';
+$lang->task->deptList['2']   = 'PM';
+$lang->task->deptList['3']   = '策划';
+$lang->task->deptList['4']   = '程序-客户端';
+$lang->task->deptList['5']   = '程序-服务器';
+$lang->task->deptList['6']   = '程序-引擎';
+$lang->task->deptList['7']   = '美术';
+$lang->task->deptList['8']   = '美术-原画';
+$lang->task->deptList['9']   = '美术-角色';
+$lang->task->deptList['10']  = '美术-UI';
+$lang->task->deptList['11']  = '美术-LA';
+$lang->task->deptList['12']  = '美术-动画';
+$lang->task->deptList['13']  = '美术-特效';
+$lang->task->deptList['14']  = '美术-音效';
+$lang->task->deptList['15']  = 'QA';
+
 
 $lang->task->importTaskFromMSProject = '从Microsoft Project格式导入';
 $lang->task->project = '所属工程';
@@ -166,7 +173,10 @@ $lang->task->statusList['closed'] = '已关闭';
 $lang->task->statusList['checked'] = '已验收'; // oscar
 $lang->task->statusList['wait_check'] = '待验收'; // oscar
 $lang->task->statusList['wait_check-by-me'] = '待我验收'; // oscar
+$lang->task->statusList['fail'] = '未通过'; // oscar
 
+$lang->task->statuschecked['0'] = '待验收'; // oscar
+$lang->task->statuschecked['1'] = '已验收'; // oscar
 
 $lang->task->typeList['']        = '';
 $lang->task->typeList['design']  = '设计';
@@ -312,7 +322,8 @@ $lang->task->batchCreateChildTask = '🚅‍';
 
 // oscar[
 $lang->task->checkByGD        = "验收";
-$lang->task->checkBy        = "验收";
+$lang->task->checkBy        = "验收人";
+$lang->task->checked        = "验收状态";
 $lang->task->uncheckByGD = '取消验收';
 $lang->task->batchAssignToCheckByGD = '指定验收';
 // oscar]
