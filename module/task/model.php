@@ -805,8 +805,8 @@ class taskModel extends model
         $task->assignedDate = $pst->assignedDate;
 
         $task->dept = $this->dao->select('dept')->from(TABLE_USER)
-            ->where('account')->eq($task->assignedTo)
-            ->fetch('dept');
+        ->where('account')->eq($task->assignedTo)
+        ->fetch('dept');
 
         //error_log("task.assign dept:" . $task->dept . " assignedTo:" . $pst->assignedTo . " assignToCheckByGD:" . $pst->assignToCheckByGD);
         /*
@@ -874,7 +874,7 @@ class taskModel extends model
 
         $task = new stdClass();
         $task->checkDate = $now;
-        $task->checked = 1;
+        $task->checkedStatus = 1;
         $task->checkedBy = $this->app->user->account;
 
         $this->dao->update(TABLE_TASK)
@@ -896,7 +896,7 @@ class taskModel extends model
 
         $task = new stdClass();
         $task->checkDate = $now;
-        $task->checked = 0;
+        $task->checkedStatus = 0;
 
         $this->dao->update(TABLE_TASK)
             ->data($task)
@@ -1789,13 +1789,13 @@ class taskModel extends model
 
             ->beginIF($type == 'checkbyme')
                 ->andWhere('t1.checkBy', true)->eq($this->app->user->account)
-                ->andWhere('t1.checked')->eq(0)
+                ->andWhere('t1.checkedStatus')->eq(0)
                 ->markRight(1)
             ->fi()
 
             ->beginIF($type == 'checkedbyme')
             ->andWhere('t1.checkBy', true)->eq($this->app->user->account)
-            ->andWhere('t1.checked')->eq(1)
+            ->andWhere('t1.checkedStatus')->eq(1)
             ->markRight(1)
             ->fi()
 
@@ -1973,7 +1973,7 @@ class taskModel extends model
      */
     public function getStoryTasks($storyID, $projectID = 0)
     {
-        $tasks = $this->dao->select('id, name, assignedTo, pri, status, estimate, consumed, closedReason, `left`, checked, story, dept')
+        $tasks = $this->dao->select('id, name, assignedTo, pri, status, estimate, consumed, closedReason, `left`, checkBy, checkedStatus, story, dept')
             ->from(TABLE_TASK)
             ->where('story')->eq((int)$storyID)
             ->andWhere('deleted')->eq(0)
@@ -2656,7 +2656,7 @@ class taskModel extends model
         {
             // oscar[
             $taskDisplayStatus = 'wait';
-            if(!$task->checked)
+            if(!$task->checkedStatus)
             {
                 if($task->status == 'done'){
                     if($task->checkBy == $this->app->user->account)
@@ -2845,12 +2845,12 @@ class taskModel extends model
                     //common::hasPriv()
                     //self::console_log("app account:" . $this->app->user->account);
                     //self::console_log("app account obj:" . $this->app->user);
-                    if($task->checkBy == $this->app->user->account && !$task->checked)// && $task->status == 'done')
+                    if($task->checkBy == $this->app->user->account && !$task->checkedStatus)// && $task->status == 'done')
                     {
                         common::printIcon('task', 'checkByGD', "taskID=$task->id", $task, 'list', '', '', 'iframe', true);
                     }
 
-                    if($task->checkBy == $this->app->user->account && $task->checked)
+                    if($task->checkBy == $this->app->user->account && $task->checkedStatus)
                     {
                         common::printIcon('task', 'uncheckByGD', "taskID=$task->id", $task, 'list', '', '', 'iframe', true);
                     }
@@ -3191,12 +3191,12 @@ class taskModel extends model
 
                 foreach ($storyTasks as $tt)
                 {
-                    if($tt->deadline > $taskDeadlineMax)
+                    if($tt->deadline > $taskDeadlineMax)// || $taskDeadlineMax == '0000-00-00')
                     {
                         $taskDeadlineMax = $tt->deadline;
                     }
 
-                    if($tt->estStarted < $taskBeginDateMin)
+                    if($tt->estStarted < $taskBeginDateMin)// || $taskBeginDateMin == '0000-00-00')
                     {
                         $taskBeginDateMin = $tt->estStarted;
                     }

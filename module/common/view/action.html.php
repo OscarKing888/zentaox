@@ -106,6 +106,10 @@ $(function()
     })
 })
 </script>
+
+<?php
+//var_dump($users);
+?>
 <?php if($extView = $this->getExtViewFile(__FILE__)){include $extView; return helper::cd();}?>
 <script src='<?php echo $jsRoot;?>jquery/reverseorder/raw.js' type='text/javascript'></script>
 

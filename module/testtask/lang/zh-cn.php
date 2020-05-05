@@ -162,6 +162,17 @@ $lang->testtask->setTestTaskStoryStatusFail = '失败';
 $lang->testtask->setTestTaskStoryStatusDone = '通过';
 $lang->testtask->setTestTaskStoryStatusCancel = '取消';
 
+$lang->testtask->startTestTask = '开始测试';
+$lang->testtask->finishTestTask = '完成测试';
+$lang->testtask->cancelTestTask = '取消测试';
+
+$lang->testtask->removeTestTask = '删除测试单';
+$lang->testtask->createBy = '由谁创建';
+
+
 $lang->icons['setTestTaskStoryStatusFail']             = 'bug';
 $lang->icons['setTestTaskStoryStatusDone']             = 'ok-sign';
 $lang->icons['setTestTaskStoryStatusCancel']             = 'remove-sign';
+$lang->icons['editTestTask']             = 'pencil';
+
+$lang->testtask->editTestTask = '编辑测试单';

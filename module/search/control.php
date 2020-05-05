@@ -24,7 +24,7 @@ class search extends control
      */
     public function buildForm($module = '', $searchFields = '', $fieldParams = '', $actionURL = '', $queryID = 0)
     {
-        self::console_log("buildForm:" . $searchFields . " pars:" . $fieldParams);
+        //self::console_log("buildForm:" . $searchFields . " pars:" . $fieldParams);
         //error_log("buildForm:" . $searchFields . " pars:" . $fieldParams);
 
         $queryID      = (empty($module) and empty($queryID)) ? $this->session->searchParams['queryID'] : $queryID;

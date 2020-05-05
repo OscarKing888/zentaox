@@ -6,7 +6,7 @@ $config->bug->longlife    = 7;
 $config->bug->create  = new stdclass();
 $config->bug->edit    = new stdclass();
 $config->bug->resolve = new stdclass();
-$config->bug->create->requiredFields  = 'title,openedBuild,module';
+$config->bug->create->requiredFields  = 'title,openedBuild,module,assignedTo';
 $config->bug->edit->requiredFields    = $config->bug->create->requiredFields;
 $config->bug->resolve->requiredFields = 'resolution,resolvedBuild';
 $config->bug->activate->requiredFields = 'openedBuild';
@@ -39,13 +39,13 @@ $config->bug->list->exportFields = 'id, product, branch, module, project, story,
     lastEditedDate, files';
 
 $config->bug->list->customCreateFields      = 'project,story,task,pri,severity,os,browser,deadline,mailto,keywords';
-$config->bug->list->customBatchCreateFields = 'module,project,story,task,steps,type,pri,severity,os,browser,keywords';
+$config->bug->list->customBatchCreateFields = 'module,project,story,task,steps,type,pri,severity,os,browser,keywords,assignedTo';
 $config->bug->list->customBatchEditFields   = 'story,type,severity,pri,productplan,assignedTo,deadline,status,resolvedBy,resolution,os,browser,keywords';
 
 $config->bug->custom = new stdclass();
 $config->bug->custom->createFields      = $config->bug->list->customCreateFields;
 //$config->bug->custom->batchCreateFields = 'module,project,steps,type,severity,os,browser';
-$config->bug->custom->batchCreateFields = 'module,story,task,steps,type,severity,os,browser';
+$config->bug->custom->batchCreateFields = 'module,story,task,steps,type,severity,assignedTo,os,browser';
 $config->bug->custom->batchEditFields   = 'type,story,task,severity,pri,branch,assignedTo,deadline,status,resolvedBy,resolution';
 
 if($config->global->flow == 'onlyTest')
@@ -70,13 +70,17 @@ $config->bug->editor->close      = array('id' => 'comment', 'tools' => 'bugTools
 $config->bug->editor->activate   = array('id' => 'comment', 'tools' => 'bugTools');
 
 global $lang;
+
 $config->bug->search['module']                   = 'bug';
+$config->bug->search['fields']['dept']           = $lang->bug->dept; // oscar
 $config->bug->search['fields']['title']          = $lang->bug->title;
 $config->bug->search['fields']['id']             = $lang->bug->id;
 $config->bug->search['fields']['keywords']       = $lang->bug->keywords;
 $config->bug->search['fields']['steps']          = $lang->bug->steps;
 $config->bug->search['fields']['assignedTo']     = $lang->bug->assignedTo;
 $config->bug->search['fields']['resolvedBy']     = $lang->bug->resolvedBy;
+
+
 
 $config->bug->search['fields']['status']         = $lang->bug->status;
 $config->bug->search['fields']['confirmed']      = $lang->bug->confirmed;
@@ -123,6 +127,7 @@ if($config->global->flow == 'onlyTest')
     unset($config->bug->search['fields']['toStory']);
 }
 
+$config->bug->search['params']['dept']           = array('operator' => '=', 'control' => 'select',  'values' => $lang->bug->deptList); // oscar
 $config->bug->search['params']['title']         = array('operator' => 'include', 'control' => 'input',  'values' => '');
 $config->bug->search['params']['keywords']      = array('operator' => 'include', 'control' => 'input',  'values' => '');
 $config->bug->search['params']['steps']         = array('operator' => 'include', 'control' => 'input',  'values' => '');

@@ -306,10 +306,6 @@
                         <td><?php echo $task->checkDate; ?></td>
                     </tr>
                     <tr>
-                        <th class='w-80px'><?php echo $lang->task->milestone; ?></th>
-                        <td><?php echo $milestone; ?></td>
-                    </tr>
-                    <tr>
                         <th><?php echo $lang->task->module; ?></th>
                         <?php
                         $moduleTitle = '';

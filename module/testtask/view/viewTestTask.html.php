@@ -21,6 +21,19 @@ include '../../common/view/datatable.fix.html.php';
 
 <div class='main'>
 
+    <div id='titlebar'>
+        <div class='heading'>
+            <span class='prefix'><?php echo html::icon($lang->icons['story']); ?> <strong><?php echo $testtask->id; ?></strong></span>
+            <strong style='color: <?php echo $story->color; ?>'><?php echo $testtask->name; ?></strong>
+        </div>
+
+    </div>
+
+    <fieldset>
+        <legend>测试说明</legend>
+        <div><?php echo nl2br(htmlspecialchars_decode($testtask->testComments));?></div>
+    </fieldset>
+
     <form method='post' id='testTaskForm'>
 
         <table class='table table-condensed table-hover table-striped tablesorter table-fixed table-selectable'
@@ -47,7 +60,6 @@ include '../../common/view/datatable.fix.html.php';
             </thead>
 
             <tbody>
-
                 <?php foreach ($stories as $story):?>
 
                 <?php

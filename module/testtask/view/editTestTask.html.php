@@ -18,7 +18,7 @@
   <div id='titlebar'>
     <div class='heading'>
       <span class='prefix'><?php echo html::icon($lang->icons['testtask']);?></span>
-      <strong><small class='text-muted'><?php echo html::icon($lang->icons['create']);?></small> <?php echo $lang->testtask->create;?></strong>
+      <strong><small class='text-muted'><?php echo html::icon($lang->icons['pencil']);?></small> <?php echo $lang->testtask->editTestTask;?></strong>
     </div>
   </div>
     <form class='form-condensed' method='post' id='dataform' data-type='iframe'>
@@ -26,13 +26,13 @@
 
       <tr>
         <th><?php echo $lang->testtask->name;?></th>
-        <td colspan='2'><?php echo html::input('name', $testTaskName, "class='form-control' autocomplete='off'");?></td>
+        <td colspan='2'><?php echo html::input('name', $testtask->name, "class='form-control' autocomplete='off'");?></td>
       </tr>  
 
         <tr>
             <th>测试说明</th>
             <td>
-                <?php echo html::textarea('testComments', "", "rows='10' class='form-control'");?>
+                <?php echo html::textarea('testComments', $testtask->testComments, "rows='10' class='form-control'");?>
             </td>
         </tr>
         <tr>
@@ -46,7 +46,7 @@
                         <input type='checkbox' checked="checked" name='storyIDList[<?php echo $k ?>]' value='<?php echo $k; ?>'/>
                     </td>
                     <td>
-                        <?php echo $v->title; ?>
+                        <?php echo "#$v->id $v->title"; ?>
                     </td>
                 </tr>
                     <?php endforeach; ?>

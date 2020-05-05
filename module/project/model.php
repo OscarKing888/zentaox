@@ -896,6 +896,10 @@ class projectModel extends model
         {
             $this->session->set('milestone', $queryID);
         }
+        else
+        {
+
+        }
         // oscar
 
         /* Set modules and $browseType. */
@@ -923,27 +927,38 @@ class projectModel extends model
         }
         else
         {
+            //$this->session->taskQuery = false;
+            //error_log("getSearchTasks ======= queryID:$queryID query:" . $this->session->taskQuery);
             if($queryID)
             {
                 $query = $this->loadModel('search')->getQuery($queryID);
                 if($query)
                 {
+                    //error_log("getSearchTasks ======= query exist save to session");
                     $this->session->set('taskQuery', $query->sql);
                     $this->session->set('taskForm', $query->form);
                 }
                 else
                 {
+                    //error_log("getSearchTasks ======= query not exist");
                     $this->session->set('taskQuery', ' 1 = 1');
                 }
             }
             else
             {
+                //error_log("getSearchTasks ======= queryID  == 0");
                 if($this->session->taskQuery == false) $this->session->set('taskQuery', ' 1 = 1');
             }
 
-            if(strpos($this->session->taskQuery, "deleted =") === false)   $this->session->set('taskQuery', $this->session->taskQuery . " AND deleted = '0'");
+            if(strpos($this->session->taskQuery, "deleted =") === false)
+            {
+                //error_log("getSearchTasks ======= !deleted");
+                $this->session->set('taskQuery', $this->session->taskQuery . " AND deleted = '0'");
+            }
 
             $taskQuery = $this->session->taskQuery;
+            //error_log("getSearchTasks ======= taskQuery 1:$taskQuery");
+
             /* Limit current project when no project. */
             if(strpos($taskQuery, "`project` =") === false) $taskQuery = $taskQuery . " AND `project` = $projectID";
             $projectQuery = "`project` " . helper::dbIN(array_keys($projects));
@@ -953,6 +968,7 @@ class projectModel extends model
             $this->session->set('taskOrderBy', $sort);
 
             //error_log("this getSearchTasks =======【");
+            //error_log("taskQuery:$taskQuery");
             $tasks = $this->getSearchTasks($taskQuery, $pager, $sort);
             //error_log("this getSearchTasks =======】");
         }

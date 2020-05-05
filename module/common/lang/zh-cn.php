@@ -225,7 +225,7 @@ $lang->project->menu->story     = array('link' => '需求|project|story|projectI
 //$lang->project->menu->module   = '模块|tree|browseTask|productID=%s&view=story';
 //oscar $lang->project->menu->bug       = 'Bug|project|bug|projectID=%s';
 $lang->project->menu->dynamic   = '动态|project|dynamic|projectID=%s';
-//oscar $lang->project->menu->build     = array('link' => '版本|project|build|projectID=%s', 'subModule' => 'build');
+$lang->project->menu->build     = array('link' => '版本|project|build|projectID=%s', 'subModule' => 'build');
 //oscar $lang->project->menu->testtask  = array('link' => '测试单|project|testtask|projectID=%s');
 $lang->project->menu->team      = array('link' => '团队|project|team|projectID=%s', 'alias' => 'managemembers');
 //oscar $lang->project->menu->doc       = array('link' => '文档|doc|objectLibs|type=project&objectID=%s&from=project', 'subModule' => 'doc');

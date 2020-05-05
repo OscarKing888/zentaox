@@ -24,7 +24,7 @@ include 'info_story.html.php';
                 <th class='w-status'><?php echo $lang->statusAB;?></th>
                 <th class='w-user'>  <?php echo $lang->task->assignedToAB;?></th>
                 <th class='w-60px'>  <?php echo $lang->task->progress;?></th>
-                <th class='w-40px'>  <?php echo $lang->actions;?></th>
+                <th class='w-80px'>  <?php echo $lang->actions;?></th>
             </tr>
             </thead>
             <tbody>
@@ -32,7 +32,7 @@ include 'info_story.html.php';
                 <?php
                 // oscar[
                 $taskDisplayStatus = 'wait';
-                if(!$task->checked)
+                if(!$task->checkedStatus)
                 {
                     if($task->status == 'done'){
                         if($task->checkBy == $this->app->user->account)
@@ -85,6 +85,17 @@ include 'info_story.html.php';
                         $projectID = $task->project;
                         $createBugParams = "productID=$productID&branch=0&extras=taskID=$task->id,projectID=$projectID,storyID=$storyID,assignedTo=$assignedTo,title=$bugTitle,moduleID=$storyModuleID";
                         common::printIcon('bug', 'create', $createBugParams, '', 'list', 'bug', '_blank');
+
+                        //echo $task->checkBy . $task->checkedStatus;
+                        if($task->checkBy == $this->app->user->account && !$task->checkedStatus)// && $task->status == 'done')
+                        {
+                            common::printIcon('task', 'checkByGD', "taskID=$task->id", $task, 'list', '', '', 'iframe', true);
+                        }
+
+                        if($task->checkBy == $this->app->user->account && $task->checkedStatus)
+                        {
+                            common::printIcon('task', 'uncheckByGD', "taskID=$task->id", $task, 'list', '', '', 'iframe', true);
+                        }
                         ?>
                     </td>
                 </tr>

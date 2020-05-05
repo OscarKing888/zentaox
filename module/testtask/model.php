@@ -147,6 +147,7 @@ class testtaskModel extends model
         return $this->dao->select()
             ->from(TABLE_TESTTASKS)
             ->where('product')->eq($productID)
+            ->andWhere('deleted')->eq(0)
             ->orderBy($orderBy)
             ->page($pager)
             ->fetchAll('id');

@@ -6,6 +6,12 @@
 </head>
 <body>
 
+************************************************************
+千万不要用HTML保留字作为DB字段名，如：
+desc, checked
+************************************************************
+
+
 *指定动作按钮图标
 $lang->icons['checkByGD']              = 'review';
 $lang->icons['finish']             = 'ok-sign';
@@ -29,6 +35,10 @@ $lang->menu->testtask  = '测试单|testtask|index';
 $lang->project->featureBar['task']['checkByMe']   = $lang->project->checkByMe;
 
 *激活子菜单
+$this->view->browseType = 'projectBlueprint';
+
+并在相应的VIEW加JS代码:
+$('#modulemenu .nav li[data-id=<?php echo $browseType?>]').addClass('active');
 
 *设置菜单工程显示
 //$productID = $this->product->saveState($productID, $this->products);
@@ -64,6 +74,13 @@ $config->task->exportFields
 *修改弹出框大小
 all.js
 ln:4205 var f = { width: '80%', height: "
+
+*添加部门名
+$depts = array('' => '') + $this->loadModel('dept')->getOptionMenu();
+$deptNames = explode('/', $depts[$task->dept]);
+$deptName = " - <span class='task-dept'>" . $deptNames[count($deptNames) - 1] . "</span>";
+
+
 
 <p>
     =============

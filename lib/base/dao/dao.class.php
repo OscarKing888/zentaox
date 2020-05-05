@@ -27,8 +27,15 @@ class baseDAO
     const LIMIT   = 'lImiT';
 
 
-    static public $debug_log_sql = false;
+	//*
+    static public $debug_log_sql = true;
     static public $debug_log_sql_all = false;
+	//*/
+
+	/*
+	static public $debug_log_sql = false;
+    static public $debug_log_sql_all = false;
+	//*/
 
     /**
      * 全局对象$app

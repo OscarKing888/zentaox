@@ -1728,6 +1728,8 @@ class storyModel extends model
     {
         if(defined('TUTORIAL')) return $this->loadModel('tutorial')->getProjectStories();
 
+        //error_log("getProjectStories:$type order:$orderBy");
+
         if($type == 'bySearch')
         {
             $queryID  = (int)$param;
@@ -1792,10 +1794,14 @@ class storyModel extends model
 //                ->page($pager, 't2.id')
 //                ->fetchAll('id');
 
+            $orderBySafe = str_replace("order_desc,", "", $orderBy);
+            //error_log("order by:$orderBy new:$orderBySafe");
+            $orderBy = $orderBySafe;
+
             $stories = $this->dao->select('*')->from(TABLE_STORY)->alias('t1')
                 ->where('t1.id')->in(array_values($storieIds))
-                //->orderBy($orderBy)
-                ->orderBy('t1.id')
+                ->orderBy($orderBy)
+                //->orderBy('t1.id')
                 ->page($pager, 't1.id')
                 ->fetchAll('id');
 
@@ -1862,6 +1868,7 @@ class storyModel extends model
             $tasks = $this->task->getStoryTasks($story, $projectID);
             $taskProgress = 0;
             $storyProgress = 0;
+            $taskCnt = 0;
             foreach($tasks as $t)
             {
                 /*
@@ -1871,16 +1878,20 @@ class storyModel extends model
                 }
                 //*/
 
-                if($t->checked )
+                if($t->checkedStatus)
                 {
                     $storyProgress += $t->progress;
                     //$this->console_log( "storyProgress:" . $val->title  . " " . $t->progress . "%");
                 }
                 $taskProgress += $t->progress;
 
+                if($t->status != 'closed' && $t->status != 'cancel')
+                {
+                    ++$taskCnt;
+                }
                 //$this->console_log( "taskprog:" . $val->title  . " " . $t->progress . "%");
             }
-            $taskCnt = count($tasks);
+            //$taskCnt = count($tasks);
             $taskProgress = $taskCnt > 0 ? $taskProgress / $taskCnt : 0;
             $taskProgress = round($taskProgress);
             $taskProgress = max(0, min(100, $taskProgress));

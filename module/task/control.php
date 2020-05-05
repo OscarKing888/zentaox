@@ -723,6 +723,12 @@ class task extends control
         $this->view->task = $task;
         $this->view->actions = $this->loadModel('action')->getList('task', $taskID);
         $this->view->users = $this->loadModel('user')->getPairs('noletter');
+
+        /*foreach ($this->view->users as $k => $v)
+        {
+            error_log("users $k = $v");
+        }*/
+
         $this->view->preAndNext = $this->loadModel('common')->getPreAndNextObject('task', $taskID);
         $this->view->product = $this->tree->getProduct($task->module);
         $this->view->modulePath = $this->tree->getParents($task->module);
@@ -1336,6 +1342,35 @@ class task extends control
         }
         die(js::reload('parent'));
     }
+
+    public function batchSetEstStartFromRealStart()
+    {
+        //error_log("===== batchSetEstStartFromRealStart");
+
+        if ($this->post->taskIDList) {
+            //error_log("===== batchSetEstStartFromRealStart");
+            $taskIDList = $this->post->taskIDList;
+            unset($_POST['taskIDList']);
+            if (!is_array($taskIDList)) die(js::locate($this->createLink('task', 'index', ""), 'parent'));
+
+            foreach ($taskIDList as $taskID) {
+                $task = $this->task->getById($taskID);
+                if($task->estStarted == '0000-00-00') {
+                    $toDateTime = $task->realStarted;
+                    if ($toDateTime == '0000-00-00') {
+                        $toDateTime = helper::now();
+                    }
+
+                    $this->dao->update(TABLE_TASK)
+                        ->set('estStarted')->eq($toDateTime)
+                        ->where('id')->eq($taskID)->exec();
+                }
+            }
+            if (!dao::isError()) $this->loadModel('score')->create('ajax', 'batchOther');
+        }
+        die(js::reload('parent'));
+    }
+
 
     /**
      * AJAX: return tasks of a user in html select.

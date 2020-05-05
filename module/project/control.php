@@ -261,6 +261,7 @@ class project extends control
         $this->view->modules = $this->tree->getTaskOptionMenu($projectID);
         $this->view->moduleID = $moduleID;
         $this->view->moduleTree = $this->tree->getTaskTreeMenu($projectID, $productID = 0, $startModuleID = 0, array('treeModel', 'createTaskLink'));
+        //$this->view->moduleTree = $this->loadModel('tree')->getTreeMenu($productID, $viewType = 'story', $startModuleID = 0, array('treeModel', 'createStoryLink'), '', 0);
         $this->view->projectTree = $this->project->tree();
         $this->view->memberPairs = $memberPairs;
         $this->view->branchGroups = $this->loadModel('branch')->getByProducts(array_keys($products), 'noempty');
@@ -646,6 +647,7 @@ class project extends control
         $this->view->type = $type;
         $this->view->param = $param;
         $this->view->moduleTree = $this->loadModel('tree')->getProjectStoryTreeMenu($projectID, $startModuleID = 0, array('treeModel', 'createProjectStoryLink'));
+        //$this->view->moduleTree = $this->loadModel('tree')->getTreeMenu($productID, $viewType = 'story', $startModuleID = 0, array('treeModel', 'createStoryLink'), '', $branch);
         $this->view->tabID = 'story';
         $this->view->storyTasks = $storyTasks;
         $this->view->storyBugs = $storyBugs;
@@ -2213,6 +2215,12 @@ class project extends control
         //*/
         $this->tasks = array();
 
+
+        $this->view->browseType = 'projectBlueprint';
+        $this->view->moduleID = 'project';
+        $this->view->projectID = $projectID;
+        //$this->view->productID = $productID;
+
         //var_dump($tasks);
         //$this->grouptask($project->id, 'assignedTo');
         $this->display();
@@ -2451,6 +2459,10 @@ class project extends control
             $this->view->milestone = 0;
         }
 
+        $this->view->browseType = 'productMilestone';
+        $this->view->moduleID = 'project';
+        $this->view->projectID = $projectID;
+
         /* Assign. */
         $this->view->title = $title;
         $this->view->position = $position;
@@ -2525,6 +2537,10 @@ class project extends control
             ->where('project')->eq($projectID)
             ->orderBy('id desc')
             ->fetchAll();
+
+        $this->view->browseType = 'productMilestonesManage';
+        $this->view->moduleID = 'project';
+        $this->view->projectID = $projectID;
 
         $this->view->milestones = ($milestones);
 

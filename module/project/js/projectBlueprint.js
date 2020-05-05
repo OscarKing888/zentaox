@@ -17,9 +17,9 @@ myDate.toLocaleString( ); //获取日期与时间
 
  */
 
-const C_TaskColor_StoryTitle = "darkorange";
-const C_TaskColor_Story = "darkorange";
-const C_StoryNameColor = "darkorange";
+const C_TaskColor_StoryTitle = "#0077ba";
+const C_TaskColor_Story = "#0077ba";
+const C_StoryNameColor = "#d000ff";
 
 const C_TaskColor_Pending = "#0080c8";
 const C_TaskColor_Completed = "#64c800";
@@ -694,29 +694,69 @@ function drawProjectBlueprintWithMilestone(tasks)
             var stroy = taskPair.story;
             var taskCount = taskPair.tasks.length;
 
-            ctx.strokeStyle = C_TaskColor_StoryTitle;
-            var xy = dateToCoord(stroy.taskBeginDate, g_drawYIdx, 0);
-            var xyend = dateToCoord(stroy.taskEndDate, g_drawYIdx + taskCount, 1, 0);
-            xyend[1] = (C_Taskbar_Height + C_Taskbar_VSpace) * (taskCount + 1);
-
-            //  roundRect(ctx, xy[0], xy[1], xyend[0] - xy[0], xyend[1] - xy[1] - C_Taskbar_Height, 5, true, false);
-            ctx.rect(xy[0], xy[1], xyend[0] - xy[0], xyend[1]);
-            ctx.stroke();
-
-            ctx.strokeStyle = C_TaskColor_Story;
             //drawBar(ctx, stroy.taskEndDate, stroy.id, stroy.title, stroy.assignedToRealName, stroy.deptName + "Cnt:" + taskCount,  stroy.taskBeginDate, 'story', g_drawYIdx);
-            drawBar(ctx, stroy.taskEndDate, stroy.id, stroy.title, stroy.assignedToRealName, stroy.deptName,  stroy.taskBeginDate, 'story', g_drawYIdx);
+
+            var storyIdx = g_drawYIdx;
+            var storyBeginDate = null;
+            var storyEndDate = null;
+            var taskDrawCount = 0;
+            //drawBar(ctx, stroy.taskEndDate, stroy.id, stroy.title, stroy.assignedToRealName, stroy.deptName,  stroy.taskBeginDate, 'story', g_drawYIdx);
+            //drawBar(ctx, storyBeginDate, stroy.id, stroy.title, stroy.assignedToRealName, stroy.deptName,  storyBeginDate, 'story', storyIdx);
 
             ++g_drawYIdx;
 
             ctx.fillStyle = C_TaskColor_Completed;
             ctx.strokeStyle = "#000000";
+
+
             for (var j = 0; j < taskPair.tasks.length;++j){
                 var task = taskPair.tasks[j];
                 //console.log("   drawTasks:", i, tasks.name);
-                if (!g_showDelayOnly || (g_showDelayOnly && isTaskDelay(tasks[i]))) {
-                    drawBar(ctx, task.deadline, task.id, task.name, task.assignedToRealName, task.deptName, task.estStarted, task.status, g_drawYIdx);
+                if (!g_showDelayOnly || (g_showDelayOnly && isTaskDelay(task))) {
+
+                    ++taskDrawCount;
+                    var beginDate = convertStringToDate(task.estStarted);
+                    var realBeginDate = convertStringToDate(task.realStarted);
+                    var endDate = convertStringToDate(task.deadline);
+
+                    //console.log("task delay:", task.id, task.name);
+
+                    if(isNaN(beginDate))
+                    {
+                        //console.log("StartErr ", task.id, task.name, "s:", task.estStarted, beginDate, "rs:", task.realStarted, "e:", new Date(endDate).toDateString());
+                    }
+
+                    if(isNaN(endDate))
+                    {
+                        //console.log("EndErr ", task.id, task.name, "end:", task.deadline, endDate);
+                    }
+
+                    if(isNaN(beginDate))
+                    {
+                        beginDate = convertStringToDate(task.realStarted);
+                    }
+
+                    if(isNaN(beginDate))
+                    {
+                        beginDate = new Date();
+                    }
+
+                    if(storyBeginDate == null || (!isNaN(beginDate) && storyBeginDate > beginDate))
+                    {
+                        storyBeginDate = beginDate;
+                    }
+
+                    if(storyEndDate == null || (!isNaN(endDate) && storyEndDate < endDate))
+                    {
+                        storyEndDate = endDate;
+                    }
+
+                    ctx.fillStyle = C_TaskColor_Completed;
+                    ctx.strokeStyle = "black";
+
+                    drawBar(ctx, endDate, task.id, task.name, task.assignedToRealName, task.deptName, beginDate, task.status, g_drawYIdx);
                     ++g_drawYIdx;
+                    //ctx.stroke();
 
                     //if(g_drawYIdx > 100)
                     {
@@ -726,7 +766,19 @@ function drawProjectBlueprintWithMilestone(tasks)
                 }
             }
 
-                g_drawYIdx += 5;
+            // draw story
+            ctx.strokeStyle = C_TaskColor_StoryTitle;
+            var xy = dateToCoord(storyBeginDate, storyIdx, 0);
+            var xyend = dateToCoord(storyEndDate, storyIdx + taskDrawCount, 1, 0);
+            xyend[1] = (C_Taskbar_Height + C_Taskbar_VSpace) * (taskDrawCount + 1);
+
+            ctx.rect(xy[0], xy[1], xyend[0] - xy[0], xyend[1]);
+            ctx.stroke();
+
+            ctx.strokeStyle = C_TaskColor_Story;
+            drawBar(ctx, storyEndDate, stroy.id, stroy.title, stroy.assignedToRealName, stroy.deptName,  storyBeginDate, 'story', storyIdx);
+            //ctx.stroke();
+            g_drawYIdx += 5;
         }
             //alert("task:" + tasks[i]);
             //console.log("task[" + tasks[i].id + "]: " + tasks[i].name + " start:" + tasks[i].realStarted + " status:" + tasks[i].status);
@@ -784,7 +836,9 @@ function drawProjectBlueprint(tasks)
 
             if(!g_showDelayOnly || (g_showDelayOnly && isTaskDelay(tasks[i])))
             {
-                drawBar(ctx, tasks[i].deadline, tasks[i].id, tasks[i].name, tasks[i].assignedToRealName, tasks[i].deptName,  tasks[i].estStarted, tasks[i].status, g_drawYIdx);
+                var beginDate = convertStringToDate(tasks[i].estStarted);
+                var endDate = convertStringToDate(tasks[i].deadline);
+                drawBar(ctx, endDate, tasks[i].id, tasks[i].name, tasks[i].assignedToRealName, tasks[i].deptName,  beginDate, tasks[i].status, g_drawYIdx);
                 ++g_drawYIdx;
 
                 //if(g_drawYIdx > 100)
@@ -836,8 +890,8 @@ function drawBar(ctx, deadline, id, name, user, dept, startDate, status, idx) {
     //ctx.fillText("auto:" + name, 10, 30);
     var cur = Date.now();
 
-    var start = convertStringToDate(startDate);
-    var deadline = convertStringToDate(deadline);
+    var start = startDate;//convertStringToDate(startDate);
+    var deadline = deadline;//convertStringToDate(deadline);
 
     if(isNaN(start))
     {
@@ -849,6 +903,13 @@ function drawBar(ctx, deadline, id, name, user, dept, startDate, status, idx) {
     {
         deadline = new Date(start).addDays(5);
     }
+
+    // if(start > deadline)
+    // {
+    //     var tmp = start;
+    //     start = deadline;
+    //     deadline = tmp;
+    // }
 
     //alert(start);
 
@@ -970,6 +1031,16 @@ function drawBar(ctx, deadline, id, name, user, dept, startDate, status, idx) {
     }
 
     //console.warn("==== stroke");
+
+    if(start > deadline)
+    {
+        //var tmp = start;
+        //start = deadline;
+        //deadline = tmp;
+
+        xy = dateToCoord(deadline, idx, 0);
+        xyend = dateToCoord(new Date(deadline).addDays(-taskDays + 1), idx, 0);
+    }
 
     var allStr = "";
 

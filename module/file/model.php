@@ -177,7 +177,7 @@ class fileModel extends model
                 $psdImg->setIteratorIndex(0);
                 $psdImg->stripImage(); //去除图片信息
                 $psdImg->setImageCompressionQuality(80); //图片质量
-                error_log("======= imgW:$new_width");
+                //error_log("======= imgW:$new_width");
                 $psdImg->thumbnailImage($new_width, 0);
                 $psdImg->writeImage($thumbImgPath);
                 $psdImg->destroy();

@@ -10,3 +10,9 @@ $lang->resource->testtask->setTestTaskStoryStatusCancel = 'setTestTaskStoryStatu
 
 $lang->resource->testtask->createTestTask = 'createTestTask';
 $lang->resource->testtask->viewTestTask = 'viewTestTask';
+
+$lang->resource->testtask->editTestTask = 'editTestTask';
+
+$lang->resource->testtask->startTestTask = 'startTestTask';
+$lang->resource->testtask->finishTestTask = 'finishTestTask';
+$lang->resource->testtask->removeTestTask = 'removeTestTask';

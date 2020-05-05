@@ -283,6 +283,7 @@ function executeQuery(queryID)
 {
     if(!queryID) return;
     location.href = actionURL.replace('myQueryID', queryID);
+    //error_log("==== executeQuery:" . location.href);
 }
 
 /**

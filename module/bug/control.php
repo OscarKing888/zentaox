@@ -535,6 +535,8 @@ class bug extends control
      */
     public function view($bugID)
     {
+        unset($_SESSION['bugQueryCondition']); // oscar
+
         /* Judge bug exits or not. */
         $bug = $this->bug->getById($bugID, true);
         if(!$bug) die(js::error($this->lang->notFound) . js::locate('back'));
@@ -572,6 +574,7 @@ class bug extends control
         $this->view->actions     = $this->action->getList('bug', $bugID);
         $this->view->builds      = $this->loadModel('build')->getProductBuildPairs($productID, $branch = 0, $params = '');
         $this->view->preAndNext  = $this->loadModel('common')->getPreAndNextObject('bug', $bugID);
+        $this->view->depts = array('' => '') + $this->loadModel('dept')->getOptionMenu(); // oscar
 
         $this->display();
     }

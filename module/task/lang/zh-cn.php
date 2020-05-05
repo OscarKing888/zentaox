@@ -175,6 +175,7 @@ $lang->task->statusList['wait_check'] = '待验收'; // oscar
 $lang->task->statusList['wait_check-by-me'] = '待我验收'; // oscar
 $lang->task->statusList['fail'] = '未通过'; // oscar
 
+$lang->task->statuschecked[''] = ''; // oscar
 $lang->task->statuschecked['0'] = '待验收'; // oscar
 $lang->task->statuschecked['1'] = '已验收'; // oscar
 
@@ -323,7 +324,8 @@ $lang->task->batchCreateChildTask = '🚅‍';
 // oscar[
 $lang->task->checkByGD        = "验收";
 $lang->task->checkBy        = "验收人";
-$lang->task->checked        = "验收状态";
+$lang->task->checkedStatus        = "验收状态";
 $lang->task->uncheckByGD = '取消验收';
 $lang->task->batchAssignToCheckByGD = '指定验收';
+$lang->task->batchSetEstStartFromRealStart = '修正开始时间';
 // oscar]

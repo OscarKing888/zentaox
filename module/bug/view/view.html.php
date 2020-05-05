@@ -15,7 +15,13 @@
 <div id='titlebar'>
   <div class='heading'>
     <span class='prefix'><?php echo html::icon($lang->icons['bug']);?> <strong><?php echo $bug->id;?></strong></span>
-    <strong style='color: <?php echo $bug->color; ?>'><?php echo $bug->title;?></strong>
+    <strong style='color: <?php echo $bug->color; ?>'>
+        <?php
+        $deptNames = explode('/', $depts[$bug->dept]);
+        $deptName = " - <span class='bug-dept'>" . $deptNames[count($deptNames) - 1] . "</span>";
+        echo $bug->title . $deptName;
+        ?>
+    </strong>
     <?php if($bug->deleted):?>
     <span class='label label-danger'><?php echo $lang->bug->deleted;?></span>
     <?php endif; ?>

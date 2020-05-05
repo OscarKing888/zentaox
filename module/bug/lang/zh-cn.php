@@ -179,6 +179,10 @@ $lang->bug->priList[4] = '4';
 
 $lang->bug->osList['']        = '';
 $lang->bug->osList['all']     = '全部';
+$lang->bug->osList['android'] = 'Android'; // oscar
+$lang->bug->osList['iOS'] = 'iOS'; // oscar
+$lang->bug->osList['simMumu'] = '模拟器-MUMU'; // oscar
+$lang->bug->osList['simBS'] = '模拟器-BlueStacks'; // oscar
 $lang->bug->osList['windows'] = 'Windows';
 $lang->bug->osList['win8']    = 'Windows 8';
 $lang->bug->osList['win7']    = 'Windows 7';
@@ -262,6 +266,7 @@ $lang->bug->report->select = '请选择报表类型';
 $lang->bug->report->create = '生成报表';
 
 $lang->bug->report->charts['bugsPerProject']        = $lang->projectCommon . 'Bug数量';
+$lang->bug->report->charts['bugsPerDept']          = '部门Bug数量'; // oscar
 $lang->bug->report->charts['bugsPerBuild']          = '版本Bug数量';
 $lang->bug->report->charts['bugsPerModule']         = '模块Bug数量';
 $lang->bug->report->charts['openedBugsPerDay']      = '每天新增Bug数';
@@ -387,3 +392,23 @@ $lang->bug->featureBar['browse']['longlifebugs']  = $lang->bug->longLifeBugs;
 $lang->bug->featureBar['browse']['postponedbugs'] = $lang->bug->postponedBugs;
 $lang->bug->featureBar['browse']['overduebugs']   = $lang->bug->overdueBugs;
 $lang->bug->featureBar['browse']['needconfirm']   = $lang->bug->needConfirm;
+
+
+$lang->bug->dept             = '部门';
+
+$lang->bug->deptList['']       = '';
+$lang->bug->deptList['1']   = '孵化部';
+$lang->bug->deptList['2']   = 'PM';
+$lang->bug->deptList['3']   = '策划';
+$lang->bug->deptList['4']   = '程序-客户端';
+$lang->bug->deptList['5']   = '程序-服务器';
+$lang->bug->deptList['6']   = '程序-引擎';
+$lang->bug->deptList['7']   = '美术';
+$lang->bug->deptList['8']   = '美术-原画';
+$lang->bug->deptList['9']   = '美术-角色';
+$lang->bug->deptList['10']  = '美术-UI';
+$lang->bug->deptList['11']  = '美术-LA';
+$lang->bug->deptList['12']  = '美术-动画';
+$lang->bug->deptList['13']  = '美术-特效';
+$lang->bug->deptList['14']  = '美术-音效';
+$lang->bug->deptList['15']  = 'QA';

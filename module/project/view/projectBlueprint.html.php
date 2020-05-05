@@ -11,6 +11,14 @@
  */
 ?>
 <?php include '../../common/view/header.html.php'; ?>
+<?php
+
+js::set('moduleID', $moduleID);
+js::set('productID', $productID);
+js::set('projectID', $projectID);
+js::set('browseType', $browseType);
+//echo "status:$status browseType:$browseType moduleID:$moduleID";
+?>
 
 <div id="featurebar">
 
@@ -54,5 +62,9 @@
 </div>
 
 <canvas id="projectCanvas"></canvas>
+
+<script>
+    $('#modulemenu .nav li[data-id=<?php echo $browseType?>]').addClass('active');
+</script>
 
 <?php include '../../common/view/footer.html.php'; ?>

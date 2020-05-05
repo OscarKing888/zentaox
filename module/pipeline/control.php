@@ -108,7 +108,7 @@ class pipeline extends control
     {
         if(!empty($_POST))
         {
-            error_log("edit pipline:$id");
+            //error_log("edit pipline:$id");
             $this->pipeline->update($id);
             $this->locate(inlink('index'));
         }

@@ -80,7 +80,7 @@ js::set('browseType', $browseType);
                 <?php
                 $taskStatus = 'wait';
                 //echo $child->status
-                if(!$task->checked)
+                if(!$task->checkedStatus)
                 {
                     if($task->status == 'done'){
                         $taskStatus = 'wait_check';
@@ -107,7 +107,7 @@ js::set('browseType', $browseType);
                             <?php
                             $taskStatus = 'wait';
                             //echo $child->status
-                            if(!$child->checked)
+                            if(!$child->checkedStatus)
                             {
                                 if($child->status == 'done'){
                                     $taskStatus = 'wait_check';
@@ -441,11 +441,19 @@ js::set('browseType', $browseType);
                             //echo "<button id='test_dpt' onclick='on_test_dpt()'>Test Dpt</button>";
                             //echo "<button id='test_dpt' onclick='on_test_setdpt()'>Test Set Dpt</button>";
 
-                            if ($tools['batchDelete']) {
+                            if (false && $tools['batchDelete']) {
 
                                 $actionLink = $this->createLink('task', 'batchDelete');
                                 $misc = "onclick=\"setFormAction('$actionLink', 'hiddenwin', '#moreAction')\"";
                                 echo html::linkButton($lang->task->delete, '#', 'self', $misc);
+                            }
+
+                            $PMRights = common::hasPriv('task', 'batchSetEstStartFromRealStart', !empty($task) ? $task : null);
+                            //if ($PMRights)
+                            {
+                                $actionLink = $this->createLink('task', 'batchSetEstStartFromRealStart');
+                                $misc = "onclick=\"setFormAction('$actionLink', 'hiddenwin', '#moreAction')\"";
+                                echo html::linkButton($lang->task->batchSetEstStartFromRealStart, '#', 'self', $misc);
                             }
                         }
                         echo "<div class='text'>" . $summary . "</div>";

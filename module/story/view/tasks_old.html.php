@@ -30,7 +30,7 @@ include '../../common/view/chart.html.php';
         <?php
             // oscar[
             $taskDisplayStatus = 'wait';
-            if(!$task->checked)
+            if(!$task->checkedStatus)
             {
                 if($task->status == 'done'){
                     if($task->checkBy == $this->app->user->account)

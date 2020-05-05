@@ -919,7 +919,12 @@ class commonModel extends model
         $table             = $this->config->objectTables[$type];
         $queryCondition    = $type . 'QueryCondition';
         $typeOnlyCondition = $type . 'OnlyCondition';
+
+        //error_log("getPreAndNextObject:$queryCondition");
+
         $queryCondition = $this->session->$queryCondition;
+
+
         $orderBy = $type . 'OrderBy';
         $orderBy = $this->session->$orderBy;
         $orderBy = str_replace('`left`', 'left', $orderBy); // process the `left` to left.

@@ -9,3 +9,5 @@ $lang->resource->task->importTaskFromMSProject = 'importTaskFromMSProject';
 $lang->resource->task->checkByGD = 'checkByGD';
 $lang->resource->task->uncheckByGD = 'uncheckByGD';
 $lang->resource->task->batchAssignToCheckByGD = 'batchAssignToCheckByGD';
+
+$lang->resource->task->batchSetEstStartFromRealStart = 'batchSetEstStartFromRealStart';

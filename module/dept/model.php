@@ -280,6 +280,7 @@ class deptModel extends model
         foreach ($childs as $deptID => $deptName) {
             if (empty($deptName)) continue;
             if (is_numeric($deptID)) {
+                $dept = new stdClass(); // oscar
                 $dept->name = strip_tags($deptName);
                 $dept->parent = $parentDeptID;
                 $dept->grade = $grade;
@@ -554,6 +555,15 @@ class deptModel extends model
         //*/
 
         return $myDepts;
+    }
+
+    public function getUsersDept()
+    {
+        $users =  $this->dao->select('account, dept')->from(TABLE_USER)
+            ->fetchPairs('account');
+
+        //var_dump($users);
+        return $users;
     }
     //oscar:
 }

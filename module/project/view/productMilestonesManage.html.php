@@ -88,5 +88,7 @@
 
     </tbody>
 </table>
-
+<script>
+    $('#modulemenu .nav li[data-id=<?php echo $browseType?>]').addClass('active');
+</script>
 <?php include '../../common/view/footer.html.php'; ?>

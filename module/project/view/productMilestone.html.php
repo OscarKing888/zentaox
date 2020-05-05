@@ -110,9 +110,6 @@
             <tr class='colhead'>
                 <?php $vars = "projectID={$project->id}&orderBy=%s&type=$type&param=$param&recTotal={$pager->recTotal}&recPerPage={$pager->recPerPage}"; ?>
                 <th class='w-id  {sorter:false}'>  <?php common::printOrderLink('id', $orderBy, $vars, $lang->idAB); ?></th>
-                <?php if ($canOrder): ?>
-                    <th class='w-50px {sorter:false}'> <?php common::printOrderLink('order', $orderBy, $vars, $lang->project->updateOrder); ?></th>
-                <?php endif; ?>
                 <th class='w-pri {sorter:false}'>  <?php common::printOrderLink('pri', $orderBy, $vars, $lang->priAB); ?></th>
                 <th class='{sorter:false}'>        <?php common::printOrderLink('title', $orderBy, $vars, $lang->story->title); ?></th>
                 <th class='w-user {sorter:false}'> <?php common::printOrderLink('openedBy', $orderBy, $vars, $lang->openedByAB); ?></th>
@@ -150,9 +147,6 @@
                         <?php endif; ?>
                         <?php echo html::a($storyLink, sprintf('%03d', $story->id)); ?>
                     </td>
-                    <?php if ($canOrder): ?>
-                        <td class='sort-handler'><i class='icon-move'></i></td>
-                    <?php endif; ?>
                     <td>
                         <span class='<?php echo 'pri' . zget($lang->story->priList, $story->pri, $story->pri) ?>'><?php echo zget($lang->story->priList, $story->pri, $story->pri); ?></span>
                     </td>
@@ -289,7 +283,7 @@
             </tbody>
             <tfoot>
             <tr>
-                <td colspan='<?php echo 12; ?>'>
+                <td colspan='<?php echo 11; ?>'>
                     <div class='table-actions clearfix'>
                         <?php
                         $storyInfo = sprintf($lang->project->productMilestoneStories, inlink('productMilestonesManage', "project={$project->id}"));
@@ -395,4 +389,7 @@
 <?php js::set('checkedSummary', $lang->product->checkedSummary); ?>
 <?php js::set('projectID', $project->id); ?>
 <?php js::set('orderBy', $orderBy) ?>
+<script>
+    $('#modulemenu .nav li[data-id=<?php echo $browseType?>]').addClass('active');
+</script>
 <?php include '../../common/view/footer.html.php'; ?>
