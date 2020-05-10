@@ -979,6 +979,8 @@ class commonModel extends model
      */
     public function saveQueryCondition($sql, $objectType, $onlyCondition = true)
     {
+        // error_log("[saveQueryCondition] obj:$objectType onlyCond:$onlyCondition sql:$sql");
+
         /* Set the query condition session. */
         if($onlyCondition)
         {

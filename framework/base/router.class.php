@@ -2194,9 +2194,13 @@ class baseRouter
         extract($trace[1]);
         $log .= ", last called by $file on line $line through function $function.\n";
 
+        error_log($log);
         xdebug_print_function_stack();
+
         /* 触发错误(Trigger the error) */
         trigger_error($log, $exit ? E_USER_ERROR : E_USER_WARNING);
+
+        xdebug_print_function_stack();
     }
 
     /**

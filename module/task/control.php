@@ -1736,6 +1736,10 @@ class task extends control
                 $task->assignedTo      = $tasks->assignedTo[$i];
                 $task->checkBy      = $tasks->checkBy[$i];
 
+
+                // oscar: find dept by assigned to account name
+                $task->dept = $this->dept->getDeptIDFromAccount($task->assignedTo);
+
                 $oldTask = $this->dao->select('*')->from(TABLE_TASK)->where('id')->eq((int)$taskId)->fetch();
 
                 if($task->estStarted == '0000-00-00')

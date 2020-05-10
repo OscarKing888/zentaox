@@ -428,6 +428,13 @@ class deptModel extends model
             ->fetch('id');
     }
 
+    public function getDeptIDFromAccount($acc)
+    {
+        return $this->dao->select('dept')->from(TABLE_USER)
+            ->where('account')->eq($acc)
+            ->fetch('dept');
+    }
+
     public function setupDeptWithUsers($view)
     {
         $depts = $this->dao->select('id,name')->from(TABLE_DEPT)->fetchPairs();

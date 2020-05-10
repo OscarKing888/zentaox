@@ -490,6 +490,20 @@ class taskModel extends model
         if($task->consumed < $oldTask->consumed) die(js::error($this->lang->task->error->consumedSmall));
 
         $task = $this->loadModel('file')->processImgURL($task, $this->config->task->editor->edit['id'], $this->post->uid);
+
+        // oscar[
+        if($task->status == 'wait' or $task->status == 'doing')
+        {
+            unset($task->finishedBy);
+            unset($task->finishedDate);
+            unset($task->canceledBy);
+            unset($task->canceledDate);
+            unset($task->closedBy);
+            unset($task->closedDate);
+            unset($task->closedReason);
+        }
+        // oscar]
+
         $this->dao->update(TABLE_TASK)->data($task)
             ->autoCheck()
             ->batchCheckIF($task->status != 'cancel', $this->config->task->edit->requiredFields, 'notempty')
@@ -498,8 +512,7 @@ class taskModel extends model
             ->checkIF($task->estimate != false, 'estimate', 'float')
             ->checkIF($task->left     != false, 'left',     'float')
             ->checkIF($task->consumed != false, 'consumed', 'float')
-            ->checkIF($task->status   != 'wait' and $task->left == 0 and $task->status != 'cancel' and $task->status != 'closed', 'status', 'equal', 'done')
-
+            //->checkIF($task->status   != 'wait' and $task->left == 0 and $task->status != 'cancel' and $task->status != 'closed', 'status', 'equal', 'done')
             ->batchCheckIF($task->status == 'wait' or $task->status == 'doing', 'finishedBy, finishedDate,canceledBy, canceledDate, closedBy, closedDate, closedReason', 'empty')
 
             ->checkIF($task->status == 'done', 'consumed', 'notempty')
@@ -805,8 +818,8 @@ class taskModel extends model
         $task->assignedDate = $pst->assignedDate;
 
         $task->dept = $this->dao->select('dept')->from(TABLE_USER)
-        ->where('account')->eq($task->assignedTo)
-        ->fetch('dept');
+            ->where('account')->eq($task->assignedTo)
+            ->fetch('dept');
 
         //error_log("task.assign dept:" . $task->dept . " assignedTo:" . $pst->assignedTo . " assignToCheckByGD:" . $pst->assignToCheckByGD);
         /*

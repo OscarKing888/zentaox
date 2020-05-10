@@ -666,7 +666,7 @@ class story extends control
         $this->view->actions    = $this->action->getList('story', $storyID);
         $this->view->modulePath = $modulePath;
         $this->view->version    = $version == 0 ? $story->version : $version;
-        $this->view->preAndNext = $this->loadModel('common')->getPreAndNextObject('story', $storyID);
+        //oscar export bug $this->view->preAndNext = $this->loadModel('common')->getPreAndNextObject('story', $storyID);
         $this->view->from       = $from;
         $this->view->param      = $param;
 
@@ -1413,7 +1413,9 @@ class story extends control
      * @return void
      */
     public function export($productID, $orderBy)
-    { 
+    {
+        error_log("story export product:$productID order:$orderBy");
+
         /* format the fields of every story in order to export data. */
         if($_POST)
         {
@@ -1435,17 +1437,21 @@ class story extends control
             $stories = array();
             if($this->session->storyOnlyCondition)
             {
-                $stories = $this->dao->select('*')->from(TABLE_STORY)->where($this->session->storyQueryCondition)
+                //$stories = $this->dao->select('*')->from(TABLE_STORY)->where($this->session->storyQueryCondition)
+                $stories = $this->dao->select('*')->from(TABLE_STORY)->where('1')
                     ->beginIF($this->post->exportType == 'selected')->andWhere('id')->in($this->cookie->checkedItem)->fi()
                     ->orderBy($orderBy)->fetchAll('id');
             }
             else
             {
-                $stmt = $this->dbh->query($this->session->storyQueryCondition . ($this->post->exportType == 'selected' ? " AND t2.id IN({$this->cookie->checkedItem})" : '') . " ORDER BY " . strtr($orderBy, '_', ' '));
+                $sql = $this->session->storyQueryCondition . ($this->post->exportType == 'selected' ? " AND id IN({$this->cookie->checkedItem})" : '') . " ORDER BY " . strtr($orderBy, '_', ' ');
+                //$sql = str_replace('`zt_task`','`zt_story`', $sql);
+                error_log("story export: $sql");
+                $stmt = $this->dbh->query($sql);
                 while($row = $stmt->fetch()) $stories[$row->id] = $row;
-            }
+        }
 
-            /* Get users, products and projects. */
+        /* Get users, products and projects. */
             $users    = $this->loadModel('user')->getPairs('noletter');
             $products = $this->loadModel('product')->getPairs('nocode');
 

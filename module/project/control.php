@@ -601,7 +601,7 @@ class project extends control
         $pager = new pager($recTotal, $recPerPage, $pageID);
 
         $stories = $this->story->getProjectStories($projectID, $sort, $type, $param, $pager);
-        $this->loadModel('common')->saveQueryCondition($this->dao->get(), 'story', false);
+        $this->loadModel('common')->saveQueryCondition($this->dao->get(), 'story', true); // oscar: export bug
         $users = $this->user->getPairs('noletter');
 
         /* Get project's product. */

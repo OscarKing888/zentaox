@@ -29,7 +29,7 @@ class baseDAO
 
 	//*
     static public $debug_log_sql = true;
-    static public $debug_log_sql_all = false;
+    static public $debug_log_sql_all = true;
 	//*/
 
 	/*
@@ -688,15 +688,23 @@ class baseDAO
     {
         /* 如果有错误，返回一个空的PDOStatement对象，确保后续方法能够执行。*/
         /* If any error, return an empty statement object to make sure the remain method to execute. */
-        if(!empty(dao::$errors)) return new PDOStatement();   
+        if(!empty(dao::$errors)) return new PDOStatement();
+
 
         if($sql)
         {
+            if(dao::$debug_log_sql_all || dao::$debug_log_sql)
+            {
+                error_log("=======[query]:$sql");
+                dao::$debug_log_sql = false;
+            }
+
             $sql       = trim($sql);
             $sqlMethod = strtolower(substr($sql, 0, strpos($sql, ' ')));
             $this->setMethod($sqlMethod);
             $this->sqlobj = new sql();
             $this->sqlobj->sql = $sql;
+
         }
         else
         {

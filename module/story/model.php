@@ -1795,14 +1795,16 @@ class storyModel extends model
 //                ->fetchAll('id');
 
             $orderBySafe = str_replace("order_desc,", "", $orderBy);
-            //error_log("order by:$orderBy new:$orderBySafe");
+            $orderBySafe = str_replace("desc,", "", $orderBySafe);
+            error_log("order by:$orderBy new:$orderBySafe");
             $orderBy = $orderBySafe;
 
-            $stories = $this->dao->select('*')->from(TABLE_STORY)->alias('t1')
-                ->where('t1.id')->in(array_values($storieIds))
+            $stories = $this->dao->select('*')->from(TABLE_STORY)//->alias('t1')
+                //->where('t1.id')->in(array_values($storieIds))
+                ->where('id')->in(array_values($storieIds))
                 ->orderBy($orderBy)
                 //->orderBy('t1.id')
-                ->page($pager, 't1.id')
+                ->page($pager, 'id')
                 ->fetchAll('id');
 
             $query    = $this->dao->get();
@@ -1883,11 +1885,11 @@ class storyModel extends model
                     $storyProgress += $t->progress;
                     //$this->console_log( "storyProgress:" . $val->title  . " " . $t->progress . "%");
                 }
-                $taskProgress += $t->progress;
 
                 if($t->status != 'closed' && $t->status != 'cancel')
                 {
                     ++$taskCnt;
+                    $taskProgress += $t->progress;
                 }
                 //$this->console_log( "taskprog:" . $val->title  . " " . $t->progress . "%");
             }
