@@ -23,31 +23,82 @@ js::set('browseType', $browseType);
 //echo "status:$status browseType:$browseType moduleID:$moduleID";
 ?>
 
+<!--<div class='side' id='taskTree'>
+    <a class='side-handle' data-id='projectTree'><i class='icon-caret-left'></i></a>
+    <div class='side-body'>
+        <div class='panel panel-sm'>
+            <div class='panel-heading nobr'>
+                <?php /*echo html::icon($lang->icons['project']); */?> <strong><?php /*echo $project->name; */?></strong>
+            </div>
+            <div class='panel-body'>
+                <?php
+/*                echo $moduleTree;
+                */?>
+                <div class='text-right'>
+                    <?php /*common::printLink('project', 'edit', "projectID=$projectID", $lang->edit); */?>
+
+                    <?php /*common::printLink('tree', 'browsetask', "rootID=$projectID&productID=0", $lang->tree->manage); */?>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>-->
+
 <div class='side' id='taskTree'>
     <a class='side-handle' data-id='projectTree'><i class='icon-caret-left'></i></a>
     <div class='side-body'>
         <div class='panel panel-sm'>
             <div class='panel-heading nobr'>
-                <?php echo html::icon($lang->icons['project']); ?> <strong><?php echo $project->name; ?></strong>
+                <?php echo html::icon($lang->icons['project']); ?> <strong><?php echo $project->name ; ?></strong>
             </div>
             <div class='panel-body'>
-                <?php echo $moduleTree; ?>
-                <div class='text-right'>
-                    <?php common::printLink('project', 'edit', "projectID=$projectID", $lang->edit); ?>
+                <?php
+                //echo $moduleTree;
+                ?>
 
-                    <?php common::printLink('tree', 'browsetask', "rootID=$projectID&productID=0", $lang->tree->manage); ?>
+                <ul class='nav'>
+                    <?php foreach ($milestones as $key => $val): ?>
+
+                        <li>
+                            <?php
+                            if($milestone == $key)
+                                $linkCls= "class=activeText";
+                            else
+                                $linkCls= "";
+                            ?>
+
+                            <?php
+                            //echo $milestone
+                            $taskBrowseType = isset($status) ? $this->session->taskBrowseType : '';
+                            common::printLink('project', 'task',
+                                "projectID=$project->id&status=$taskBrowseType&$param=$key&moduleType=byMilestone&&orderBy=$orderBy",
+                                $val, '', $linkCls);
+                            ?>
+
+                        </li>
+                    <?php endforeach; ?>
+                </ul>
+                <div class='text-right'>
+                    <?php
+                    //common::printLink('tree', 'browsetask', "rootID=$projectID&productID=$productID", $lang->tree->manage);
+                    ?>
+
+                    <?php
+                    common::printLink('project', 'productMilestonesManage', "projectID=$project->id", $lang->project->manageMilestones);
+                    ?>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
 <div class='main'>
     <script>setTreeBox();</script>
     <form method='post' id='projectTaskForm'>
         <?php
         $datatableId = $this->moduleName . ucfirst($this->methodName);
         $useDatatable = (isset($this->config->datatable->$datatableId->mode) and $this->config->datatable->$datatableId->mode == 'datatable');
-        $vars = "projectID=$project->id&status=$status&parma=$param&orderBy=%s&recTotal=$recTotal&recPerPage=$recPerPage";
+        $vars = "projectID=$project->id&status=$status&parma=$param&moduleType=byMilestone&orderBy=%s&recTotal=$recTotal&recPerPage=$recPerPage";
 
         if ($useDatatable) include '../../common/view/datatable.html.php';
         $customFields = $this->datatable->getSetting('project');

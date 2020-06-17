@@ -341,3 +341,10 @@ $lang->project->checkBy = '验收';
 
 $lang->project->unlinkMilestoneStory    = "从里程碑中移除该需求";
 $lang->project->unlinkMilestoneStoryConfirm    = "您确定从该里程碑中移除该需求吗？";
+
+
+$lang->project->featureBar['productMilestoneTask']['sotry']   = $lang->project->story;
+$lang->project->featureBar['productMilestoneTask']['task']   = $lang->project->task;
+
+$lang->project->storyMilestone            = '需求';
+$lang->project->taskMilestone            = '任务';

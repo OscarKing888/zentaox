@@ -435,6 +435,8 @@ class commonModel extends model
             if(isset($menuItem->hidden) && $menuItem->hidden) continue;
             if($isMobile and empty($menuItem->link)) continue;
 
+            //error_log("print menu $currentModule $currentMethod $menuItem");
+
             /* Init the these vars. */
             if($menuItem->link)
             {
@@ -450,13 +452,19 @@ class commonModel extends model
                     if(isset($menuItem->link['subModule']))
                     {
                         $subModules = explode(',', $menuItem->link['subModule']);
-                        if(in_array($currentModule, $subModules) and $float != 'right') $active = 'active';
+                        if(in_array($currentModule, $subModules) and $float != 'right')
+                        {
+                            // oscar:
+                            //error_log("set menu active $currentModule $currentMethod $menu");
+                            $active = 'active';
+                        }
                     }
                     if(isset($menuItem->link['alias']))  $alias  = $menuItem->link['alias'];
                     if(isset($menuItem->link['target'])) $target = $menuItem->link['target'];
                     if(isset($menuItem->link['module'])) $module = $menuItem->link['module'];
                     if(isset($menuItem->link['method'])) $method = $menuItem->link['method'];
                 }
+
                 if($float != 'right' and $module == $currentModule and ($method == $currentMethod or strpos(",$alias,", ",$currentMethod,") !== false)) $active = 'active';
 
                 $menuItemHtml = "<li class='$float $active' data-id='$menuItem->name'>" . html::a($link, $menuItem->text, $target) . "</li>\n";

@@ -142,7 +142,7 @@ class project extends control
      * @access public
      * @return void
      */
-    public function task($projectID = 0, $status = 'unclosed', $param = 0, $orderBy = '', $recTotal = 0, $recPerPage = 100, $pageID = 1)
+    public function task($projectID = 0, $status = 'unclosed', $param = 0, $moduleType='byMilestone', $orderBy = '', $recTotal = 0, $recPerPage = 100, $pageID = 1)
     {
         //error_log("oscar: project-task: status:$status param:$param");
 
@@ -152,6 +152,12 @@ class project extends control
         $this->loadModel('datatable');
 
         $this->project->getLimitedProject();
+
+        // oscar
+        $milestones = $this->project->getMilestonesPairs($projectID);
+        $this->view->milestones = $milestones;
+        $this->view->milestone = $param;
+        // oscar
 
         /* Set browse type. */
         $browseType = strtolower($status);
@@ -180,14 +186,21 @@ class project extends control
 
         /* Set queryID, moduleID and productID. */
         $queryID = ($browseType == 'bysearch') ? (int)$param : 0;
-        $moduleID = ($browseType == 'bymodule') ? (int)$param : (($browseType == 'bysearch' or $browseType == 'byproduct') ? 0 : $this->cookie->moduleBrowseParam);
+        //oscar$moduleID = ($browseType == 'bymodule') ? (int)$param : (($browseType == 'bysearch' or $browseType == 'byproduct') ? 0 : $this->cookie->moduleBrowseParam);
         $productID = ($browseType == 'byproduct') ? (int)$param : (($browseType == 'bysearch' or $browseType == 'bymodule') ? 0 : $this->cookie->productBrowseParam);
 
         // oscar[
+        $moduleID = 0;
         if($browseType != 'bymodule')
         {
-            $moduleID = 0;
+            //$moduleID = 0;
         }
+
+        if($moduleType == 'byMilestone')
+        {
+            $moduleID = $param;
+        }
+
         // oscar]
 
         /* Save to session. */
@@ -214,14 +227,14 @@ class project extends control
         $pager = new pager($recTotal, $recPerPage, $pageID);
 
         // oscar
-        if($status == 'milestone')
-        {
-            $queryID = $param;
-        }
+        //if($status == 'milestone')
+        //{
+            //$queryID = $param;
+        //}
         // oscar
 
         /* Get tasks. */
-        $tasks = $this->project->getTasks($productID, $projectID, $this->projects, $browseType, $queryID, $moduleID, $sort, $pager);
+        $tasks = $this->project->getTasks($productID, $projectID, $this->projects, $browseType, $queryID, $moduleType, $moduleID, $sort, $pager);
 
         /*
         error_log("get-project-tasks:");
@@ -2765,4 +2778,8 @@ class project extends control
         //public function productMilestone($projectID = 0, $orderBy = 'order_desc', $type = 'byMilestone', $param = 0, $recTotal = 0, $recPerPage = 50, $pageID = 1)
         die(js::locate($this->createLink('project', 'productMilestone', "projectID=$projectID&orderby=desc&type=byMilestone&param=$milestone")));
     }
+
+
+
+
 }

@@ -885,20 +885,17 @@ class projectModel extends model
      * @access public
      * @return array
      */
-    public function getTasks($productID, $projectID, $projects, $browseType, $queryID, $moduleID, $sort, $pager)
+    public function getTasks($productID, $projectID, $projects, $browseType, $queryID, $moduleType, $moduleID, $sort, $pager)
     {
         //error_log("project-getTasks: browseType:$browseType queryID:$queryID");
 
         $this->loadModel('task');
 
         // oscar
-        if($browseType == 'milestone')
+        if($browseType == 'byMilestone')
         {
-            $this->session->set('milestone', $queryID);
-        }
-        else
-        {
-
+            //$this->session->set('milestone', $queryID);
+            //return $this->getTasksByMileStone($productID, $projectID, $projects, $queryID, $sort, $pager);
         }
         // oscar
 
@@ -923,7 +920,7 @@ class projectModel extends model
             }
 
             //$this->console_log("task getProjectTasks");
-            $tasks = $this->task->getProjectTasks($projectID, $productID, $queryStatus, $modules, $sort, $pager);
+            $tasks = $this->task->getProjectTasks($projectID, $productID, $queryStatus, $moduleType, $moduleID, $sort, $pager);
         }
         else
         {
@@ -975,6 +972,7 @@ class projectModel extends model
 
         return $tasks;
     }
+
 
     /**
      * Get project by id.
@@ -2600,6 +2598,8 @@ class projectModel extends model
 
     public function getMilestonesStories($projectID, $milestone, $mode='')
     {
+        //error_log("getMilestonesStories: proj:$projectID milestone:$milestone mode:$mode");
+
         $milestoneStories = $this->dao->select('id, story')->from(TABLE_PRODUCTMILESTONESTORY)
             ->where('project')->eq($projectID)
             ->beginIf(strpos($mode, 'all') === false)->andWhere('productMilestone')->eq($milestone)->fi()

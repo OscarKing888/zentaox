@@ -40,7 +40,7 @@ function loadModuleRelated()
 {
     moduleID  = $('#module').val();
     productID = $('#product').val();
-    setAssignedTo(moduleID, productID);
+    //setAssignedTo(moduleID, productID);
     setStories(moduleID, productID);
 }
 
