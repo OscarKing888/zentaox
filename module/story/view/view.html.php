@@ -151,6 +151,30 @@
             </fieldset>
             <?php echo $this->fetch('file', 'printFiles', array('files' => $story->files, 'fieldset' => 'true')); ?>
 
+
+            <fieldset>
+                <legend><?php echo "需求任务概览"; ?></legend>
+                <ul class='list-unstyled'>
+                    <?php
+                    foreach ($story->tasks as $taskgrp) {
+                        foreach($taskgrp as $k => $taskt) {
+                            //echo "<span> task:" . $taskt->id . "</span>";
+                            $deptStr = "<span class='confirmedtext'>" . $depts[$taskt->dept] . "</span>";
+                            echo "<li title='$taskt->name'>" . html::a($this->createLink('task', 'view', "taskID=$taskt->id", '', true),
+                                    $deptStr
+                                    . " - </><span class='taskIDColor'>#" . $taskt->id . "</span>"
+                                    . " - <span class=''>【" . $taskt->name . "】</span>"
+                                    . " - <span class='taskUserNameColor'>" . $users[$taskt->assignedTo] . "</span>  " , '', "class='iframe' data-width='80%'");
+
+                            common::printIcon('task', 'edit', "taskID=$taskt->id", $taskt, 'icon', '', '_blank');
+                        }
+                    }
+                    ?>
+                </ul>
+            </fieldset>
+
+
+
             <fieldset>
                 <legend><?php echo $lang->artstation->common; ?></legend>
                 <?php foreach ($story->artstation as $artstation): ?>

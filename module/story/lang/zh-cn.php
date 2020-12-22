@@ -29,9 +29,9 @@ $lang->story->cases       = "相关用例";
 $lang->story->taskCount   = '任务数';
 $lang->story->bugCount    = 'Bug数';
 $lang->story->caseCount   = '用例数';
-$lang->story->taskCountAB = 'T';
-$lang->story->bugCountAB  = 'B';
-$lang->story->caseCountAB = 'C';
+$lang->story->taskCountAB = '任务数';
+$lang->story->bugCountAB  = 'BUG数';
+$lang->story->caseCountAB = '用例数';
 $lang->story->linkStory   = '关联需求';
 $lang->story->unlinkStory = '移除相关需求';
 $lang->story->export      = "导出数据";
@@ -310,3 +310,11 @@ $lang->story->pipelineType[4] = '关卡';
 $lang->story->action->linked2milestone      = array('main' => '$date, 由 <strong>$actor</strong> 关联到里程碑' . $lang->projectCommon . ' <strong>$extra</strong>。');
 
 //$lang->story->progress = '进度';
+
+
+
+$lang->story->exportProgress = '导出进度到EXCEL';
+$lang->story->progress = '进度';
+$lang->story->taskProgress     = '任务进度';
+$lang->story->storyProgress    = '验收进度';
+$lang->story->deadline    = '截止日期';

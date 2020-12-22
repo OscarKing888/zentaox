@@ -78,6 +78,7 @@ include 'info_story.html.php';
                         $storyID = $task->story;
                         $assignedTo = $task->assignedTo;
                         $bugTitle = $task->name . "_" .  $this->dept->getByID($task->dept)->name;
+                        $bugTitle = baseModel::trimTitle($bugTitle);
                         $storyModuleID = $task->module;
                         $productID = $this->dao->select('product')->from(TABLE_PROJECTPRODUCT)
                             ->where('project')->eq($task->project)

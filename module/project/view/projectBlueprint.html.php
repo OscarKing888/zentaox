@@ -62,6 +62,17 @@ js::set('browseType', $browseType);
 </div>
 
 <canvas id="projectCanvas"></canvas>
+<style>
+    canvas {
+
+        image-rendering: optimizeSpeed;
+        image-rendering: crisp-edges;
+        image-rendering: -moz-crisp-edges;
+        image-rendering: -o-crisp-edges;
+        image-rendering: -webkit-optimize-contrast;
+        -ms-interpolation-mode: nearest-neighbor;
+    }
+</style>
 
 <script>
     $('#modulemenu .nav li[data-id=<?php echo $browseType?>]').addClass('active');

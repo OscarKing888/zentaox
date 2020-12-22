@@ -7,6 +7,11 @@ $config->project->weekend          = '2';
 
 $config->project->list = new stdclass();
 $config->project->list->exportFields = 'id,name,code,milestone,PM,end,status,totalEstimate,totalConsumed,totalLeft,progress';
+$config->project->list->exportProgressFields = '
+    id, title, taskProgress, storyProgress, deadline,
+    pri, taskCountAB, bugCountAB,
+    openedBy, openedDate, assignedTo,
+    ';
 
 global $lang, $app;
 $app->loadLang('task');

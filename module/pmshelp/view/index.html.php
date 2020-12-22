@@ -27,7 +27,12 @@
 
             <table class='table'>
                 <thead>
-
+				<tr>
+                    <th>WIKI</th>
+					<td>
+						<a href="http://172.20.1.128:8088/wiki" target="_blank">Wiki</a>
+					</td>
+				</tr>
                 <tr>
                     <th>我是组员🐑</th>
                     <td>

@@ -266,3 +266,23 @@ $lang->task->report->tasksPerClosedReason->graph->xAxisName = 'Close Reason';
 
 $lang->task->report->finishedTasksPerDay->type               = 'bar';
 $lang->task->report->finishedTasksPerDay->graph->xAxisName   = 'Date';
+
+$lang->task->deptList['']       = '';
+$lang->task->deptList['1']   = '高层管理';
+$lang->task->deptList['2']   = '项目管理';
+$lang->task->deptList['3']   = '策划';
+$lang->task->deptList['4']   = '程序-客户端';
+$lang->task->deptList['5']   = '程序-服务器';
+$lang->task->deptList['6']   = '美术';
+$lang->task->deptList['7']   = '测试';
+$lang->task->deptList['8']   = '产品运营';
+$lang->task->deptList['9']   = '产品总监';
+$lang->task->deptList['10']  = '产品经理';
+$lang->task->deptList['11']  = 'GS主管';
+$lang->task->deptList['12']  = '社区运营';
+$lang->task->deptList['13']  = '美术设计';
+$lang->task->deptList['14']  = '客服经理';
+$lang->task->deptList['15']  = '内宣支持';
+$lang->task->deptList['16']  = 'GS';
+$lang->task->deptList['17']  = 'CS';
+$lang->task->deptList['18']  = 'GM';

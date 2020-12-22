@@ -964,9 +964,13 @@ class projectModel extends model
             $this->session->set('taskOnlyCondition', true);
             $this->session->set('taskOrderBy', $sort);
 
+            // oscar
+            //$this->session->set('moduleType', $moduleType);
+            //$this->session->set('moduleID', $moduleID);
+
             //error_log("this getSearchTasks =======【");
             //error_log("taskQuery:$taskQuery");
-            $tasks = $this->getSearchTasks($taskQuery, $pager, $sort);
+            $tasks = $this->getSearchTasks($taskQuery, $pager, $sort, $projectID, $moduleType, $moduleID);
             //error_log("this getSearchTasks =======】");
         }
 
@@ -1833,12 +1837,33 @@ class projectModel extends model
      * @access public
      * @return array
      */
-    public function getSearchTasks($condition, $pager, $orderBy)
+    public function getSearchTasks($condition, $pager, $orderBy, $projectID, $moduleType, $milestone)
     {
+        //error_log("------------------: project-getSearchTasks: moduleType:$moduleType milestone:$milestone");
+
+        //var_dump($condition);
+        //var_dump($moduleType);
+        //var_dump($milestone);
+
+        $moduleType = strtolower($moduleType);
+
+        $milestoneStories = $this->loadModel('project')->getMilestonesStories($projectID, $milestone);
+
+        //var_dump($milestoneStories);
+
         $taskIdList = $this->dao->select('id')
             ->from(TABLE_TASK)
             ->where($condition)
+
+            // oscar:
+            ->beginIF($moduleType == 'bymilestone' && count($milestoneStories) > 0)
+                ->andWhere('story', true)->in(array_keys($milestoneStories))
+                ->markRight(1)
+            ->fi()
+            // oscar:
+
             ->andWhere('deleted')->eq(0)
+            //->andWhere('parent')->eq(0) // oscar: select main task only
             ->orderBy($orderBy)
             ->page($pager)
             ->fetchAll('id');
@@ -1851,8 +1876,90 @@ class projectModel extends model
              ->andWhere('t1.id')->in(array_keys($taskIdList))
              ->orderBy($orderBy)
              ->fetchAll();
-        $this->loadModel('task')->processTasks($tasks);
-        return $tasks;
+
+        /* Select children task. */
+        /*
+        $children = $this->dao->select('t1.*, t2.id AS storyID, t2.title AS storyTitle, t2.product, t2.branch, t2.version AS latestStoryVersion, t2.status AS storyStatus, t3.realname AS assignedToRealName')
+            ->from(TABLE_TASK)->alias('t1')
+            ->leftJoin(TABLE_STORY)->alias('t2')->on('t1.story = t2.id')
+            ->leftJoin(TABLE_USER)->alias('t3')->on('t1.assignedTo = t3.account')
+            //oscar milestone ->leftJoin(TABLE_MODULE)->alias('t4')->on('t1.module = t4.id')
+            ->where('t1.project')->eq((int)$projectID)
+            //->andWhere($condition) // oscar
+            ->andWhere('t1.parent')->in($taskIdList)
+            ->andWhere('t1.deleted')->eq(0)
+            //oscar milestone  ->beginIF($productID)->andWhere("((t4.root=" . (int)$productID . " and t4.type='story') OR t2.product=" . (int)$productID . ")")->fi()
+            //->beginIF($type == 'undone')->andWhere("(t1.status = 'wait' or t1.status ='doing')")->fi()
+            //->beginIF($type == 'needconfirm')->andWhere('t2.version > t1.storyVersion')->andWhere("t2.status = 'active'")->fi()
+            //->beginIF($type == 'assignedtome')->andWhere('t1.assignedTo')->eq($this->app->user->account)->fi()
+            //->beginIF($type == 'finishedbyme')->andWhere('t1.finishedby')->eq($this->app->user->account)->fi()
+            //->beginIF($type == 'delayed')->andWhere('t1.deadline')->gt('1970-1-1')->andWhere('t1.deadline')->lt(date(DT_DATE1))->andWhere('t1.status')->in('wait,doing')->fi()
+            //->beginIF($type != 'mydept' and (is_array($type) or strpos(',all,undone,needconfirm,assignedtome,delayed,finishedbyme,myinvolved,', ",$type,") === false))->andWhere('t1.status')->in($type)->fi()
+            //->beginIF($type == 'checkbyme')->andWhere('t1.checkBy')->eq($this->app->user->account)->fi() // oscar
+            //->beginIF($modules)->andWhere('t1.module')->in($modules)->fi()
+            ->orderBy('t1.`id`,' . $orderBy)
+            ->fetchAll('id');
+
+        //*/
+
+        /*
+        $children = $this->dao->select('*')
+            ->from(TABLE_TASK)->alias('t1')
+            ->where('t1.deleted')->eq(0)
+            ->andWhere($condition)
+            //->where('1 ')
+            // oscar:
+            ->beginIF($moduleType == 'bymilestone' && count($milestoneStories) > 0)
+                ->andWhere('t1.story', true)->in(array_keys($milestoneStories))
+                ->markRight(1)
+            ->fi()
+            // oscar:
+            ->andWhere('t1.parent')->in($taskIdList)
+            //->andWhere('t1.parent')->ne(0) // oscar: select main task only
+            //->andWhere('t1.id')->notin($taskIdList)
+
+            //oscar milestone  ->beginIF($productID)->andWhere("((t4.root=" . (int)$productID . " and t4.type='story') OR t2.product=" . (int)$productID . ")")->fi()
+            //->beginIF($type == 'undone')->andWhere("(t1.status = 'wait' or t1.status ='doing')")->fi()
+            //->beginIF($type == 'needconfirm')->andWhere('t2.version > t1.storyVersion')->andWhere("t2.status = 'active'")->fi()
+            //->beginIF($type == 'assignedtome')->andWhere('t1.assignedTo')->eq($this->app->user->account)->fi()
+            //->beginIF($type == 'finishedbyme')->andWhere('t1.finishedby')->eq($this->app->user->account)->fi()
+            //->beginIF($type == 'delayed')->andWhere('t1.deadline')->gt('1970-1-1')->andWhere('t1.deadline')->lt(date(DT_DATE1))->andWhere('t1.status')->in('wait,doing')->fi()
+            //->beginIF($type != 'mydept' and (is_array($type) or strpos(',all,undone,needconfirm,assignedtome,delayed,finishedbyme,myinvolved,', ",$type,") === false))->andWhere('t1.status')->in($type)->fi()
+            //->beginIF($type == 'checkbyme')->andWhere('t1.checkBy')->eq($this->app->user->account)->fi() // oscar
+            //->beginIF($modules)->andWhere('t1.module')->in($modules)->fi()
+            ->orderBy('t1.`id`,' . $orderBy)
+            ->fetchAll('id');
+
+        //*/
+
+
+        //var_dump("--------------children:");
+        //var_dump($children);
+
+        /*
+        if(!empty($children))
+        {
+            foreach($children as $child)
+            {
+                if($child->parent != 0)
+                {
+                    $tasks[$child->parent]->children[] = $child;
+                }
+            }
+        }
+        //*/
+
+        foreach($tasks as $taskID => $task)
+        {
+            if($task->parent != 0 and isset($tasks[$task->parent]))
+            {
+                $tasks[$task->parent]->children[] = $task;
+                unset($tasks[$taskID]);
+            }
+        }
+
+
+        return $this->loadModel('task')->processTasks($tasks);
     }
 
     /**

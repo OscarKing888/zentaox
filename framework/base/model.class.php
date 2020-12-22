@@ -299,4 +299,12 @@ class baseModel// extends  debugUtil
     {
         $this->dao->delete()->from($table)->where('id')->eq($id)->exec();
     }
+
+    public static function trimTitle($title)
+    {
+        $titleNew = preg_replace('/\s+/', '', $title);
+        $titleNew = str_replace('[', '【', $titleNew);
+        $titleNew = str_replace(']', '】', $titleNew);
+        return $titleNew;
+    }
 }

@@ -348,3 +348,8 @@ $lang->project->featureBar['productMilestoneTask']['task']   = $lang->project->t
 
 $lang->project->storyMilestone            = '需求';
 $lang->project->taskMilestone            = '任务';
+
+
+
+
+$lang->project->exportProgress = '导出进度到EXCEL';

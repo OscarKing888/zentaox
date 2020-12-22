@@ -87,7 +87,7 @@ function on_createRootTask(projectID, storyID, storyTitle, productID) {
      }
 
     url = createLink('pipeline', 'batchCreateRootTask');
-    //alert("on_createRootTask productID:" + productID + " projectID:" + projectID + " pipelineID:" + pipelineID + " storyID:" + storyID + " url:" + url);
+    alert("on_createRootTask productID:" + productID + " projectID:" + projectID + " pipelineID:" + pipelineID + " storyID:" + storyID + " url:" + url);
 
     $.ajax(
         {
@@ -98,7 +98,7 @@ function on_createRootTask(projectID, storyID, storyTitle, productID) {
             //*
             ,success:  function()
             {
-                alert("批量创建主任务成功！");
+                alert("批量创建主任务成功！！");
             },
             error: function(error){
                 alert("批量创建主任务出错：" + JSON.stringify(error));

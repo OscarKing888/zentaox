@@ -312,7 +312,16 @@ class taskModel extends model
             $data[$i]->story      = (int)$story;
             $data[$i]->type       = $type;
             $data[$i]->module     = (int)$module;
-            $data[$i]->assignedTo = $leaders[$dept];
+
+            //if($this->app->user->account == $leaders[$dept])
+            //{
+                $data[$i]->assignedTo = $assignedTo;
+            //}
+            //else
+            //{
+            //    $data[$i]->assignedTo = $leaders[$dept];
+            //}
+
             $data[$i]->color      = $tasks->color[$i];
             $data[$i]->name       = $tasks->name[$i];
             $data[$i]->desc       = nl2br($tasks->desc[$i]);
@@ -1734,7 +1743,7 @@ class taskModel extends model
      */
     public function getProjectTasks($projectID, $productID = 0, $type = 'all', $moduleType, $milestone = 0, $orderBy = 'status_asc, id_desc', $pager = null)
     {
-        //error_log("getProjectTasks: type:$type queryID:$queryID orderBy:$orderBy me:" . $this->app->user->account);
+        //error_log("===== getProjectTasks: type:$type moduleType:$moduleType milestone:$milestone orderBy:$orderBy me:" . $this->app->user->account);
 
         //oscar:
         $this->loadModel('dept');
@@ -1804,7 +1813,10 @@ class taskModel extends model
             ->leftJoin(TABLE_TEAM)->alias('t4')->on('t1.id = t4.task')
             //oscar milestone ->leftJoin(TABLE_MODULE)->alias('t5')->on('t1.module = t5.id')
             ->where('t1.project')->eq((int)$projectID)
-            ->beginIF(!in_array($type, array('assignedtome', 'myinvolved')))->andWhere('t1.parent')->eq(0)->fi()
+
+            ->beginIF(!in_array($type, array('assignedtome', 'myinvolved')))
+                // oscar: ->andWhere('t1.parent')->eq(0)
+            ->fi()
 
 
             // oscar:
@@ -1820,9 +1832,9 @@ class taskModel extends model
             ->fi()
 
             ->beginIF($type == 'checkedbyme')
-            ->andWhere('t1.checkBy', true)->eq($this->app->user->account)
-            ->andWhere('t1.checkedStatus')->eq(1)
-            ->markRight(1)
+                ->andWhere('t1.checkBy', true)->eq($this->app->user->account)
+                ->andWhere('t1.checkedStatus')->eq(1)
+                ->markRight(1)
             ->fi()
 
             ->beginIF($type == 'mydept')
@@ -1840,9 +1852,9 @@ class taskModel extends model
             // oscar:
 
             ->beginIF($type == 'myinvolved')
-            ->andWhere('t4.account', true)->eq($this->app->user->account)
-            ->orWhere('t1.assignedTo')->eq($this->app->user->account)
-            ->orWhere('t1.finishedby')->eq($this->app->user->account)
+                ->andWhere('t4.account', true)->eq($this->app->user->account)
+                ->orWhere('t1.assignedTo')->eq($this->app->user->account)
+                ->orWhere('t1.finishedby')->eq($this->app->user->account)
             ->markRight(1)->fi()
 
             //oscar milestone ->beginIF($productID)->andWhere("((t5.root=" . (int)$productID . " and t5.type='story') OR t2.product=" . (int)$productID . ")")->fi()
@@ -1858,7 +1870,7 @@ class taskModel extends model
             ->page($pager, 't1.id')
             ->fetchAll('id');
 
-        error_log("getTasSQL:" . $this->dao->get());
+        //error_log("getTasSQL:" . $this->dao->get());
 
         $this->loadModel('common')->saveQueryCondition($this->dao->get(), 'task', ($productID or in_array($type, array('assignedtome', 'myinvolved', 'needconfirm'))) ? false : true);
 
@@ -1879,7 +1891,19 @@ class taskModel extends model
             foreach($taskTeam as $taskID => $team) $tasks[$taskID]->team = $team;
         }
 
-        /* Select children task. */
+
+        foreach($tasks as $taskID => $task)
+        {
+            if($task->parent != 0 and isset($tasks[$task->parent]))
+            {
+                $tasks[$task->parent]->children[] = $task;
+                unset($tasks[$taskID]);
+            }
+        }
+
+        /*
+
+        // Select children task
         $children = $this->dao->select('t1.*, t2.id AS storyID, t2.title AS storyTitle, t2.product, t2.branch, t2.version AS latestStoryVersion, t2.status AS storyStatus, t3.realname AS assignedToRealName')
             ->from(TABLE_TASK)->alias('t1')
             ->leftJoin(TABLE_STORY)->alias('t2')->on('t1.story = t2.id')
@@ -1904,9 +1928,14 @@ class taskModel extends model
         {
             foreach($children as $child)
             {
-                $tasks[$child->parent]->children[] = $child;
+                if($children->parent != 0)
+                {
+                    $tasks[$child->parent]->children[] = $child;
+                }
             }
         }
+        //*/
+
 
         return $this->processTasks($tasks);
     }
@@ -2001,7 +2030,7 @@ class taskModel extends model
      */
     public function getStoryTasks($storyID, $projectID = 0)
     {
-        $tasks = $this->dao->select('id, name, assignedTo, pri, status, estimate, consumed, closedReason, `left`, checkBy, checkedStatus, story, dept')
+        $tasks = $this->dao->select('id, name, assignedTo, pri, status, estimate, consumed, closedReason, `left`, checkBy, checkedStatus, story, dept, deadline')
             ->from(TABLE_TASK)
             ->where('story')->eq((int)$storyID)
             ->andWhere('deleted')->eq(0)
@@ -2190,6 +2219,8 @@ class taskModel extends model
      */
     public function processTasks($tasks)
     {
+        // oscar: no use????
+        //*
         foreach($tasks as $task)
         {
             $task = $this->processTask($task);
@@ -2198,6 +2229,8 @@ class taskModel extends model
                 foreach($task->children as $child) $task = $this->processTask($child);
             }
         }
+        //*/
+
         return $tasks;
     }
 
@@ -2894,6 +2927,8 @@ class taskModel extends model
                     $storyID = $task->story;
                     $assignedTo = $task->assignedTo;
                     $bugTitle = $task->name . "_" .  $this->dept->getByID($task->dept)->name;
+                    $bugTitle = baseModel::trimTitle($bugTitle);
+
                     $storyModuleID = $task->module;
                     $productID = $this->dao->select('product')->from(TABLE_PROJECTPRODUCT)
                     ->where('project')->eq($task->project)

@@ -32,7 +32,8 @@
     <div class='actions'>
         <div class='btn-group'>
             <?php
-            //common::printIcon('story', 'export', "productID=$productID&orderBy=id_desc", '', 'button', '', '', 'export');
+
+            common::printIcon('project', 'exportProgress', "productID=$productID&projectID=$project->id&orderBy=id_desc", '', 'button', ' icon-download-alt', '', 'export');
 
             $this->lang->story->create = $this->lang->project->createStory;
 
@@ -69,21 +70,48 @@
                 //echo $moduleTree;
                 ?>
                 <ul class='nav'>
+
+                    <?php
+
+                    $totalProgress = 0;
+                    $taskCnt = count($stories);
+
+                    foreach ($stories as $key => $story)
+                    {
+                        $totalProgress += $story->taskProgress;
+                    }
+
+                    $totalProgress = $taskCnt > 0 ? $totalProgress / $taskCnt : 0;
+                    $totalProgress = round($totalProgress);
+                    $totalProgress = max(0, min(100, $totalProgress));
+
+                    ?>
+
                     <?php foreach ($milestones as $key => $val): ?>
 
                         <li>
                             <?php
                                 if($milestone == $key)
-                                    $linkCls= "class=activeText";
+                                    {
+                                        $linkCls= "class=activeText";
+                                        $this->app->session->set("milestoneProg_$key", $totalProgress);
+                                    }
                                 else
                                     $linkCls= "";
                             ?>
 
                             <?php
                             //echo $milestone
+                            $progKey = "milestoneProg_". $key;
+                            $progTotal = $this->app->session->$progKey;
+                            if(!isset($progTotal))
+                            {
+                                $progTotal = 0;
+                            }
+
                             common::printLink('project', 'productMilestone',
                                 "projectID=$project->id&&orderBy=$orderBy&$type=byMilestone&$param=$key",
-                                $val, '', $linkCls);
+                                $val . " [" . $progTotal . "%]", '', $linkCls);
                             ?>
 
                         </li>
@@ -195,7 +223,7 @@
                         //oscar:
                         $storyID = $story->id;
                         $assignedTo = $story->assignedTo;
-                        $storyTitle = $story->title;
+                        $storyTitle = baseModel::trimTitle($story->title);
                         $storyModuleID = $story->module;
                         $productID = $story->product;
                         $createBugParams = "productID=$productID&branch=$story->branch&extras=storyID=$storyID,assignedTo=$assignedTo,title=$storyTitle,moduleID=$storyModuleID";

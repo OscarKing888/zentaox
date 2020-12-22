@@ -328,6 +328,7 @@ $lang->resource->project->kanbanColsColor  = 'kanbanColsColor';
 $lang->resource->project->export           = 'export';
 $lang->resource->project->storyKanban      = 'storyKanban';
 $lang->resource->project->storySort        = 'storySort';
+$lang->resource->project->exportProgress = 'exportProgress';
 
 $lang->project->methodOrder[0]   = 'index';
 $lang->project->methodOrder[5]   = 'view';

@@ -1569,7 +1569,7 @@ class task extends control
             foreach ($tasks as $k => $task) {
                 $hasChildren = false;
                 foreach ($children as $p => $id) {
-                    error_log("oscar: hasChildren parent:$p = $task->id : $task->name");
+                    //error_log("oscar: hasChildren parent:$p = $task->id : $task->name");
                     if($p == $task->id)
                     {
                         $hasChildren = true;
@@ -1719,6 +1719,26 @@ class task extends control
 
             $tasks = fixer::input('post')->get();
             $batchNum = count(reset($tasks));
+
+            for($i = 0; $i < $batchNum; ++$i)
+            {
+                $taskId      = $tasks->id[$i];
+
+                if($tasks->estimate[$i] == '0000-00-00'
+                || $tasks->estimate[$i] == '')
+                {
+                    //$this->dao->rollBack();
+                    die(js::error("任务[$taskId]预计开始日期不正确，请修正后再提交！"));
+                }
+
+                if($tasks->deadline[$i] == '0000-00-00'
+                || $tasks->deadline[$i] == '')
+                {
+                    //$this->dao->rollBack();
+                    die(js::error("任务[$taskId]截止日期不正确，请修正后再提交！"));
+                }
+            }
+
             for($i = 0; $i < $batchNum; ++$i)
             {
                 $taskId      = $tasks->id[$i];
@@ -1960,5 +1980,14 @@ class task extends control
 
         die(js::reload('parent'));
     }
+
+    /*
+    public function ajaxShowTask($taskId)
+    {
+        //error_log("task.control.ajaxShowTask:" . $taskId);
+        $lnk = helper::createLink('task', 'view', "taskID=$taskId");
+        die($lnk);
+    }
+    //*/
     // oscar]
 }

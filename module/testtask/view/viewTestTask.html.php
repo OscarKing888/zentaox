@@ -105,7 +105,7 @@ include '../../common/view/datatable.fix.html.php';
                         <?php
                         //$storyID = $story->storyDat->id;
                         $assignedTo = $story->storyDat->assignedTo;
-                        $storyTitle = $story->storyDat->title;
+                        $storyTitle = $bugTitle = baseModel::trimTitle($story->storyDat->title);
                         $storyModuleID = $story->storyDat->module;
                         //$productID = $story->product;
                         $createBugParams = "productID=$productID&branch=$story->branch&extras=storyID=$storyID,assignedTo=$assignedTo,title=$storyTitle,moduleID=$storyModuleID";

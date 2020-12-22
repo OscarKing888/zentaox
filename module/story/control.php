@@ -1414,7 +1414,7 @@ class story extends control
      */
     public function export($productID, $orderBy)
     {
-        error_log("story export product:$productID order:$orderBy");
+        //error_log("XXXXXXX: story.control.export product:$productID order:$orderBy");
 
         /* format the fields of every story in order to export data. */
         if($_POST)
@@ -1638,4 +1638,6 @@ class story extends control
         if($id) die(html::select("storys[$id]", $storys, '', 'class="form-control"'));
         die(html::select('story', $storys, '', 'class=form-control'));
     }
+
+
 }

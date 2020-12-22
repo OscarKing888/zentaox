@@ -15,6 +15,6 @@ $config->user->custom->batchEditFields   = 'dept,join,email,commiter';
 
 $config->user->failTimes   = 6;
 $config->user->lockMinutes = 10;
-$config->user->batchCreate = 10;
+$config->user->batchCreate = 30;
 
 $config->user->showDeleted = 0;

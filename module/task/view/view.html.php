@@ -84,9 +84,42 @@
                 <?php else: ?>
                     <fieldset>
                         <legend><?php echo $lang->task->storySpec; ?></legend>
+                        <div class='article-content'>
+                            <?php
+                            $storyTitleDisplay = "<span class='taskIDColor'>#" . $task->story->id . "</span> 【" . $task->storyTitle. "】";
+                            common::printLink('story', 'view', "storyID=".$task->story->id, $storyTitleDisplay, '', "class='iframe' data-width='80%'", true, true);
+                            ?>
+                        </div>
+
+
                         <div class='article-content'><?php echo $task->storySpec; ?></div>
                         <?php echo $this->fetch('file', 'printFiles', array('files' => $task->storyFiles, 'fieldset' => 'false')); ?>
                     </fieldset>
+
+
+                    <fieldset>
+                        <legend><?php echo "需求任务概览"; ?></legend>
+                        <ul class='list-unstyled'>
+                            <?php
+                            //echo var_dump($task->story->tasks);
+                            foreach ($task->story->tasks as $taskgrp) {
+                                foreach($taskgrp as $k => $taskt) {
+                                    //echo "<span> task:" . $taskt->id . "</span>";
+                                    $deptStr = "<span class='confirmedtext'>" . $depts[$taskt->dept] . "</span>";
+                                    echo "<li title='$taskt->name'>" . html::a($this->createLink('task', 'view', "taskID=$taskt->id", '', true),
+                                            $deptStr
+                                            . " - </><span class='taskIDColor'>#" . $taskt->id . "</span>"
+                                            . " - <span class=''>【" . $taskt->name . "】</span>"
+                                            . " - <span class='taskUserNameColor'>" . $users[$taskt->assignedTo] . "</span>  " , '', "class='iframe' data-width='80%'");
+
+                                    common::printIcon('task', 'edit', "taskID=$taskt->id", $taskt, 'icon', '', '_blank');
+                                }
+                            }
+                            ?>
+                        </ul>
+                    </fieldset>
+
+
 
                     <?php if (strpos(",$showFields,", ',verify,') !== false): ?>
                         <fieldset>

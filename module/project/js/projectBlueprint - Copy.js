@@ -64,12 +64,10 @@ var lastX = -1;
 var lastY = 0;
 
 var g_tasks = null;
-var g_tasksFilted = new Array();
-
 var canvas = null;
+var destCanvas = null;
 var context = null;
 var mouseIsDown = false;
-var mousePress = false;
 
 var drawType = EDrawUnit.day;
 
@@ -85,8 +83,7 @@ var g_boundXMax = 0;
 
 var selectedMilestone = 0;
 var selectedDept = 0;
-var selectedUser = '';
-var hitTaskID = -1;
+
 
 function onOrigi()
 {
@@ -326,7 +323,7 @@ function convertStringToDate(dateString)
     //dateString = dateString[1] + '/' + dateString[2] + '/' + dateString[0];
     var outDate = Date.parse(dateString);
     //alert("convertStringToDate: " + dateString + " o:" + outDate);
-    return outDate;
+    return   outDate;
 }
 
 
@@ -357,14 +354,7 @@ $(document).ready(function()
         ajaxGetTasks();
     });
 
-    canvas = document.getElementById("projectCanvas");
-    context = canvas.getContext('2d');
 
-    canvas.onmousemove = onCanvasMouseMove;
-    canvas.onmousedown = onCanvasMouseDown;
-    canvas.onmouseup = onCanvasMouseUp;
-    canvas.onmouseout = onCanvasMouseOut;
-    canvas.onmousewheel = onCanvasMouseWheel;
 
     window.addEventListener("resize", resizeCanvas, false);
     resizeCanvas();
@@ -380,6 +370,22 @@ function setupCanvas()
     if(canvas == null)
     {
         canvas = document.getElementById("projectCanvas");
+
+        destCanvas = document.getElementById("projectCanvas");
+
+        var drawCanvas = canvas;
+        //canvas = document.createElement("canvas");
+        //canvas = new OffscreenCanvas(destCanvas.width, destCanvas.height);
+
+        canvas.width = destCanvas.width;
+        canvas.height = destCanvas.height;
+        context = canvas.getContext('2d');
+
+        drawCanvas.onmousemove = onCanvasMouseMove;
+        drawCanvas.onmousedown = onCanvasMouseDown;
+        drawCanvas.onmouseup = onCanvasMouseUp;
+        drawCanvas.onmouseout = onCanvasMouseOut;
+        drawCanvas.onmousewheel = onCanvasMouseWheel;
     }
 
     if(context == null)
@@ -426,7 +432,6 @@ function onCanvasMouseWheel(evt)
 function onCanvasMouseOut(evt)
 {
     mouseIsDown = false;
-    mousePress = false;
     //console.log("!!!! canvas mouse out !!!!");
 }
 
@@ -460,7 +465,8 @@ function canSee(x, y)
     return false;
 }
 
-function onCanvasMouseMove(evt) {
+function onCanvasMouseMove(evt)
+{
     var mousePos = getMousePos(canvas, evt);
     var message = 'Mouse move position: ' + mousePos.x + ',' + mousePos.y;
     //console.log(message);
@@ -468,26 +474,10 @@ function onCanvasMouseMove(evt) {
 
     //writeMessage(canvas, message, mousePos);
 
-    if (lastX == -1) {
+    if(lastX == -1)
+    {
         lastX = mousePos.x;
         lastY = mousePos.y;
-    }
-
-    if(Math.abs(lastY - mousePos.y) > 5)
-    {
-        mousePress = false;
-    }
-
-    //console.log("mouse onCanvasMouseMove", mousePress);
-
-    var needRedraw = false;
-
-    if(!mouseIsDown)
-    {
-        if (hitTestTask(mousePos.x, mousePos.y) != -1)
-        {
-            needRedraw = true;
-        }
     }
 
     if(mouseIsDown)
@@ -496,11 +486,6 @@ function onCanvasMouseMove(evt) {
         origY += (mousePos.y - lastY) * 5;
         clampMinMaxOrigXY();
 
-        needRedraw = true;
-    }
-
-    if(needRedraw)
-    {
         redraw();
     }
 
@@ -511,33 +496,15 @@ function onCanvasMouseMove(evt) {
 function onCanvasMouseDown(evt)
 {
     mouseIsDown = true;
-    mousePress = true;
-    //console.log("mouse pressed", mousePress);
     var mousePos = getMousePos(canvas, evt);
     var message = 'Mouse Down: ' + mousePos.x + ',' + mousePos.y;
-    //writeMessage(canvas, message, mousePos);
+    writeMessage(canvas, message, mousePos);
 }
 
 function onCanvasMouseUp(evt)
 {
     mouseIsDown = false;
     var mousePos = getMousePos(canvas, evt);
-
-    if(mousePress)
-    {
-        console.log("mouse pressed");
-        hitTestTask(mousePos.x, mousePos.y);
-        if(hitTaskID != -1)
-        {
-            showTask(hitTaskID);
-        }
-        mousePress = false;
-    }
-    else
-    {
-        //console.log("mouse pressed", mousePress);
-    }
-
     var message = 'Mouse Up: ' + mousePos.x + ',' + mousePos.y;
     //writeMessage(canvas, message, mousePos);
 }
@@ -557,12 +524,6 @@ function writeMessage(canvas, message, mousePos) {
 function redraw()
 {
     //  alert("redraw");
-    //var canvasDest = document.getElementById("projectCanvas");
-    //canvas = document.createElement('canvas');
-    //canvas.width = canvasDest.width;
-    //canvas.height = canvasDest.height;
-
-    //context = canvas.getContext('2d');
 
     setupCanvas();
 
@@ -587,12 +548,20 @@ function redraw()
     drawMiniMap();
 
     context.fillStyle = C_TaskColor_StoryTitle;
-    //roundRect(context, origX, origY, 5, 5, 2, true);
-    //context.rect(origX, origX, 10, 10);
+    roundRect(context, origX, origY, 5, 5, 2, true);
 
-    //var contexDest = canvasDest.getContext('2d');
-    //context.clearRect(0, 0, canvas.width, canvas.height);
-    //contexDest.drawImage(canvas, 0, 0);
+    context.rect(origX, origX, 10, 10);
+
+
+    //destContext = destCanvas.getContext('2d');
+    //destContext.clearRect(0, 0, destCanvas.width, destCanvas.height);
+    //destCanvas.width = destCanvas.width;
+    //destContext.fillRect(0, 0, destCanvas.width, destCanvas.height);
+    //destContext.imageSmoothingEnabled = false;
+    //context.imageSmoothingEnabled = false;
+    //destContext.webkitImageSmoothingEnabled = false;
+    //destContext.mozImageSmoothingEnabled = false;
+    //destContext.drawImage(canvas, 0, 0);
 }
 
 function getMousePos(canvas, evt) {
@@ -632,7 +601,6 @@ function ajaxGetTasks()
     {
         //console.log("ajaxGetTasks:", JSON.stringify(r));
         g_tasks = r;
-        updateFiltedTasks();
         //canvas.height = ((g_tasks.length + 6) * (C_Taskbar_Height + C_Taskbar_VSpace));
         //canvas.width = 4096;
         //canvas.height = 2080;
@@ -741,19 +709,12 @@ function drawProjectBlueprintWithMilestone(tasks)
 
     if(tasks != null)
     {
-        //console.log(tasks);
-
         for(var i = 0; i < tasks.length; ++i) {
             //console.log("   drawTasks:", JSON.stringify(tasks[i]));
             var taskPair = tasks[i];
 
             var stroy = taskPair.story;
-
-            var taskCount = 0;
-            if(taskPair.tasks != null)
-            {
-                taskCount = taskPair.tasks.length;
-            }
+            var taskCount = taskPair.tasks.length;
 
             //drawBar(ctx, stroy.taskEndDate, stroy.id, stroy.title, stroy.assignedToRealName, stroy.deptName + "Cnt:" + taskCount,  stroy.taskBeginDate, 'story', g_drawYIdx);
 
@@ -770,7 +731,7 @@ function drawProjectBlueprintWithMilestone(tasks)
             ctx.strokeStyle = "#000000";
 
 
-            for (var j = 0; j < taskCount;++j){
+            for (var j = 0; j < taskPair.tasks.length;++j){
                 var task = taskPair.tasks[j];
                 //console.log("   drawTasks:", i, tasks.name);
                 if (!g_showDelayOnly || (g_showDelayOnly && isTaskDelay(task))) {
@@ -1112,21 +1073,9 @@ function drawBar(ctx, deadline, id, name, user, dept, startDate, status, idx) {
         ctx.fillStyle = C_TaskNameColor;
     }
 
+    ctx.strokeStyle = "#111111";
 
-
-    if(id == hitTaskID)
-    {
-        ctx.lineWidth = 4;
-        ctx.strokeStyle = "#ff0000";
-
-        console.log("draw hit task:", id);
-    }
-    else
-    {
-        ctx.lineWidth = 2;
-        ctx.strokeStyle = "#111111";
-    }
-
+    ctx.lineWidth = 2;
     ctx.font = C_TaskNameFont;
     var idStr = "[" + id + "]  " + name;
     if(needDraw)
@@ -1273,114 +1222,5 @@ function roundRect(ctx, x, y, width, height, radius, fill, stroke) {
 
     //ctx.restore();
 }
-
-function hitTestTask(x, y)
-{
-    hitTaskID = -1;
-
-    if (selectedMilestone == 0) {
-        hitTaskID = hitTestTaskNoMilestone(x, y);
-    }
-    else
-    {
-        hitTaskID = hitTestTaskWithMilestone(x, y);
-    }
-
-    if(hitTaskID != -1)
-    {
-        console.log("hit task:", hitTaskID);
-    }
-
-    return hitTaskID;
-}
-
-function hitTestTaskNoMilestone(x, y)
-{
-    console.log("x:", x, "y:", y);
-
-    if(g_tasksFilted != null)
-    {
-        //drawYIdx = 0;
-        for(var i = 0; i < g_tasksFilted.length; ++i)
-        {
-            //if(!g_showDelayOnly || (g_showDelayOnly && isTaskDelay(g_tasksFilted[i])))
-            {
-                var beginY = (origY - C_RulerHeight * 3) + (C_Taskbar_Height + C_Taskbar_VSpace) * (i) + C_RulerHeight * 3;
-                var endY = C_Taskbar_Height + beginY;
-                if(y >= beginY && y <= endY)
-                {
-                    console.log("x:", x, "y:", y, "hit task:", g_tasksFilted[i]);
-                    return g_tasksFilted[i].id;
-                }
-
-                //++drawYIdx;
-            }
-        }
-    }
-
-    return -1;
-}
-
-function hitTestTaskWithMilestone(x, y)
-{
-    return -1;
-}
-
-function showTask(taskId)
-{
-    url = createLink('task', 'view', 'taskID=' + taskId);
-    window.open(url);
-    //console.log('press task:' + url);
-
-    //url = createLink('task', 'ajaxShowTask', 'taskID=' + taskId);
-    /*
-    $.get(link, function(r)
-    {
-        console.log('press task:' + r);
-        window.open(r);
-    });
-    //*/
-}
-
-function updateFiltedTasks()
-{
-    g_tasksFilted.length = 0;
-    var tasks = g_tasks;
-
-    if (selectedMilestone == 0)
-    {
-        for(var i = 0; i < tasks.length; ++i)
-        {
-            if(!g_showDelayOnly || (g_showDelayOnly && isTaskDelay(tasks[i])))
-            {
-                g_tasksFilted.push(tasks[i]);
-            }
-        }
-    }
-    else
-    {
-        for(var i = 0; i < tasks.length; ++i)
-        {
-            var taskPair = tasks[i];
-
-            var taskCnt = 0;
-            if(taskPair.tasks != null)
-            {
-                taskCnt = taskPair.tasks.length;
-            }
-
-            for (var j = 0; j < taskCnt; ++j)
-            {
-                var task = taskPair.tasks[j];
-
-                if (!g_showDelayOnly || (g_showDelayOnly && isTaskDelay(task)))
-                {
-                    g_tasksFilted.push(task);
-                }
-            }
-        }
-    }
-}
-
 
 onZoomMonth();

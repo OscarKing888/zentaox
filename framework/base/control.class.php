@@ -570,6 +570,8 @@ class baseControl// extends  debugUtil
      */
     public function parse($moduleName = '', $methodName = '')
     {
+        //error_log("XXXXXXX: baseControl.parse moduleName:$moduleName methodName:$methodName");
+
         if(empty($moduleName)) $moduleName = $this->moduleName;
         if(empty($methodName)) $methodName = $this->methodName;
 
@@ -590,6 +592,8 @@ class baseControl// extends  debugUtil
      */
     public function parseJSON($moduleName, $methodName)
     {
+        //error_log("XXXXXXX: baseControl.parseJSON module:$moduleName method:$methodName");
+
         unset($this->view->app);
         unset($this->view->config);
         unset($this->view->lang);
@@ -618,6 +622,8 @@ class baseControl// extends  debugUtil
      */
     public function parseDefault($moduleName, $methodName)
     {
+        //error_log("XXXXXXX: baseControl.parseDefault module:$moduleName method:$methodName hookFiles:$hookFiles");
+
         /**
          * 设置视图文件。(PHP7有一个bug，不能直接$viewFile = $this->setViewFile())。
          * Set viewFile. (Can't assign $viewFile = $this->setViewFile() directly because one php7's bug.)

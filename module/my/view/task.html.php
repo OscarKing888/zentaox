@@ -66,7 +66,25 @@
       <td><?php echo $task->consumed;?></td>
       <td><?php echo $task->left;?></td>
       <td class='<?php if(isset($task->delay)) echo 'delayed';?>'><?php if(substr($task->deadline, 0, 4) > 0) echo $task->deadline;?></td>
-      <td class='task-<?php echo $task->status;?>'><?php echo $lang->task->statusList[$task->status];?></td>
+      <td class='task-<?php echo $task->status;?>'>
+          <?php
+          $taskStatus = 'wait';
+          //echo $child->status
+          if(!$task->checkedStatus)
+          {
+              if($task->status == 'done'){
+                  $taskStatus = 'wait_check';
+              }
+              else {
+                  $taskStatus = $task->status;
+              }                        }
+          else
+          {
+              $taskStatus = 'checked';
+          }
+          echo $lang->task->statusList[$taskStatus];
+          ?>
+      </td>
       <td class='text-right'>
         <?php
         //common::printIcon('task', 'assignTo', "projectID=$task->project&taskID=$task->id", $task, 'list', 'hand-right', '', 'iframe', true);

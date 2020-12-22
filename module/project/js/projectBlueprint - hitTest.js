@@ -63,7 +63,7 @@ var origY = C_RulerHeight * 3;
 var lastX = -1;
 var lastY = 0;
 
-var g_tasks = null;
+var g_tasks = new Array();
 var g_tasksFilted = new Array();
 
 var canvas = null;
@@ -675,7 +675,8 @@ function ajaxGetTasks()
 
 function drawBg()
 {
-    setupCanvas();
+    //setupCanvas();
+
     //var canvas = document.getElementById("projectCanvas");
     ctx = context;
     ctx.save();
@@ -741,19 +742,12 @@ function drawProjectBlueprintWithMilestone(tasks)
 
     if(tasks != null)
     {
-        //console.log(tasks);
-
         for(var i = 0; i < tasks.length; ++i) {
             //console.log("   drawTasks:", JSON.stringify(tasks[i]));
             var taskPair = tasks[i];
 
             var stroy = taskPair.story;
-
-            var taskCount = 0;
-            if(taskPair.tasks != null)
-            {
-                taskCount = taskPair.tasks.length;
-            }
+            var taskCount = taskPair.tasks.length;
 
             //drawBar(ctx, stroy.taskEndDate, stroy.id, stroy.title, stroy.assignedToRealName, stroy.deptName + "Cnt:" + taskCount,  stroy.taskBeginDate, 'story', g_drawYIdx);
 
@@ -770,7 +764,7 @@ function drawProjectBlueprintWithMilestone(tasks)
             ctx.strokeStyle = "#000000";
 
 
-            for (var j = 0; j < taskCount;++j){
+            for (var j = 0; j < taskPair.tasks.length;++j){
                 var task = taskPair.tasks[j];
                 //console.log("   drawTasks:", i, tasks.name);
                 if (!g_showDelayOnly || (g_showDelayOnly && isTaskDelay(task))) {
@@ -1118,8 +1112,6 @@ function drawBar(ctx, deadline, id, name, user, dept, startDate, status, idx) {
     {
         ctx.lineWidth = 4;
         ctx.strokeStyle = "#ff0000";
-
-        console.log("draw hit task:", id);
     }
     else
     {
@@ -1285,19 +1277,10 @@ function hitTestTask(x, y)
     {
         hitTaskID = hitTestTaskWithMilestone(x, y);
     }
-
-    if(hitTaskID != -1)
-    {
-        console.log("hit task:", hitTaskID);
-    }
-
-    return hitTaskID;
 }
 
 function hitTestTaskNoMilestone(x, y)
 {
-    console.log("x:", x, "y:", y);
-
     if(g_tasksFilted != null)
     {
         //drawYIdx = 0;
@@ -1305,11 +1288,10 @@ function hitTestTaskNoMilestone(x, y)
         {
             //if(!g_showDelayOnly || (g_showDelayOnly && isTaskDelay(g_tasksFilted[i])))
             {
-                var beginY = (origY - C_RulerHeight * 3) + (C_Taskbar_Height + C_Taskbar_VSpace) * (i) + C_RulerHeight * 3;
+                var beginY = origY + (C_Taskbar_Height + C_Taskbar_VSpace)* (i - 1);
                 var endY = C_Taskbar_Height + beginY;
                 if(y >= beginY && y <= endY)
                 {
-                    console.log("x:", x, "y:", y, "hit task:", g_tasksFilted[i]);
                     return g_tasksFilted[i].id;
                 }
 
@@ -1363,13 +1345,7 @@ function updateFiltedTasks()
         {
             var taskPair = tasks[i];
 
-            var taskCnt = 0;
-            if(taskPair.tasks != null)
-            {
-                taskCnt = taskPair.tasks.length;
-            }
-
-            for (var j = 0; j < taskCnt; ++j)
+            for (var j = 0; j < taskPair.tasks.length; ++j)
             {
                 var task = taskPair.tasks[j];
 

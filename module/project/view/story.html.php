@@ -171,7 +171,10 @@
                         //oscar:
                         $storyID = $story->id;
                         $assignedTo = $story->assignedTo;
-                        $storyTitle = $story->title;
+                        $storyTitle = $bugTitle = baseModel::trimTitle($story->title);
+                        //$storyTitle = preg_replace('/\s+/', '', ($story->title));
+                        //$storyTitle = str_replace('[', '【', $storyTitle);
+                        //$storyTitle = str_replace(']', '】', $storyTitle);
                         $storyModuleID = $story->module;
                         $productID = $story->product;
                         $createBugParams = "productID=$productID&branch=$story->branch&extras=storyID=$storyID,assignedTo=$assignedTo,title=$storyTitle,moduleID=$storyModuleID";
@@ -259,7 +262,7 @@
             </tbody>
             <tfoot>
             <tr>
-                <td colspan='<?php echo 12; ?>'>
+                <td colspan='<?php echo 11; ?>'>
                     <div class='table-actions clearfix'>
                         <?php
                         $storyInfo = sprintf($lang->project->productStories, inlink('linkStory', "project={$project->id}"));
@@ -303,6 +306,12 @@
                         $memberPairs = $deptUsers;
                         $actionLink = $this->createLink('story', 'batchAssignTo', "productID=$productID");
 
+                        $deptPairs = array();
+                        foreach ($depts as $key => $val) {
+                            $deptPairs[$key] = $val;
+                            //echo "dept $key -> $val <br>";
+                        }
+                        /*
                         echo "<div class='btn-group dropup'>";
                         echo "<button id='taskBatchAssignTo' type='button' class='btn dropdown-toggle' data-toggle='dropdown'>" . $lang->story->assignedTo . "<span class='caret'></span></button>";
                         echo "<ul class='dropdown-menu' id='taskBatchAssignToMenu'>";
@@ -314,6 +323,29 @@
                             //$actionLink = $this->createLink('story', 'batchAssignTo', "productID=$productID");
                             echo "<li>" . html::a("javascript:$(\"#assignedTo\").val(\"$key\");setFormAction(\"$actionLink\", \"hiddenwin\" )", $value, '', '') . '</li>';
                         }
+                        //*/
+
+                        echo "<div class='btn-group dropup'>";
+                        echo "<button id='taskBatchAssignTo' type='button' class='btn dropdown-toggle' data-toggle='dropdown'>" . $lang->story->assignedTo . "<span class='caret'></span></button>";
+                        echo "<ul class='dropdown-menu' id='taskBatchAssignToMenu'>";
+                        echo html::select('assignedTo', $memberPairs, '', 'class="hidden"');
+
+                        foreach ($deptWithUsers as $key => $value) {
+                            if (empty($key)) continue;
+                            echo '<li class="dropdown-submenu">';
+                            echo html::a('javascript:;', $deptPairs[$key], '', "id='dept-id-$key'");
+                            echo '<ul class="dropdown-menu">';
+                            foreach($value as $account => $realName)
+                            {
+                                //$actionLink = $this->createLink('story', 'batchAssignTo', "productID=$productID");
+                                $actionLink = $this->createLink('story', 'batchAssignTo', "");
+                                echo "<li class='option' data-key='$account'>" . html::a("javascript:$(\"#assignedTo\").val(\"$account\");setFormAction(\"$actionLink\", \"hiddenwin\");", $realName, '', '') . '</li>';
+                            }
+                            echo '</li>';
+                            echo '</ul>';
+                        }
+
+
                         echo "</ul>";
                         //if ($withSearch) echo "<div class='menu-search'><div class='input-group input-group-sm'><input type='text' class='form-control' placeholder=''><span class='input-group-addon'><i class='icon-search'></i></span></div></div>";
                         echo "</div></li>";

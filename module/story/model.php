@@ -1796,7 +1796,7 @@ class storyModel extends model
 
             $orderBySafe = str_replace("order_desc,", "", $orderBy);
             $orderBySafe = str_replace("desc,", "", $orderBySafe);
-            error_log("order by:$orderBy new:$orderBySafe");
+            //error_log("order by:$orderBy new:$orderBySafe");
             $orderBy = $orderBySafe;
 
             $stories = $this->dao->select('*')->from(TABLE_STORY)//->alias('t1')

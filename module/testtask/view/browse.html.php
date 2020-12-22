@@ -87,7 +87,7 @@ $status = $this->session->testTaskVersionStatus;
     </tbody>
     <tfoot>
     <tr>
-        <td colspan='5'><?php $pager->show(); ?></td>
+        <td colspan='6'><?php $pager->show(); ?></td>
     </tr>
     </tfoot>
 </table>

@@ -144,7 +144,7 @@ class project extends control
      */
     public function task($projectID = 0, $status = 'unclosed', $param = 0, $moduleType='byMilestone', $orderBy = '', $recTotal = 0, $recPerPage = 100, $pageID = 1)
     {
-        //error_log("oscar: project-task: status:$status param:$param");
+        //error_log("------------------: project-task: status:$status param:$param moduleType:$moduleType");
 
         $this->loadModel('tree');
         $this->loadModel('search');
@@ -153,15 +153,27 @@ class project extends control
 
         $this->project->getLimitedProject();
 
-        // oscar
-        $milestones = $this->project->getMilestonesPairs($projectID);
-        $this->view->milestones = $milestones;
-        $this->view->milestone = $param;
-        // oscar
 
         /* Set browse type. */
         $browseType = strtolower($status);
         if ($this->config->global->flow == 'onlyTask' and $browseType == 'byproduct') $param = 0;
+
+
+
+        // oscar
+
+        //var_dump($param);
+
+        $milestone = $param;
+        if($milestone == 'myQueryID') {
+            $milestone = $this->app->session->milestone;
+            //error_log("GET milestone from session <<< :$milestone");
+        }
+
+        $milestones = $this->project->getMilestonesPairs($projectID);
+        $this->view->milestones = $milestones;
+        $this->view->milestone = $milestone;
+        // oscar
 
         /* Get products by project. */
         $project = $this->commonAction($projectID, $status);
@@ -196,9 +208,11 @@ class project extends control
             //$moduleID = 0;
         }
 
-        if($moduleType == 'byMilestone')
+        if($milestone != 'myQueryID')
         {
-            $moduleID = $param;
+            $moduleID = $milestone;
+            $this->app->session->set('milestone', $milestone);
+            //error_log("SET milestone to session >>> :$milestone");
         }
 
         // oscar]
@@ -672,6 +686,7 @@ class project extends control
         //oscar:
         $this->loadModel('dept');
         $this->dept->setupDeptUsers($this->view, $this->app->user->account, $this->app->user->dept);
+        $this->dept->setupDeptWithUsers($this->view);
 
         $this->loadModel('pipeline');
         $this->pipeline->setupOptionMenu($this->view);
@@ -2070,7 +2085,12 @@ class project extends control
      */
     public function export($status, $productID, $orderBy)
     {
+        //error_log("XXXXXXX: project.control.export product:$productID order:$orderBy post:$this->post");
+
         if ($_POST) {
+
+            //error_log("XXXXXXX: project.control.export.post product:$productID order:$orderBy");
+
             $projectLang = $this->lang->project;
             $projectConfig = $this->config->project;
 
@@ -2412,6 +2432,8 @@ class project extends control
 
         /* Save session. */
         $this->app->session->set('storyList', $this->app->getURI(true));
+        $this->app->session->set('mileStoneParamater', $param);
+        $this->app->session->set('mileStoneQueryType', $type);
 
         /* Process the order by field. */
         if (!$orderBy) $orderBy = $this->cookie->projectStoryOrder ? $this->cookie->projectStoryOrder : 'pri';
@@ -2781,5 +2803,153 @@ class project extends control
 
 
 
+    /**
+     * get data to export
+     *
+     * @param  int $productID
+     * @param  string $orderBy
+     * @access public
+     * @return void
+     */
+    public function exportProgress($productID, $projectID, $orderBy)
+    {
+        //error_log("XXXXXXX: project.control.exportProgress product:$productID order:$orderBy post:$this->post");
 
+        /* format the fields of every story in order to export data. */
+        if($_POST)
+        {
+            //error_log("XXXXXXX: project.control.exportProgress.post product:$productID order:$orderBy post:". print_r($_POST, 1));
+
+            $this->loadModel('story');
+            $this->loadModel('user');
+            $this->loadModel('project');
+
+            $param = $this->app->session->mileStoneParamater;
+            $type = $this->app->session->mileStoneQueryType;
+
+            $milestones = $this->project->getMilestonesPairs($projectID);
+
+            /* Process the order by field. */
+            if (!$orderBy) $orderBy = $this->cookie->projectStoryOrder ? $this->cookie->projectStoryOrder : 'pri';
+            setcookie('projectStoryOrder', $orderBy, $this->config->cookieLife, $this->config->webRoot);
+
+            /* Append id for secend sort. */
+            $sort = $this->loadModel('common')->appendOrder($orderBy);
+
+            $queryID = 0;//($type == 'bySearch') ? (int)$param : 0;
+            $project = $this->commonAction($projectID);
+            $projectID = $project->id;
+
+
+            /* Load pager. */
+            //$this->app->loadClass('pager', $static = true);
+            //$pager = new pager($recTotal, $recPerPage, $pageID);
+
+            $stories = $this->story->getProjectStories($projectID, $sort, $type, $param, null);
+            //error_log("=========");
+            //error_log(print_r($stories, 1));
+            //error_log("=========");
+
+            $this->loadModel('common')->saveQueryCondition($this->dao->get(), 'story', false);
+            $users = $this->user->getPairs('noletter');
+
+            //error_log("=========");
+            //error_log(print_r($users, 1));
+            //error_log("=========");
+
+            /* Get project's product. */
+            $productID = 0;
+            $productPairs = $this->loadModel('product')->getProductsByProject($projectID);
+            if ($productPairs) $productID = key($productPairs);
+
+            /* Build the search form. */
+            $modules = array();
+            $projectModules = $this->loadModel('tree')->getTaskTreeModules($projectID, true);
+            $products = $this->project->getProducts($projectID);
+            foreach ($products as $product) {
+                $productModules = $this->tree->getOptionMenu($product->id);
+                foreach ($productModules as $moduleID => $moduleName) {
+                    if ($moduleID and !isset($projectModules[$moduleID])) continue;
+                    $modules[$moduleID] = ((count($products) >= 2 and $moduleID) ? $product->name : '') . $moduleName;
+                }
+            }
+            $actionURL = $this->createLink('project', 'story', "projectID=$projectID&orderBy=$orderBy&type=bySearch&queryID=myQueryID");
+            $branchGroups = $this->loadModel('branch')->getByProducts(array_keys($products), 'noempty');
+            $this->project->buildStorySearchForm($products, $branchGroups, $modules, $queryID, $actionURL, 'projectStory');
+
+            /* Header and position. */
+            $title = $project->name . $this->lang->colon . $this->lang->project->story;
+            $position[] = html::a($this->createLink('project', 'browse', "projectID=$projectID"), $project->name);
+            $position[] = $this->lang->project->story;
+
+            /* Count T B C */
+            $storyIdList = array_keys($stories);
+            $storyTasks = $this->loadModel('task')->getStoryTaskCounts($storyIdList, $projectID);
+            $storyBugs = $this->loadModel('bug')->getStoryBugCounts($storyIdList, $projectID);
+            $storyCases = $this->loadModel('testcase')->getStoryCaseCounts($storyIdList);
+
+            $projectLang = $this->lang->story;
+            $projectConfig = $this->config->project;
+
+            $fields = $this->post->exportFields ? $this->post->exportFields : explode(',', $projectConfig->list->exportProgressFields);
+            foreach ($fields as $key => $fieldName) {
+                $fieldName = trim($fieldName);
+                $fields[$fieldName] = zget($projectLang, $fieldName);
+                unset($fields[$key]);
+            }
+
+            foreach($stories as $story)
+            {
+                //$story->openedBy = $users[$story->openedBy] . "测试";
+                $story->assignedTo = $users[$story->assignedTo];
+                $story->openedBy = $users[$story->openedBy];
+                $story->deadline = helper::today();
+                $story->taskProgress = $story->taskProgress . "%";
+                $story->storyProgress = $story->storyProgress . "%";
+
+                $story->openedDate = date('Y-m-d', strtotime($story->openedDate));
+                $story->assignedDate = date('Y-m-d', strtotime($story->assignedDate));
+
+                $storyTsks = $this->task->getStoryTasks($story->id, $projectID);
+
+                //error_log("========= storyTsks");
+                //error_log(print_r($storyTsks, 1));
+
+                $deadline = date("Y-m-d", strtotime("1000-01-01"));
+                foreach ($storyTsks as $tsk) {
+                    $tskDdline = date("Y-m-d", strtotime($tsk->deadline));
+                    if($tskDdline > $deadline)
+                    {
+                        //error_log("task deadline: $tskDdline orig:$tsk->deadline");
+                        $deadline = $tsk->deadline;
+                    }
+                }
+
+                $story->deadline = $deadline;
+                //error_log("stroy $story->id deadline:" . $deadline);
+
+                if(isset($storyTasks[$story->id]))     $story->taskCountAB = $storyTasks[$story->id];
+                if(isset($storyBugs[$story->id]))      $story->bugCountAB  = $storyBugs[$story->id];
+                //if(isset($storyCases[$story->id]))     $story->caseCountAB = $storyCases[$story->id];
+            }
+
+
+            //error_log( $stories);
+            // write(print_r($stories, 1));
+            //error_log("========= storyTasks");
+            //error_log(print_r($stories, 1));
+            //error_log(print_r($storyTasks, 1));
+            //error_log("=========");
+
+
+            $this->post->set('fields', $fields);
+            $this->post->set('rows', $stories);
+            $this->post->set('kind', 'story');
+            $this->fetch('file', 'export2' . $this->post->fileType, $_POST);
+        }
+
+        $this->view->allExportFields = $this->config->project->list->exportFields;
+        $this->view->customExport    = false;
+        $this->display();
+    }
 }
