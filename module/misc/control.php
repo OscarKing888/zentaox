@@ -175,6 +175,12 @@ class misc extends control
         $this->view->version  = $version;
         $this->view->features = zget($this->lang->misc->feature->all, $version, '');
 
+        //FIXME 触发修复team表的projectId
+        if($version == '9.0.fix'){
+            $this->misc->fixTeamProjectId();
+            die('fixed team projectId');
+        }
+
         $detailed      = '';
         $changeLogFile = $this->app->getBasePath() . 'doc' . DS . 'CHANGELOG';
         if(file_exists($changeLogFile))

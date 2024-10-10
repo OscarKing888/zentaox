@@ -25,7 +25,7 @@ class testreport extends control
         $this->loadModel('project');
         $this->loadModel('product');
         $this->loadModel('story');
-        $this->loadModel('build');
+        $this->loadModel('buildex');
         $this->loadModel('bug');
         $this->loadModel('tree');
         $this->loadModel('testcase');

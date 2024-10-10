@@ -40,7 +40,7 @@ function loadModuleRelated()
 {
     moduleID  = $('#module').val();
     productID = $('#product').val();
-    setAssignedTo(moduleID, productID);
+    //setAssignedTo(moduleID, productID);
     setStories(moduleID, productID);
 }
 
@@ -96,7 +96,7 @@ function hideXIcon(templateID)
 
 $(function()
 {
-    if($('#project').val()) loadProjectRelated($('#project').val());
+    //if($('#project').val()) loadProjectRelated($('#project').val());
     $('#saveTplModal').on('hide.zui.modal', function(){$(this).find('#title').val('');});
     $('#saveTplBtn').click(function(){$('#saveTplModal').modal('show');});
     $('#saveTplModal #submit').click(function()
@@ -123,7 +123,7 @@ $(function()
     {
         var $group = $('#bugTypeInputGroup');
         var width = $group.width(), addonWidth = 0;
-        var $controls = $group.children('.form-control');
+        var $controls = $group.find('.chosen-single');
         $group.children('.input-group-addon').each(function()
         {
             addonWidth += $(this).outerWidth();

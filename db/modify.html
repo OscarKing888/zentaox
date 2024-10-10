@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+************************************************************
+千万不要用HTML保留字作为DB字段名，如：
+desc, checked
+************************************************************
+
+
+*指定动作按钮图标
+$lang->icons['checkByGD']              = 'review';
+$lang->icons['finish']             = 'ok-sign';
+
+*icon定义位置
+zh-cn.blackberry.css
+
+*如何让动作按钮变灰
+public static function isClickable($task, $action)
+if($action == 'checkbygd')   return $task->status == 'done'; // 注意要小写
+
+*主菜单
+$lang->menu->testtask  = '测试单|testtask|index';
+$lang->menuOrder
+
+*模块菜单
+$lang->testtask->menu = new stdclass();
+$lang->menu->testtask  = '测试单|testtask|index';
+
+*子菜单
+$lang->project->featureBar['task']['checkByMe']   = $lang->project->checkByMe;
+
+*激活子菜单
+$this->view->browseType = 'projectBlueprint';
+
+并在相应的VIEW加JS代码:
+$('#modulemenu .nav li[data-id=<?php echo $browseType?>]').addClass('active');
+
+*设置菜单工程显示
+//$productID = $this->product->saveState($productID, $this->products);
+$this->testtask->setMenu($this->products, $productID, 0);
+
+
+*显示到权限设置表
+$lang->resource->project->productMilestone = 'productMilestone';
+
+*修改搜索字段
+$config->project->search['fields']['checkBy']        = $lang->task->checkBy;
+$config->project->search['fields']['dept']           = $lang->task->dept; // oscar
+$config->project->search['params']['dept']           = array('operator' => '=', 'control' => 'select',  'values' => $lang->task->deptList); // oscar
+$config->project->search['params']['checkBy']        = array('operator' => '=', 'control' => 'select',  'values' => 'users'); // oscar
+
+function buildTaskSearchForm()
+
+
+*如何修改显示表头相关：
+$config->story->datatable->fieldList['taskCount']['title']    = 'T';
+
+printHeader
+printCell
+
+*header/footer
+public static function printModuleMenu($moduleName)
+
+非管理员账号看不到新加的项目子模块，需要类似添加：
+$lang->resource->project->buildex = 'buildex';
+权限设置在“项目视图”组
+
+*修改部门后需要检查列表配置
+$lang->task->deptList
+
+*导出CSV字段配置
+$config->task->exportFields
+
+
+*修改弹出框大小
+all.js
+ln:4205 var f = { width: '80%', height: "
+
+*添加部门名
+$depts = array('' => '') + $this->loadModel('dept')->getOptionMenu();
+$deptNames = explode('/', $depts[$task->dept]);
+$deptName = " - <span class='task-dept'>" . $deptNames[count($deptNames) - 1] . "</span>";
+
+
+
+<p>
+    =============
+    element { property:value; property:value}
+
+    element Selector
+    h p h1
+
+    =============
+    id Selector
+    #id
+
+    =============
+    class Selector
+    .class
+    .center
+
+    p.center
+
+    =============
+    Universal Selector
+    * {
+    text-align: center;
+    color: blue;
+    }
+
+    =============
+    group selector
+    h1, h2, p {
+    text-align: center;
+    color: red;
+    }
+
+    =============
+    a:link {
+    text-decoration: none;
+    }
+
+    a:visited {
+    text-decoration: none;
+    }
+
+    a:hover {
+    text-decoration: underline;
+    }
+
+    a:active {
+    text-decoration: underline;
+    }
+
+    =============
+    descendant selector (space)
+    child selector (>)
+    adjacent sibling selector (+)
+    general sibling selector (~)
+</p>
+
+<p>
+
+    主要是MSVC 2015 redist
+
+    https://blog.csdn.net/qq_32320151/article/details/86371278
+    1.写在前面
+
+    1-1.ImageMagick介绍
+
+    ImageMagick是一套功能强大、稳定而且开源的工具集和开发包，可以用来读、写和处理超过89种基本格式的图片文件，包括流行的TIFF、JPEG、GIF、 PNG、PDF以及PhotoCD等格式。利用ImageMagick，你可以根据web应用程序的需要动态生成图片, 还可以对一个（或一组）图片进行改变大小、旋转、锐化、减色或增加特效等操作，并将操作的结果以相同格式或其它格式保存，对图片的操作，即可以通过命令行进行，也可以用C/C++、Perl、Java、PHP、Python或Ruby编程来完成。
+
+    ps：php本身和wamp等集成环境默认是没有安装的哦，默认只有GD库那些
+
+    1-2.安装需要安装哪些文件？
+
+    安装ImageMagick，首先需要安装php的扩展文件，（php_imagick.dll），这个文件使php可调用ImageMagick提供的接口， 
+    然后需要安装ImageMagick软件，这个软件和之前的不同，这个软件有很多平台的版本，win，mac，linux都有，为php_imagick.dll提供接口。
+
+    1-3.是否需要php_imagick.dll和ImageMagick编译环境一样？
+
+    不需要
+
+    2.安装步骤
+
+    2-1.下载php_imagick.dll
+
+    点击以下链接，选择合适的版本，然后下载 （先选php版本，再选是Thread Safe版本还是Non Thread Safe版本的，最后看wamp是64位还是32位；这里不是电脑的操作系统64位还是32位！！注意！！）
+
+    问：怎么看php是Thread Safe版本还是Non Thread Safe版本？
+
+    答：通过phpinfo()函数，如果Thread Safety是enable，就是Thread Safe版本的；如果Thread Safety是disable，就是Non Thread Safe版本啦！如下图所示（本人的php是Thread Safety版本的）
+
+
+
+    问：怎么看wamp是64位还是32位？
+
+    答：还是通过phpinfo()函数，Architecture是X86就是32位
+
+
+
+    2-2.安装php_imagick.dll
+
+    http://www.peewit.fr/imagick/ 
+    http://pecl.php.net/package/imagick
+
+    把php_imagick.dll文件，将它放入php的扩展文件目录，我的是目录是”D:\wamp\bin\php\php5.5.12\ext”；
+    把下载的imagick扩展文件里面的CORE_*.dll的8个文件放到php安装根目录下；我的是目录是D:\wamp\bin\php\php5.5.12
+     
+
+    (本人在上面第一个链接下载的imagick拓展文件是不需要编译的)
+    2-3.修改php.ini，引入扩展文件
+
+    extension=php_imagick.dll
+
+    2-4.在命令行切换到php的目录，看imagick扩展是否加载成功
+
+    命令：php -m
+
+    例：
+
+    2-5.在cmd命令行下imagick扩展加载成功，使用phpinfo（）函数，未显示加载imagick成功
+
+    因为cmd下加载的是php目录下的php.ini的配置；phpinfo（）函数中加载的是apache目录下的bin文件夹，php.ini配置文件。
+
+    需要将把下载的imagick扩展文件里面的CORE_*.dll的8个文件放到安装apache的bin文件夹下，例：C:\wamp\bin\apache\apache2.4.9\bin
+
+    2-6.下载imagemagick
+
+    cmd命令：php --ri imagick
+
+    http://ftp.icm.edu.pl/packages/ImageMagick/binaries/
+
+    注：如果安装ImageMagick软件时，软件没有建立系统变量，需要另外 新建一个系统环境变量名为MAGICK_HOME，值为E:\你的imagick路径\modules\coders， 这步主要用来定位imagemagick的module，很重要。( 否则支持的图片格式数量默认为0 ImageMagick number of supported formats:  => 0 )
+    ————————————————
+    版权声明：本文为CSDN博主「qq_32320151」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。
+    原文链接：https://blog.csdn.net/qq_32320151/article/details/86371278
+</p>
+</body>
+</html>

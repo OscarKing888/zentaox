@@ -48,6 +48,10 @@ class searchModel extends model
         $groupAndOr = strtoupper($this->post->groupAndOr);
         if($groupAndOr != 'AND' and $groupAndOr != 'OR') $groupAndOr = 'AND';
         $scoreNum = 0;
+
+        //error_log("==== buildQuery Start");
+        $msg = "";
+
         for($i = 1; $i <= $groupItems * 2; $i ++)
         {
             /* The and or between two groups. */
@@ -60,11 +64,16 @@ class searchModel extends model
             $operatorName = "operator$i";
             $valueName    = "value$i";
 
+
             /* Skip empty values. */
             if($this->post->$fieldName == 'activatedCount' and $this->post->$valueName == '0') $this->post->$valueName = 'ZERO';
             if($this->post->$valueName == false) continue;
             if($this->post->$valueName == 'null') $this->post->$valueName = '';  // Null is special, stands to empty.
             if($this->post->$valueName == 'ZERO') $this->post->$valueName = 0;   // ZERO is special, stands to 0.
+
+            //oscar[
+            //if($this->post->$fieldName == 'checkedStatus' and $this->post->$valueName == '0') continue;
+            // oscar]
 
             $scoreNum += 1;
 
@@ -76,6 +85,9 @@ class searchModel extends model
             $value    = $this->post->$valueName;
             $operator = $this->post->$operatorName;
             if(!isset($this->lang->search->operators[$operator])) $operator = '=';
+
+            //erro_log("==== buildQuery: filedName:" . $fieldName . " value:" . $value);
+            $msg = "==== buildQuery: $fieldName:" . $this->post->$fieldName . " value:" . $value . "\r\n";
 
             /* Set condition. */
             $condition = '';
@@ -123,6 +135,9 @@ class searchModel extends model
 
         $where .=" ))";
         $where  = $this->replaceDynamic($where);
+
+        //error_log("==== buildQuery:$msg");
+        //error_log("==== buildQuery:$where");
 
         /* Save to session. */
         $querySessionName = $this->post->module . 'Query';

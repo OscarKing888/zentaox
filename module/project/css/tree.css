@@ -33,3 +33,5 @@
 .main > .panel > .panel-heading > .panel-actions {margin-top: -8px; margin-right: -12px;}
 
 .label-task-count {background: #ddd; color: #333}
+
+.red {color: #b90000;font-weight:bold}

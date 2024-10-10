@@ -42,7 +42,7 @@ $lang->project->progress      = '进度';
 $lang->project->hours         = '预计 %s 消耗 %s 剩余 %s';
 $lang->project->viewBug       = '查看bug';
 $lang->project->noProduct     = "无{$lang->productCommon}{$lang->projectCommon}";
-$lang->project->createStory   = "新增需求";
+$lang->project->createStory   = "添加需求";
 $lang->project->all           = '所有';
 $lang->project->undone        = '未完成';
 $lang->project->unclosed      = '未关闭';
@@ -107,6 +107,8 @@ $lang->project->story            = '需求列表';
 $lang->project->bug              = 'Bug列表';
 $lang->project->dynamic          = '动态';
 $lang->project->build            = '版本列表';
+$lang->project->buildex          = '版本列表(新)';
+$lang->project->burnex           = '人力统计';
 $lang->project->testtask         = '测试任务';
 $lang->project->burn             = '燃尽图';
 $lang->project->baseline         = '基准线';
@@ -137,10 +139,16 @@ $lang->project->updateOrder      = '排序';
 $lang->project->tree             = '树状图';
 $lang->project->storyKanban      = '需求看板';
 $lang->project->storySort        = '需求排序';
+$lang->project->createTestTask        = '提交测试';
 
 /* 分组浏览。*/
-$lang->project->allTasks             = '所有';
-$lang->project->assignedToMe         = '指派给我';
+$lang->project->allTasks     = '所有';
+$lang->project->assignedToMe = '指派给我';
+$lang->project->myInvolved   = '由我参与';
+$lang->project->mydept   = '我的部门';
+$lang->project->checkByMe   = '待我验收';
+$lang->project->checkedByMe   = '我已验收';
+
 
 $lang->project->statusSelects['']             = '更多';
 $lang->project->statusSelects['wait']         = '未开始';
@@ -179,12 +187,15 @@ $lang->project->beginAndEnd     = '起止时间';
 $lang->project->lblStats        = '工时统计';
 $lang->project->stats           = '可用工时<strong>%s</strong>工时，总共预计<strong>%s</strong>工时，已经消耗<strong>%s</strong>工时，预计剩余<strong>%s</strong>工时';
 $lang->project->taskSummary     = "本页共 <strong>%s</strong> 个任务，未开始 <strong>%s</strong>，进行中 <strong>%s</strong>，总预计<strong>%s</strong>工时，已消耗<strong>%s</strong>工时，剩余<strong>%s</strong>工时。";
+$lang->project->checkedSummary  = "选中 <strong>%total%</strong> 个任务，未开始 <strong>%wait%</strong>，进行中 <strong>%doing%</strong>，总预计<strong>%estimate%</strong>工时，已消耗<strong>%consumed%</strong>工时，剩余<strong>%left%</strong>工时。";
 $lang->project->memberHours     = "%s共有 <strong>%s</strong> 个可用工时，";
 $lang->project->groupSummary    = "本组共 <strong>%s</strong> 个任务，未开始 <strong>%s</strong>，进行中 <strong>%s</strong>，总预计<strong>%s</strong>工时，已消耗<strong>%s</strong>工时，剩余<strong>%s</strong>工时。";
 $lang->project->groupSummaryAB  = "总任务<strong>%s</strong> ，未开始<strong>%s</strong>，进行中<strong>%s</strong>。<br />总预计<strong>%s</strong>，已消耗<strong>%s</strong>，剩余<strong>%s</strong>。";
 $lang->project->noTimeSummary   = "本组共 <strong>%s</strong> 个任务，未开始 <strong>%s</strong>，进行中 <strong>%s</strong>";
 $lang->project->wbs             = "分解任务";
-$lang->project->batchWBS        = "批量分解";
+$lang->project->batchWBS        = "批量分解子任务";
+$lang->project->batchWBSRoot        = "批量分解主任务";
+
 $lang->project->howToUpdateBurn = "<a href='http://api.zentao.net/goto.php?item=burndown&lang=zh-cn' target='_blank' title='如何更新燃尽图？' class='btn btn-sm'>帮助</a>";
 $lang->project->whyNoStories    = "看起来没有需求可以关联。请检查下{$lang->projectCommon}关联的{$lang->productCommon}中有没有需求，而且要确保它们已经审核通过。";
 $lang->project->productStories  = "{$lang->projectCommon}关联的需求是{$lang->productCommon}需求的子集，并且只有评审通过的需求才能关联。请<a href='%s'>关联需求</a>。";
@@ -213,7 +224,7 @@ $lang->project->tips                  = '提示';
 $lang->project->afterInfo             = "{$lang->projectCommon}添加成功，您现在可以进行以下操作：";
 $lang->project->setTeam               = '设置团队';
 $lang->project->linkStory             = '关联需求';
-$lang->project->createTask            = '添加任务';
+$lang->project->createTask            = '创建任务';
 $lang->project->goback                = "返回任务列表";
 $lang->project->noweekend             = '去除周末';
 $lang->project->withweekend           = '显示周末';
@@ -272,9 +283,20 @@ $lang->printKanban->taskStatus = '状态';
 $lang->printKanban->typeList['all']       = '全部';
 $lang->printKanban->typeList['increment'] = '增量';
 
+
+$lang->project->featureBar['task']['mydept']   = $lang->project->mydept;
+$lang->project->featureBar['task']['assignedtome'] = $lang->project->assignedToMe;
+// oscar[
+$lang->project->featureBar['task']['checkByMe']   = $lang->project->checkByMe;
+$lang->project->featureBar['task']['checkedByMe']   = $lang->project->checkedByMe;
+// oscar]
+$lang->project->featureBar['task']['myinvolved']   = $lang->project->myInvolved;
+
+
+//$lang->project->featureBar['task']['milestone']       =  '标签';
+
 $lang->project->featureBar['task']['unclosed']     = $lang->project->unclosed;
 $lang->project->featureBar['task']['all']          = $lang->project->allTasks;
-$lang->project->featureBar['task']['assignedtome'] = $lang->project->assignedToMe;
 $lang->project->featureBar['task']['delayed']      = '已延期';
 $lang->project->featureBar['task']['needconfirm']  = '需求变动';
 $lang->project->featureBar['task']['status']       = $lang->project->statusSelects[''];
@@ -291,3 +313,80 @@ if($config->global->flow == 'onlyTask')
     unset($lang->project->groups['story']);
     unset($lang->project->featureBar['task']['needconfirm']);
 }
+$lang->project->versionend = "结束";
+$lang->project->version = "标签";
+$lang->project->closeStat = "验收情况";
+$lang->project->closed = "已验收";
+$lang->project->unclose = "未验收";
+$lang->project->close = "验收";
+
+$lang->project->status              = "状态";
+$lang->project->action              = "操作";
+
+$lang->project->active              = "激活";
+
+$lang->project->deadlineRequirement     = '需求截止日期';
+$lang->project->deadline     = '开发截止日期';
+$lang->project->deadlineQA     = 'QA截止日期';
+$lang->project->opOnlineDate     = '运营上线日期';
+
+$lang->project->update     = '更新';
+$lang->project->batchChangeVersion = '批量标签';
+
+$lang->project->manageMilestones = '维护里程碑';
+$lang->project->milestone = '里程碑';
+$lang->project->productMilestoneStories  = "请<a href='%s'>创建里程碑</a>。";
+
+
+$lang->project->productMilestone = '里程碑查看';
+$lang->project->productMilestonesManage = '里程碑维护';
+$lang->project->activeMilestone = '里程碑激活';
+$lang->project->closeMilestone = '里程碑关闭';
+$lang->project->updateMilestoneDeadline = '里程碑更新截止日期';
+$lang->project->linkMilestoneStory        = '里程碑关联需求';
+$lang->project->unlinkMilestoneStory = '里程碑取消关联需求';
+$lang->project->batchUnlinkMilestoneStory = '里程碑批量取消关联';
+
+$lang->project->checkBy = '验收';
+
+$lang->project->unlinkMilestoneStory    = "从里程碑中移除该需求";
+$lang->project->unlinkMilestoneStoryConfirm    = "您确定从该里程碑中移除该需求吗？";
+
+
+$lang->project->featureBar['productMilestoneTask']['sotry']   = $lang->project->story;
+$lang->project->featureBar['productMilestoneTask']['task']   = $lang->project->task;
+
+$lang->project->storyMilestone            = '需求';
+$lang->project->taskMilestone            = '任务';
+
+
+$lang->project->exportProgress = '导出进度到EXCEL';
+
+$lang->project->editMilestone = '编辑里程碑';
+
+
+$lang->project->burnexReport    = '工时(人天)';
+$lang->project->percent          = '百分比';
+
+$lang->project->report         = new stdclass();
+$lang->project->report->common = '里程碑人天统计:统计每个人在该里程碑中已经分配的任务的总人天，占整个里程碑总天数的比例';
+$lang->project->report->select = '请选择里程碑';
+$lang->project->report->create = '显示里程碑人天';
+$lang->project->report->value  = '任务数';
+
+$lang->project->report->charts['manmonth']  = '里程碑内分别累计人天';
+
+//$lang->project->report->manMonth = new stdClass();
+$lang->project->report->manMonth->item  = '用户名';
+
+$lang->project->report->statDepts = array();
+// 配置需要进行人力统计的组
+
+$lang->project->report->statDepts[0] = 3; // 策划
+$lang->project->report->statDepts[1] = 4; // 客户端
+$lang->project->report->statDepts[2] = 5; // 服务端
+$lang->project->report->statDepts[3] = 24; // 引擎
+$lang->project->report->statDepts[4] = 4; // 美术
+$lang->project->report->statDepts[5] = 25; // 美术/UI
+$lang->project->report->statDepts[6] = 26; // 美术/原画
+$lang->project->report->statDepts[7] = 27; // 美术/特效

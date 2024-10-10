@@ -328,6 +328,7 @@ $lang->resource->project->kanbanColsColor  = 'kanbanColsColor';
 $lang->resource->project->export           = 'export';
 $lang->resource->project->storyKanban      = 'storyKanban';
 $lang->resource->project->storySort        = 'storySort';
+$lang->resource->project->exportProgress = 'exportProgress';
 
 $lang->project->methodOrder[0]   = 'index';
 $lang->project->methodOrder[5]   = 'view';
@@ -385,9 +386,11 @@ $lang->resource->task->finish             = 'finish';
 $lang->resource->task->cancel             = 'cancel';
 $lang->resource->task->close              = 'close';
 $lang->resource->task->batchCreate        = 'batchCreate';
+$lang->resource->task->batchCreateRoot   = 'batchCreateRoot';
 $lang->resource->task->batchEdit          = 'batchEdit';
 $lang->resource->task->batchClose         = 'batchClose';
 $lang->resource->task->batchCancel        = 'batchCancel';
+$lang->resource->task->batchSetWorkhour      = 'batchSetWorkhour';
 $lang->resource->task->batchAssignTo      = 'batchAssignTo';
 $lang->resource->task->batchChangeModule  = 'batchChangeModule';
 $lang->resource->task->activate           = 'activate';
@@ -399,6 +402,8 @@ $lang->resource->task->recordEstimate     = 'recordEstimate';
 $lang->resource->task->editEstimate       = 'editEstimate';
 $lang->resource->task->deleteEstimate     = 'deleteEstimate';
 $lang->resource->task->report             = 'reportChart';
+
+$lang->resource->task->batchAssignToDept = 'assignedToDept';
 
 $lang->task->methodOrder[5]   = 'create';
 $lang->task->methodOrder[10]  = 'batchCreate';
@@ -423,6 +428,7 @@ $lang->task->methodOrder[100] = 'editEstimate';
 $lang->task->methodOrder[105] = 'deleteEstimate';
 $lang->task->methodOrder[110] = 'report';
 $lang->task->methodOrder[115] = 'batchChangeModule';
+$lang->task->methodOrder[120] = 'batchAssignToDept';
 
 /* Build. */
 $lang->resource->build = new stdclass();
@@ -483,6 +489,7 @@ $lang->resource->bug->saveTemplate       = 'saveTemplate';
 $lang->resource->bug->deleteTemplate     = 'deleteTemplate';
 $lang->resource->bug->setPublic          = 'setPublic';
 $lang->resource->bug->batchChangeModule  = 'batchChangeModule';
+$lang->resource->bug->batchChangeBranch  = 'batchChangeBranch';
 
 $lang->bug->methodOrder[0]   = 'index';
 $lang->bug->methodOrder[5]   = 'browse';
@@ -511,6 +518,7 @@ $lang->bug->methodOrder[110] = 'setPublic';
 $lang->bug->methodOrder[115] = 'linkBugs';
 $lang->bug->methodOrder[120] = 'unlinkBug';
 $lang->bug->methodOrder[125] = 'batchChangeModule';
+$lang->bug->methodOrder[130] = 'batchChangeBranch';
 
 /* Test case. */
 $lang->resource->testcase = new stdclass();
@@ -534,6 +542,7 @@ $lang->resource->testcase->showImport         = 'showImport';
 $lang->resource->testcase->confirmChange      = 'confirmChange';
 $lang->resource->testcase->confirmStoryChange = 'confirmStoryChange';
 $lang->resource->testcase->batchChangeModule  = 'batchChangeModule';
+$lang->resource->testcase->batchChangeBranch  = 'batchChangeBranch';
 $lang->resource->testcase->bugs               = 'bugs';
 $lang->resource->testcase->review             = 'review';
 $lang->resource->testcase->batchReview        = 'batchReview';
@@ -556,9 +565,10 @@ $lang->testcase->methodOrder[55]  = 'confirmStoryChange';
 $lang->testcase->methodOrder[60]  = 'batchEdit';
 $lang->testcase->methodOrder[65]  = 'batchDelete';
 $lang->testcase->methodOrder[70]  = 'batchChangeModule';
-$lang->testcase->methodOrder[75]  = 'linkCases';
-$lang->testcase->methodOrder[80]  = 'unlinkCase';
-$lang->testcase->methodOrder[85]  = 'bugs';
+$lang->testcase->methodOrder[75]  = 'batchChangeBranch';
+$lang->testcase->methodOrder[80]  = 'linkCases';
+$lang->testcase->methodOrder[85]  = 'unlinkCase';
+$lang->testcase->methodOrder[90]  = 'bugs';
 $lang->testcase->methodOrder[95]  = 'review';
 $lang->testcase->methodOrder[100] = 'batchReview';
 $lang->testcase->methodOrder[105] = 'batchConfirmStoryChange';
@@ -989,6 +999,13 @@ $lang->resource->file->delete       = 'delete';
 $lang->resource->file->uploadImages = 'uploadImages';
 $lang->resource->file->setPublic     = 'setPublic';
 
+//oscar:
+$lang->resource->file->downloadthumb     = 'downloadthumb';
+$lang->resource->file->downloadToDisk     = 'downloadToDisk';
+$lang->resource->file->buildFormsingle     = 'buildFormsingle';
+$lang->resource->file->readthumb     = 'readthumb';
+//oscar:
+
 $lang->file->methodOrder[5]  = 'download';
 $lang->file->methodOrder[10] = 'edit';
 $lang->file->methodOrder[15] = 'delete';
@@ -1005,12 +1022,15 @@ $lang->resource->action->trash    = 'trash';
 $lang->resource->action->undelete = 'undelete';
 $lang->resource->action->hideOne  = 'hideOne';
 $lang->resource->action->hideAll  = 'hideAll';
+$lang->resource->action->comment  = 'comment';
 $lang->resource->action->editComment = 'editComment';
 
 $lang->action->methodOrder[5]  = 'trash';
 $lang->action->methodOrder[10] = 'undelete';
 $lang->action->methodOrder[15] = 'hideOne';
 $lang->action->methodOrder[20] = 'hideAll';
+$lang->action->methodOrder[25] = 'comment';
+$lang->action->methodOrder[30] = 'editComment';
 
 $lang->resource->backup = new stdclass();
 $lang->resource->backup->index   = 'index';

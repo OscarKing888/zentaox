@@ -19,6 +19,12 @@ js::set('kuid', $uid);
 <script language='javascript'>
 var editor = <?php echo json_encode($editor);?>;
 
+var blogTools =
+['undo', 'redo', '|', 'emoticons', 'code', 'link', '|', 'removeformat', 'fullscreen', 'source'];
+
+var blogImageTools =
+    ['undo', 'redo', '|',  'image',  '|', 'fullscreen', 'source'];
+
 var bugTools =
 [ 'formatblock', 'fontname', 'fontsize', '|', 'forecolor', 'hilitecolor', 'bold', 'italic','underline', '|', 
 'justifyleft', 'justifycenter', 'justifyright', 'insertorderedlist', 'insertunorderedlist', '|',
@@ -50,6 +56,8 @@ function initKindeditor(afterInit)
         editorTool = simpleTools;
         if(editor.tools == 'bugTools')  editorTool = bugTools;
         if(editor.tools == 'fullTools') editorTool = fullTools;
+        if(editor.tools == 'blogTools') editorTool = blogTools;
+        if(editor.tools == 'blogImageTools') editorTool = blogImageTools;
 
         var K = KindEditor, $editor = $('#' + editorID);
         var placeholderText = $editor.attr('placeholder');
@@ -126,6 +134,25 @@ function initKindeditor(afterInit)
                                 html = '<img src="' + result + '" alt="" />';
                                 $.post(createLink('file', 'ajaxPasteImage', 'uid=' + kuid), {editor: html}, function(data)
                                 {
+                                    //先执行删除操作，将base64图片删除
+                                    cmd.selection();
+                                    var rng = cmd.range;
+                                    var offset = -1;
+                                    for(var i=rng.startContainer.childNodes.length-1; i>=0; --i){
+                                        var node = rng.startContainer.childNodes[i];
+                                        if(node.tagName == 'IMG' || node.tagName == 'img'){
+                                            if(node.src && node.src.search(/data:.+;base64,/) > -1){
+                                                offset = i;
+                                                break;
+                                            }
+                                        }
+                                    }
+                                    if(offset!=-1){
+                                        K(rng.startContainer.childNodes[offset]).remove();
+                                        rng.startOffset = rng.endOffset = offset;
+                                    }
+                                    
+                                    //在执行插入操作，插入src图片
                                     cmd.inserthtml(data);
                                     $('#submit').removeAttr('disabled');
                                 });

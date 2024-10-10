@@ -1119,8 +1119,11 @@ class baseRouter
         if($full and $this->config->requestType == 'PATH_INFO')
         {
             if($this->URI) return $this->config->webRoot . $this->URI . '.' . $this->viewType;
+            //error_log("OSCAR:get URI" . $this->config->webRoot);
             return $this->config->webRoot;
         }
+
+        //error_log("OSCAR:get URI" . $this->URI);
         return $this->URI;
     }
 
@@ -2191,8 +2194,13 @@ class baseRouter
         extract($trace[1]);
         $log .= ", last called by $file on line $line through function $function.\n";
 
+        error_log($log);
+        //xdebug_print_function_stack();
+
         /* 触发错误(Trigger the error) */
         trigger_error($log, $exit ? E_USER_ERROR : E_USER_WARNING);
+
+        //xdebug_print_function_stack();
     }
 
     /**

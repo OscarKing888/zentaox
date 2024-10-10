@@ -20,4 +20,11 @@
 include dirname(__FILE__) . '/base/control.class.php';
 class control extends baseControl
 {
+    // oscar[
+    static public function console_log( $data ){
+        echo '<script>';
+        echo 'console.log('. json_encode( $data ) .')';
+        echo '</script>';
+    }
+    // oscar]
 }

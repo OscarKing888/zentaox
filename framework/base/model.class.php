@@ -12,7 +12,7 @@
  *  May you find forgiveness for yourself and forgive others.
  *  May you share freely, never taking more than you give.
  */
-class baseModel
+class baseModel// extends  debugUtil
 {
     /**
      * 全局对象$app。
@@ -298,5 +298,13 @@ class baseModel
     public function delete($table, $id)
     {
         $this->dao->delete()->from($table)->where('id')->eq($id)->exec();
+    }
+
+    public static function trimTitle($title)
+    {
+        $titleNew = preg_replace('/\s+/', '', $title);
+        $titleNew = str_replace('[', '【', $titleNew);
+        $titleNew = str_replace(']', '】', $titleNew);
+        return $titleNew;
     }
 }

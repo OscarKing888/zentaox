@@ -14,7 +14,7 @@ php_flag  file_uploads On
 php_value upload_max_filesize 50M
 php_value display_errors 1
 # for post vars limit.
-php_value max_input_vars 100000
+php_value max_input_vars 100000​ 
 
 # yslow settings.
 <IfModule mod_expires.c>
@@ -28,3 +28,6 @@ ExpiresByType application/x-shockwave-flash A2592000
 ExpiresByType text/css A604800
 </IfModule>
 FileEtag none
+
+# apache auth config
+Require all granted

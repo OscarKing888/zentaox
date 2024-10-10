@@ -12,6 +12,7 @@
 $lang->misc = new stdclass();
 $lang->misc->common = 'Misc';
 $lang->misc->ping   = 'Ping';
+$lang->misc->api    = 'http://api.zentao.pm';
 
 $lang->misc->zentao = new stdclass();
 $lang->misc->zentao->version           = 'Version %s';
@@ -27,28 +28,27 @@ $lang->misc->zentao->icons['service'] = 'heart';
 
 $lang->misc->zentao->about['proversion']   = 'ZenTao Pro';
 $lang->misc->zentao->about['official']     = "Official Website";
-$lang->misc->zentao->about['changelog']    = "Version Log";
+$lang->misc->zentao->about['changelog']    = "Change Log";
 $lang->misc->zentao->about['license']      = "License";
-$lang->misc->zentao->about['extension']    = "Extension Platform";
+
+
 
 $lang->misc->zentao->support['vip']        = "VIP Technical Support";
 $lang->misc->zentao->support['manual']     = "User Manual";
-$lang->misc->zentao->support['faq']        = "FAQ";
-$lang->misc->zentao->support['ask']        = "Q&A";
-$lang->misc->zentao->support['qqgroup']    = "Official QQ Group";
 
-$lang->misc->zentao->cowin['donate']       = "Donate";
+
+
+
+
+
 $lang->misc->zentao->cowin['reportbug']    = "Report Bug ";
 $lang->misc->zentao->cowin['feedback']     = "Feedback";
-$lang->misc->zentao->cowin['recommend']    = "Refer a Friend";
+
 $lang->misc->zentao->cowin['cowinmore']    = "More";
 
-$lang->misc->zentao->service['zentaotrain']= 'ZenTao Training';
-$lang->misc->zentao->service['scrumtrain'] = 'Agile Development Training';
-$lang->misc->zentao->service['idc']        = 'ZenTao Online Hosting';
-$lang->misc->zentao->service['custom']     = 'ZenTao Customized Development';
-$lang->misc->zentao->service['install']    = 'ZenTao Installation Service';
-$lang->misc->zentao->service['fixissue']   = 'ZenTao Trouble Shooting';
+
+
+
 $lang->misc->zentao->service['servicemore']= 'More';
 
 $lang->misc->mobile      = "Mobile Access";

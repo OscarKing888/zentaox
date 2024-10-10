@@ -11,7 +11,7 @@
  */
 $lang->task->index              = "任務一覽";
 $lang->task->create             = "建任務";
-$lang->task->batchCreate        = "批量添加";
+$lang->task->batchCreate        = "批量建任務";
 $lang->task->batchEdit          = "批量編輯";
 $lang->task->batchChangeModule  = "批量修改模組";
 $lang->task->batchClose         = "批量關閉";
@@ -45,6 +45,7 @@ $lang->task->project          = '所屬' . $lang->projectCommon;
 $lang->task->module           = '所屬模組';
 $lang->task->moduleAB         = '模組';
 $lang->task->story            = '相關需求';
+$lang->task->storyAB          = '需求';
 $lang->task->storySpec        = '需求描述';
 $lang->task->storyVerify      = '驗收標準';
 $lang->task->name             = '任務名稱';
@@ -103,6 +104,7 @@ $lang->task->transferTo       = '轉交給';
 $lang->task->children         = '子任務';
 $lang->task->childrenAB       = '子';
 $lang->task->parent           = '父任務';
+$lang->task->parentAB         = '父';
 $lang->task->lblPri           = 'P';
 $lang->task->lblHour          = '(h)';
 $lang->task->deniedNotice     = '此任務只允許由團隊第一人開始。';
@@ -122,6 +124,7 @@ $lang->task->statusList['done']   = '已完成';
 $lang->task->statusList['pause']  = '已暫停';
 $lang->task->statusList['cancel'] = '已取消';
 $lang->task->statusList['closed'] = '已關閉';
+$lang->task->statusList['checked'] = '已验收';
 
 $lang->task->typeList['']        = '';
 $lang->task->typeList['design']  = '設計';
@@ -260,3 +263,23 @@ $lang->task->report->tasksPerClosedReason->graph->xAxisName = '關閉原因';
 
 $lang->task->report->finishedTasksPerDay->type             = 'bar';
 $lang->task->report->finishedTasksPerDay->graph->xAxisName = '日期';
+
+$lang->task->deptList['']       = '';
+$lang->task->deptList['1']   = '高层管理';
+$lang->task->deptList['2']   = '项目管理';
+$lang->task->deptList['3']   = '策划';
+$lang->task->deptList['4']   = '程序-客户端';
+$lang->task->deptList['5']   = '程序-服务器';
+$lang->task->deptList['6']   = '美术';
+$lang->task->deptList['7']   = '测试';
+$lang->task->deptList['8']   = '产品运营';
+$lang->task->deptList['9']   = '产品总监';
+$lang->task->deptList['10']  = '产品经理';
+$lang->task->deptList['11']  = 'GS主管';
+$lang->task->deptList['12']  = '社区运营';
+$lang->task->deptList['13']  = '美术设计';
+$lang->task->deptList['14']  = '客服经理';
+$lang->task->deptList['15']  = '内宣支持';
+$lang->task->deptList['16']  = 'GS';
+$lang->task->deptList['17']  = 'CS';
+$lang->task->deptList['18']  = 'GM';

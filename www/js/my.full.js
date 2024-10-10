@@ -954,6 +954,8 @@ function selectItem(SelectID)
  */
 function ajaxDelete(url, replaceID, notice)
 {
+    //alert("ajaxDelete:" + notice);
+
     if(confirm(notice))
     {
         $.ajax(
@@ -1485,6 +1487,18 @@ function fixedTfootAction(formID)
     if(typeof(ssoRedirect) != "undefined") pageFooterHeight = 0;
     function fixTfoot()
     {
+        var $table = $form.find('table:last');
+        var $tfoot = $table.find('tfoot');
+        if($table.hasClass('table-datatable'))
+        {
+            $table = $form.find('.datatable-rows');
+            $tfoot = $form.find('.datatable-footer tfoot');
+        }
+
+        $tbody = $table.find('tbody'),
+        $inputGroup = $tfoot.find('.table-actions').children('.input-group'),
+        pageFooterHeight = $('#footer').height(),
+
         tableWidth   = $table.width();
         hasFixed     = $tfoot.hasClass('fixedTfootAction');
         offsetHeight = $(window).height() + $(window).scrollTop() - pageFooterHeight/2;
@@ -1516,6 +1530,15 @@ function fixedTfootAction(formID)
     {
         // Fix table foot when scrolling.
         fixTfoot();
+
+        var $table = $form.find('table:last');
+        var $tfoot = $table.find('tfoot');
+        if($table.hasClass('table-datatable'))
+        {
+            $table = $form.find('.datatable-rows');
+            $tfoot = $form.find('.datatable-footer tfoot');
+        }
+
         $tfoot.addClass('scrolling scrolled');
         clearTimeout(scrollCallTask);
         scrollCallTask = setTimeout(function(){$tfoot.removeClass('scrolling');}, 200)
@@ -1920,6 +1943,51 @@ function revertModuleCookie()
     }
 }
 
+/**
+ * Focus move up or down for input.
+ *
+ * @param type up|down
+ */
+function inputFocusJump(type){
+    var hasFocus = $('input').is(':focus');
+    if(hasFocus)
+    {
+        var title     = $("input:focus").attr('name').replace(/\[\d]/g, '');
+        var $input    = $(":input[name^=" + title + "]:text:not(:disabled):not([name*='%'])");
+        var num       = $input.length;
+        var index     = parseInt($("input:focus").attr('name').replace(/[^0-9]/g, ''));
+        var nextIndex = type == 'down' ? index + 1 : index - 1;
+
+        if(nextIndex < num && nextIndex >= 0)
+        {
+            $input[nextIndex].focus();
+        }
+    }
+}
+
+/**
+ * Focus move up or down for select.
+ *
+ * @param type
+ */
+function selectFocusJump(type)
+{
+    var hasFocus = $('select').is(':focus');
+    if(hasFocus)
+    {
+        var title     = $("select:focus").attr('name').replace(/\[\d]/g, '');
+        var $select   = $("select[name^=" + title + "]:not([name*='%'])");
+        var num       = $select.length;
+        var index     = parseInt($("select:focus").attr('name').replace(/[^0-9]/g, ''));
+        var nextIndex = type == 'down' ? index + 1 : index - 1;
+
+        if(nextIndex < num && nextIndex >= 0)
+        {
+            $select[nextIndex].focus();
+        }
+    }
+}
+
 /* Ping the server every some minutes to keep the session. */
 needPing = true;
 
@@ -1960,8 +2028,11 @@ $(document).ready(function()
         {
             if($(this).attr('checked'))
             {
-                var checkedVal = parseInt($(this).val());
-                if(checkedVal != 0) checkeds = checkeds + checkedVal + ',';
+                if(!isNaN($(this).val()))
+                {
+                    var checkedVal = parseInt($(this).val());
+                    if(checkedVal != 0) checkeds = checkeds + checkedVal + ',';
+                }
             }
         })
         if(checkeds != '') checkeds = checkeds.substring(0, checkeds.length - 1);
@@ -1973,4 +2044,17 @@ $(document).ready(function()
     initHelpLink();
     checkTutorial();
     revertModuleCookie();
+
+    /* Adjust for dropdown position. */
+    $('li.dropdown-submenu').mouseover(function()
+    {
+        $('li.dropdown-submenu > .dropdown-menu').each(function()
+        {
+            if($(this).css('display') == 'block')
+            {
+                var topPosition = $(this).offset().top;
+                if(topPosition < 0) $(this).css('bottom', Number($(this).css('bottom').replace('px', '')) + topPosition);
+            }
+        })
+    })
 });

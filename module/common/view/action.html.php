@@ -106,6 +106,10 @@ $(function()
     })
 })
 </script>
+
+<?php
+//var_dump($users);
+?>
 <?php if($extView = $this->getExtViewFile(__FILE__)){include $extView; return helper::cd();}?>
 <script src='<?php echo $jsRoot;?>jquery/reverseorder/raw.js' type='text/javascript'></script>
 
@@ -132,7 +136,7 @@ $(function()
   <ol id='historyItem'>
     <?php $i = 1; ?>
     <?php foreach($actions as $action):?>
-    <?php $canEditComment = (end($actions) == $action and $action->comment and $this->methodName == 'view' and $action->actor == $this->app->user->account);?>
+    <?php $canEditComment = (end($actions) == $action and $action->comment and $this->methodName == 'view' and $action->actor == $this->app->user->account and common::hasPriv('action', 'editComment'));?>
     <li value='<?php echo $i ++;?>'>
       <?php
       if(isset($users[$action->actor])) $action->actor = $users[$action->actor];

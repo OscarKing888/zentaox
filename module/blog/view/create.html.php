@@ -10,22 +10,25 @@
  *  May you share freely, never taking more than you give.
  */
 ?>
-<?php include '../../common/view/header.html.php'; ?>
-<?php include '../../common/view/datepicker.html.php'; ?>
-<?php include '../../common/view/kindeditor.html.php'; ?>
+<?php
+include '../../common/view/header.html.php';
+include '../../common/view/form.html.php';
+include '../../common/view/kindeditor.html.php';
+include '../../common/view/datepicker.html.php';
+?>
 
 <div class='container'>
     <div class='panel'>
-        <div class='panel-heading'><strong><?php echo $lang->blog->add; ?></strong></div>
+        <div class='panel-heading'><strong><?php echo $title . "[" . $article->id . "]" ?></strong></div>
         <form method='post'>
             <table class='table table-borderless table-form' align='center'>
                 <tr>
-                    <th><?php echo $lang->project->manageProducts; ?></th>
+                    <th><?php echo $lang->product->name; ?></th>
                     <td class='text-left' id='productsBox' colspan="2">
                         <div class='row'>
                             <div class='col-sm-3'>
                                 <div class='input-group'>
-                                    <?php echo html::select("product", $allProducts, '', "class='form-control chosen' onchange='loadBranches(this)'"); ?>
+                                    <?php echo html::select("product", $allProducts, $product, "class='form-control chosen' onchange=''"); ?>
                                     <span class='input-group-addon fix-border' style='padding:0px'></span>
                                 </div>
                             </div>
@@ -35,12 +38,22 @@
                 <tr>
                     <th><?php echo $lang->blog->date; ?></th>
                     <td>
-                        <?php echo html::input('date', helper::today(), "class='form-control form-date' placeholder=''"); ?>
+                        <?php echo html::input('date', $article->date, "class='form-control form-date' placeholder=''"); ?>
                     </td>
                 </tr>
                 <tr>
                     <th><?php echo $lang->blog->content; ?></th>
-                    <td><?php echo html::textarea('content', '', "class='form-control' cols='50' rows='10'"); ?></td>
+
+                    <td colspan='2'>
+                        <?php echo html::textarea('content', $article->content, "rows='5' class='form-control'");?>
+                    </td>
+                </tr>
+                <tr>
+                    <th><?php echo $lang->blog->pic; ?></th>
+
+                    <td colspan='2'>
+                        <?php echo html::textarea('contentimages', ($article->contentimages), "rows='30' class='form-control'");?>
+                    </td>
                 </tr>
                 <tr>
                     <th></th>

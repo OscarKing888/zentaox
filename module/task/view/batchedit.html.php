@@ -66,6 +66,8 @@ foreach(explode(',', $showFields) as $field)
 
           $members = $this->project->getTeamMemberPairs($tasks[$taskID]->project, 'nodeleted');
           $members = array('' => '', 'ditto' => $this->lang->task->ditto) + $members;
+
+          $depts = array('' => '', 'ditto' => -1) + $depts;
       }
       ?>
       <tr class='text-center'>
@@ -78,7 +80,7 @@ foreach(explode(',', $showFields) as $field)
         </td>
         <td class='text-left<?php echo zget($visibleFields, 'module', ' hidden')?>' style='overflow:visible'><?php echo html::select("modules[$taskID]",     $modules, $tasks[$taskID]->module, "class='form-control chosen'")?></td>
         <td class='text-left<?php echo zget($visibleFields, 'assignedTo', ' hidden')?>' style='overflow:visible'><?php echo html::select("assignedTos[$taskID]", $members, $tasks[$taskID]->assignedTo, "class='form-control chosen'");?></td>
-        <td><?php echo html::select("types[$taskID]",    $typeList, $tasks[$taskID]->type, 'class=form-control');?></td>
+        <td><?php echo html::select("depts[$taskID]",    $depts, $tasks[$taskID]->dept, 'class=form-control');?></td>
         <td <?php echo zget($visibleFields, 'status', "class='hidden'")?>><?php echo html::select("statuses[$taskID]", $statusList, $tasks[$taskID]->status, 'class=form-control');?></td>
         <td <?php echo zget($visibleFields, 'pri', "class='hidden'")?>><?php echo html::select("pris[$taskID]",     $priList, $tasks[$taskID]->pri, 'class=form-control');?></td>
         <td <?php echo zget($visibleFields, 'estimate', "class='hidden'")?>><?php echo html::input("estimates[$taskID]", $tasks[$taskID]->estimate, "class='form-control text-center' autocomplete='off'");?></td>

@@ -10,7 +10,7 @@
  * @link        http://www.zentao.net
  */
 $lang->story->create      = "提需求";
-$lang->story->batchCreate = "批量添加";
+$lang->story->batchCreate = "批量提需求";
 $lang->story->change      = "变更";
 $lang->story->changed     = '需求变更';
 $lang->story->review      = '评审';
@@ -29,9 +29,9 @@ $lang->story->cases       = "相关用例";
 $lang->story->taskCount   = '任务数';
 $lang->story->bugCount    = 'Bug数';
 $lang->story->caseCount   = '用例数';
-$lang->story->taskCountAB = 'T';
-$lang->story->bugCountAB  = 'B';
-$lang->story->caseCountAB = 'C';
+$lang->story->taskCountAB = '任务数';
+$lang->story->bugCountAB  = 'BUG数';
+$lang->story->caseCountAB = '用例数';
 $lang->story->linkStory   = '关联需求';
 $lang->story->unlinkStory = '移除相关需求';
 $lang->story->export      = "导出数据";
@@ -44,6 +44,9 @@ $lang->story->batchChangeBranch = "批量修改分支";
 $lang->story->batchChangeStage  = "批量修改阶段";
 $lang->story->batchAssignTo     = "批量指派";
 $lang->story->batchChangeModule = "批量修改模块";
+
+$lang->story->batchChangePriorityAB = '优先级';
+$lang->story->batchChangePriority = '批量修改优先级';
 
 $lang->story->common         = '需求';
 $lang->story->id             = '编号';
@@ -209,7 +212,7 @@ $lang->story->action->linkrelatedstory    = array('main' => '$date, 由 <strong>
 $lang->story->action->subdividestory      = array('main' => '$date, 由 <strong>$actor</strong> 细分为需求 <strong>$extra</strong>。');
 $lang->story->action->unlinkrelatedstory  = array('main' => '$date, 由 <strong>$actor</strong> 移除相关需求 <strong>$extra</strong>。');
 $lang->story->action->unlinkchildstory    = array('main' => '$date, 由 <strong>$actor</strong> 移除细分需求 <strong>$extra</strong>。');
-
+$lang->story->action->edit    = array('main' => '$date, 由 <strong>$actor</strong> 编辑 <strong>$extra</strong>。');
 /* 统计报表。*/
 $lang->story->report = new stdclass();
 $lang->story->report->common = '报表';
@@ -296,3 +299,22 @@ $lang->story->chosen->reviewedBy = '选择评审人...';
 
 $lang->story->notice = new stdClass();
 $lang->story->notice->closed = '您选择的需求已经被关闭了！';
+
+
+$lang->story->pipelineType[0] = '无';
+$lang->story->pipelineType[1] = '角色';
+$lang->story->pipelineType[2] = '场景';
+$lang->story->pipelineType[3] = '技能';
+$lang->story->pipelineType[4] = '关卡';
+
+$lang->story->action->linked2milestone      = array('main' => '$date, 由 <strong>$actor</strong> 关联到里程碑' . $lang->projectCommon . ' <strong>$extra</strong>。');
+
+//$lang->story->progress = '进度';
+
+
+
+$lang->story->exportProgress = '导出进度到EXCEL';
+$lang->story->progress = '进度';
+$lang->story->taskProgress     = '任务进度';
+$lang->story->storyProgress    = '验收进度';
+$lang->story->deadline    = '截止日期';

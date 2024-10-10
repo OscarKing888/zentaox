@@ -23,8 +23,15 @@ class testtask extends control
     {
         parent::__construct($moduleName, $methodName);
         $this->loadModel('product');
+        $this->loadModel('task');
+
         $this->view->products = $this->products = $this->product->getPairs('nocode');
         if(empty($this->products)) die($this->locate($this->createLink('product', 'showErrorNone', "fromModule=testtask")));
+
+        // oscar[
+        $this->loadModel('dept');
+        $this->loadModel('story');
+        // oscar]
     }
 
     /**
@@ -50,7 +57,7 @@ class testtask extends control
      * @access public
      * @return void
      */
-    public function browse($productID = 0, $branch = '', $type = 'local,wait', $orderBy = 'id_desc', $recTotal = 0, $recPerPage = 20, $pageID = 1, $beginTime = 0, $endTime = 0)
+    public function browse_old($productID = 0, $branch = '', $type = 'local,wait', $orderBy = 'id_desc', $recTotal = 0, $recPerPage = 20, $pageID = 1, $beginTime = 0, $endTime = 0)
     {
         /* Save session. */
         $this->session->set('testtaskList', $this->app->getURI(true));
@@ -89,6 +96,201 @@ class testtask extends control
 
         $this->display();
     }
+
+    public function browse($productID = 0, $type = 'all', $orderBy = 'id_desc', $recTotal = 0, $recPerPage = 20, $pageID = 1)
+    {
+        /* Save session. */
+        $this->session->set('testtaskList', $this->app->getURI(true));
+
+        $scopeAndStatus = explode(',',$type);
+//        $this->session->set('testTaskVersionScope', $scopeAndStatus[0]);
+//        $this->session->set('testTaskVersionStatus', $scopeAndStatus[1]);
+
+        //$beginTime = $beginTime ? date('Y-m-d', strtotime($beginTime)) : '';
+        //$endTime   = $endTime   ? date('Y-m-d', strtotime($endTime))   : '';
+
+        /* Set menu. */
+        $productID = $this->product->saveState($productID, $this->products);
+        //if($branch === '') $branch = (int)$this->cookie->preBranch;
+        $this->testtask->setMenu($this->products, $productID, 0);
+
+        /* Load pager. */
+        $this->app->loadClass('pager', $static = true);
+        $pager = pager::init($recTotal, $recPerPage, $pageID);
+
+        /* Append id for secend sort. */
+        $sort = $this->loadModel('common')->appendOrder($orderBy);
+
+        $this->view->title       = $this->products[$productID] . $this->lang->colon . $this->lang->testtask->common;
+        $this->view->position[]  = html::a($this->createLink('testtask', 'browse', "productID=$productID"), $this->products[$productID]);
+        $this->view->position[]  = $this->lang->testtask->common;
+        $this->view->productID   = $productID;
+        $this->view->products = $this->products;
+        $this->view->orderBy     = $orderBy;
+        $this->view->tasks       = $this->testtask->getTestTasks($productID, $sort, $pager, $scopeAndStatus);
+        $this->view->users       = $this->loadModel('user')->getPairs('noclosed|noletter');
+        $this->view->pager       = $pager;
+
+        $this->display();
+    }
+
+    public function createTestTask($productID, $milestoneID)
+    {
+        $tag = isset($_POST['createTestTaskTag']);
+
+        //error_log("createTestTask tag:$tag");
+        //var_dump($_POST);
+
+        $productID = $this->product->saveState($productID, $this->products);
+        //if($branch === '') $branch = (int)$this->cookie->preBranch;
+        $this->testtask->setMenu($this->products, $productID, 0);
+
+        $storyIDList = array();
+        $stories = array();
+
+
+
+        if ($tag && isset($_POST['storyIDList'])) {
+            $storyIDList = $this->post->storyIDList;
+        }
+
+        if(!$tag)
+        {
+            if(!empty($_POST)) {
+
+                $storyIDList = $this->post->storyIDList;
+                $testTaskDat = new stdClass();
+                $testTaskDat->name = $_POST['name'];
+                $testTaskDat->product = $productID;
+                $testTaskDat->status = 'wait';
+                $testTaskDat->testComments = $_POST['testComments'];
+                $testTaskDat->createBy = $this->app->user->account;
+
+                $this->dao->insert(TABLE_TESTTASKS)->data($testTaskDat)->exec();
+                $testTaskID = $this->dao->lastInsertID();
+
+                foreach ($storyIDList as $k)
+                {
+                    $dat = new stdClass();
+                    $dat->testtask = $testTaskID;
+                    $dat->story = $k;
+                    $this->dao->insert(TABLE_TESTTASKSTORIES)->data($dat)->exec();
+                    //error_log("=== createTestTask story:$k");
+                }
+                die(js::locate($this->createLink('testtask', 'browse', "productID=$productID"), 'parent'));
+            }
+        }
+
+        if(!empty($storyIDList))
+        {
+            $stories = $this->dao->select()->from(TABLE_STORY)
+                ->where('id')->in(array_keys($storyIDList))
+                ->fetchAll('id');
+        }
+
+
+        $this->view->testTaskName = $this->dao->select('name')->from(TABLE_PRODUCTMILESTONE)->where('id')->eq($milestoneID)->fetch('name');
+        $this->view->stories = $stories;
+        $this->display();
+    }
+
+    public function editTestTask($productID, $testtaskID)
+    {
+        //error_log("editTestTask =========【");
+
+        $productID = $this->product->saveState($productID, $this->products);
+        //if($branch === '') $branch = (int)$this->cookie->preBranch;
+        $this->testtask->setMenu($this->products, $productID, 0);
+
+
+        $storyIDListOld = $this->dao->select('story')->from(TABLE_TESTTASKSTORIES)
+            ->where('testtask')->eq($testtaskID)
+            ->fetchPairs('id');
+
+        if(!empty($_POST)) {
+
+            //error_log("editTestTask ========= proc post");
+
+            $storyIDListNew = $this->post->storyIDList;
+            $testTaskDat = new stdClass();
+            $testTaskDat->name = $this->post->name;
+            //$testTaskDat->product = $productID;
+            //$testTaskDat->status = 'wait';
+            $testTaskDat->testComments = $this->post->testComments;
+
+            $this->dao->update(TABLE_TESTTASKS)
+                ->data($testTaskDat)
+                ->where('id')->eq($testtaskID)
+                ->exec();
+
+            foreach ($storyIDListNew as $i => $k)
+            {
+                //error_log("+++ $i : $k");
+                if(array_key_exists($storyIDListOld, $k)) {
+                    //error_log("+++ $k");
+                    $dat = new stdClass();
+                    $dat->testtask = $testtaskID;
+                    $dat->story = $k;
+                    $this->dao->insert(TABLE_TESTTASKSTORIES)->data($dat)->exec();
+                }
+            }
+
+            foreach ($storyIDListOld as $i => $k)
+            {
+                //error_log("--- $i : $k");
+
+                if(!array_key_exists($storyIDListNew, $k)) {
+                    //error_log("remove $k");
+                    $this->dao->delete()->from(TABLE_TESTTASKSTORIES)
+                        ->where('story')->eq($k)
+                        ->andWhere('testtask')->eq($testtaskID)
+                        ->exec();
+                }
+            }
+
+            die(js::locate($this->createLink('testtask', 'browse', "productID=$productID"), 'parent'));
+        }
+
+
+        $storyIDList = $this->dao->select('story')->from(TABLE_TESTTASKSTORIES)
+            ->where('testtask')->eq($testtaskID)
+            ->fetchAll('story');
+
+        $stories = array();
+        if(!empty($storyIDList))
+        {
+            $stories = $this->dao->select()->from(TABLE_STORY)
+                ->where('id')->in(array_keys($storyIDList))
+                ->fetchAll('id');
+        }
+
+        $this->view->testtask = $this->dao->select()->from(TABLE_TESTTASKS)->where('id')->eq($testtaskID)->fetch();
+        $this->view->stories = $stories;
+        $this->display();
+        //error_log("editTestTask =========】");
+    }
+
+    public function startTestTask($productID, $testtaskID)
+    {
+        //error_log("finishTestTask === $testtaskID");
+        $this->dao->update(TABLE_TESTTASKS)->set('status')->eq('doing')->where('id')->eq($testtaskID)->exec();
+        die(js::locate($this->createLink('testtask', 'browse', "productID=$productID"), 'parent'));
+    }
+
+    public function finishTestTask($productID, $testtaskID)
+    {
+        //error_log("finishTestTask === $testtaskID");
+        $this->dao->update(TABLE_TESTTASKS)->set('status')->eq('done')->where('id')->eq($testtaskID)->exec();
+        die(js::locate($this->createLink('testtask', 'browse', "productID=$productID"), 'parent'));
+    }
+
+    public function removeTestTask($productID, $testtaskID)
+    {
+        //error_log("removeTestTask === $testtaskID");
+        $this->dao->update(TABLE_TESTTASKS)->set('deleted')->eq(1)->where('id')->eq($testtaskID)->exec();
+        die(js::locate($this->createLink('testtask', 'browse', "productID=$productID"), 'parent'));
+    }
+
 
     /**
      * Create a test task.
@@ -140,7 +342,7 @@ class testtask extends control
         if($projectID == 0)
         {
             $projects = $this->product->getProjectPairs($productID, $branch = 0, $params = 'nodeleted');
-            $builds   = $this->loadModel('build')->getProductBuildPairs($productID, 0, 'notrunk');
+            $builds   = $this->loadModel('buildex')->getProductBuildPairs($productID, 0, 'notrunk');
         }
 
         /* Set menu. */
@@ -181,7 +383,7 @@ class testtask extends control
         $productID = $task->product;
         $buildID   = $task->build;
 
-        $build   = $this->loadModel('build')->getByID($buildID);
+        $build   = $this->loadModel('buildex')->getByID($buildID);
         $stories = array();
         $bugs    = array();
 
@@ -210,6 +412,118 @@ class testtask extends control
         $this->view->bugs      = $bugs;
 
         $this->display();
+    }
+
+
+    public function viewTestTask($productID, $taskID)
+    {
+        /* Set menu. */
+        //$productID = $this->product->saveState($productID, $this->products);
+        $this->testtask->setMenu($this->products, $productID, 0);
+
+        $stories = $this->dao->select()->from(TABLE_TESTTASKSTORIES)
+            ->where('testtask')->eq($taskID)
+            ->fetchAll();
+
+        $storyIdList = array();
+        foreach($stories as $k => $story)
+        {
+            //error_log("viewTestTask #$k story:$story");
+            $story->storyDat = $this->dao->select()->from(TABLE_STORY)->where('id')->eq($story->story)->fetch();
+            $stories[$k] = $story;
+            array_push($storyIdList, $story->story);
+        }
+
+        $this->view->stories    = $stories;
+
+
+        $deptID = $this->dept->getDeptIDFromName("QA");
+        //error_log("select qa id:$deptID");
+        $users = $this->dept->getDeptUserPairs($deptID);
+        $users[''] = '未指派';
+
+        $projectID = $this->dao->select('project')->from(TABLE_AUTOSTORY)
+            ->where('product')->eq($productID)
+            ->fetch('project');
+
+        //$storyIdList = array_keys($stories);
+
+//        foreach ($storyIdList as $i) {
+//            error_log("story id:$i");
+//        }
+        $storyTasks = $this->loadModel('task')->getStoryTaskCounts($storyIdList, $projectID);
+        $storyBugs = $this->loadModel('bug')->getStoryBugCounts($storyIdList, $projectID);
+        $storyCases = $this->loadModel('testcase')->getStoryCaseCounts($storyIdList);
+
+        $this->view->testtask = $this->dao->select()->from(TABLE_TESTTASKS)->where('id')->eq($taskID)->fetch();
+
+        $this->view->storyTasks = $storyTasks;
+        $this->view->storyBugs = $storyBugs;
+        $this->view->storyCases = $storyCases;
+        $this->view->projectID = $projectID;
+
+        $this->view->deptID = $deptID;
+        $this->view->users = $users;
+        $this->view->productID = $productID;
+        $this->display();
+    }
+
+    public function batchAssignTestStoryTo($user)
+    {
+        if(!empty($_POST)) {
+            $idList = $this->post->taskIDList;
+            $idList = array_unique($idList);
+            foreach($idList as $id)
+            {
+                $this->dao->update(TABLE_TESTTASKSTORIES)
+                ->set('assignedTo')->eq($user)
+                ->where('id')->eq($id)
+                ->exec();
+            }
+        }
+
+        die(js::reload('parent'));
+    }
+
+    public function batchUnlinkStoryFromTestTask()
+    {
+        //error_log("batchUnlinkStoryFromTestTask");
+        if(!empty($_POST)) {
+            $idList = $this->post->taskIDList;
+            $idList = array_unique($idList);
+            $this->dao->delete()->from(TABLE_TESTTASKSTORIES)
+                ->where('id')->in(array_keys($idList))
+                ->exec();
+        }
+
+        die(js::reload('parent'));
+    }
+
+    public function setTestTaskStoryStatus($taskStoryID, $status)
+    {
+        //error_log("setTestTaskStoryStatus $taskStoryID = $status");
+        $this->dao->update(TABLE_TESTTASKSTORIES)
+            ->set('status')->eq($status)
+            ->where('id')->eq($taskStoryID)
+            ->exec();
+    }
+
+    public function setTestTaskStoryStatusFail($taskStoryID)
+    {
+        $this->setTestTaskStoryStatus($taskStoryID, 'fail');
+        die(js::reload('parent'));
+    }
+
+    public function setTestTaskStoryStatusDone($taskStoryID)
+    {
+        $this->setTestTaskStoryStatus($taskStoryID, 'done');
+        die(js::reload('parent'));
+    }
+
+    public function setTestTaskStoryStatusCancel($taskStoryID)
+    {
+        $this->setTestTaskStoryStatus($taskStoryID, 'cancel');
+        die(js::reload('parent'));
     }
 
     /**
@@ -441,7 +755,7 @@ class testtask extends control
 
         $this->view->task         = $task;
         $this->view->projects     = $this->product->getProjectPairs($productID);
-        $this->view->builds       = $this->loadModel('build')->getProductBuildPairs($productID, $branch = 0, $params = 'notrunk');
+        $this->view->builds       = $this->loadModel('buildex')->getProductBuildPairs($productID, $branch = 0, $params = 'notrunk');
         $this->view->users        = $this->loadModel('user')->getPairs('nodeleted', $task->owner);
         $this->view->contactLists = $this->user->getContactLists($this->app->user->account, 'withnote');
 
@@ -939,7 +1253,7 @@ class testtask extends control
         $this->view->case    = $case;
         $this->view->runID   = $runID;
         $this->view->results = $results;
-        $this->view->builds  = $this->loadModel('build')->getProductBuildPairs($case->product, $branch = 0, $params = '');
+        $this->view->builds  = $this->loadModel('buildex')->getProductBuildPairs($case->product, $branch = 0, $params = '');
         $this->view->users   = $this->loadModel('user')->getPairs('noclosed, noletter');
 
         die($this->display());

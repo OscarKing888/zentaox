@@ -28,9 +28,29 @@
 
     foreach(customModel::getFeatureMenu('project', 'task') as $menuItem)
     {
+        if($project->type == 'ops' && $menuItem->name == 'needconfirm') continue;
         if(isset($menuItem->hidden)) continue;
         $menuType = $menuItem->name;
-        if(strpos($menuType, 'QUERY') === 0)
+
+        //error_log("project task menuType:$menuType");
+
+        if($menuType == 'milestone')
+        {
+            echo "<li id='milestoneTab' class='dropdown'>";
+            $milestoneType = isset($versions) ? $this->session->milestone : '';
+            $current        = zget($lang->project->milestone, $milestoneType, '');
+            if(empty($current)) $current = $menuItem->text;
+            echo html::a('javascript:;', $current . " <span class='caret'></span>", '', "data-toggle='dropdown'");
+            echo "<ul class='dropdown-menu'>";
+            foreach ($versions as $key => $value)
+            {
+                if($key == '') continue;
+                echo '<li' . ($key == $milestoneType ? " class='active'" : '') . '>';
+                echo html::a($this->createLink('project', 'task', "project=$projectID&type=milestone&param=$key"), $value);
+            }
+            echo '</ul></li>';
+        }
+        elseif(strpos($menuType, 'QUERY') === 0)
         {
             $queryID = (int)substr($menuType, 5);
             echo "<li id='{$menuType}Tab'>" . html::a(inlink('task', "project=$projectID&type=bySearch&param=$queryID"), $menuItem->text) . '</li>' ;
@@ -55,7 +75,18 @@
             }
             echo '</ul></li>';
         }
+
+
     }
+
+
+
+    /*
+    foreach ($versions as $key => $value)
+    {
+        echo "<li id='$key'> $value </li>";
+    }
+    //*/
 
     echo "<li id='kanbanTab'>"; common::printLink('project', 'kanban', "projectID=$projectID", $lang->project->kanban); echo '</li>';
     if($project->type == 'sprint' or $project->type == 'waterfall')
@@ -73,6 +104,7 @@
     foreach ($lang->project->groups as $key => $value)
     {
         if($key == '') continue;
+        if($project->type == 'ops' && $key == 'story') continue;
         echo '<li' . ($key == $groupBy ? " class='active'" : '') . '>';
         common::printLink('project', 'groupTask', "project=$projectID&groupBy=$key", $value);
     }
@@ -96,7 +128,7 @@
         <ul class='dropdown-menu' id='exportActionMenu'>
         <?php 
         $misc = common::hasPriv('task', 'export') ? "class='export iframe' data-width='700'" : "class=disabled";
-        $link = common::hasPriv('task', 'export') ?  $this->createLink('task', 'export', "project=$projectID&orderBy=$orderBy") : '#';
+        $link = common::hasPriv('task', 'export') ? $this->createLink('task', 'export', "project=$projectID&orderBy=$orderBy&type=$browseType") : '#';
         echo "<li>" . html::a($link, $lang->task->export, '', $misc) . "</li>";
         ?>
         </ul>
@@ -108,7 +140,11 @@
             <span class='caret'></span>
         </button>
         <ul class='dropdown-menu' id='importActionMenu'>
-        <?php 
+        <?php
+        // oscar[
+        $link = common::hasPriv('task', 'importTaskFromMSProject') ?  $this->createLink('task', 'importTaskFromMSProject', "project=$project->id") : '#';
+        echo "<li>" . html::a($link, $lang->task->importTaskFromMSProject, '', "") . "</li>";
+        // oscar]
         $misc = common::hasPriv('project', 'importTask') ? '' : "class=disabled";
         $link = common::hasPriv('project', 'importTask') ?  $this->createLink('project', 'importTask', "project=$project->id") : '#';
         echo "<li>" . html::a($link, $lang->project->importTask, '', $misc) . "</li>";

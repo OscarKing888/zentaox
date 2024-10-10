@@ -26,6 +26,17 @@ class baseDAO
     const ORDERBY = 'oRdEr bY';
     const LIMIT   = 'lImiT';
 
+
+	/*
+    static public $debug_log_sql = true;
+    static public $debug_log_sql_all = true;
+	//*/
+
+	//*
+	static public $debug_log_sql = false;
+    static public $debug_log_sql_all = false;
+	//*/
+
     /**
      * 全局对象$app
      * The global app object.
@@ -627,6 +638,11 @@ class baseDAO
         }
 
         self::$querys[] = $this->processKeywords($sql);
+        if(dao::$debug_log_sql_all || dao::$debug_log_sql)
+        {
+            error_log("=======[processSQL]:$sql");
+            dao::$debug_log_sql = false;
+        }
         return $sql;
     }
 
@@ -672,15 +688,23 @@ class baseDAO
     {
         /* 如果有错误，返回一个空的PDOStatement对象，确保后续方法能够执行。*/
         /* If any error, return an empty statement object to make sure the remain method to execute. */
-        if(!empty(dao::$errors)) return new PDOStatement();   
+        if(!empty(dao::$errors)) return new PDOStatement();
+
 
         if($sql)
         {
+            if(dao::$debug_log_sql_all || dao::$debug_log_sql)
+            {
+                error_log("=======[query]:$sql");
+                dao::$debug_log_sql = false;
+            }
+
             $sql       = trim($sql);
             $sqlMethod = strtolower(substr($sql, 0, strpos($sql, ' ')));
             $this->setMethod($sqlMethod);
             $this->sqlobj = new sql();
             $this->sqlobj->sql = $sql;
+
         }
         else
         {
@@ -782,7 +806,7 @@ class baseDAO
     {
         $sql   = $this->processSQL();
         $table = $this->table;
-        $key   = 'fetch-' . md5($sql);
+        $key   = 'fetch-' . md5($sql . $field);
         if(isset(dao::$cache[$table][$key]))
         {
             if(empty($field)) return $this->getRow(dao::$cache[$table][$key]);
@@ -800,7 +824,7 @@ class baseDAO
 
         $this->setFields($field);
         $result = $this->query()->fetch(PDO::FETCH_OBJ);
-        dao::$cache[$table][$key] = $result;
+        dao::$cache[$table][$key] = $this->getRow($result);
         return $result ? $result->$field : '';
     }
 
@@ -1104,7 +1128,7 @@ class baseDAO
             $checkFunc = 'check' . $funcName;
             if(validater::$checkFunc($value, $arg0, $arg1, $arg2) === false)
             {
-                $this->logError($funcName, $fieldName, $fieldLabel, $funcArgs);
+                $this->logError($funcName, $fieldName, $fieldLabel, $funcArgs, $value); // oscar
             }
         }
 
@@ -1220,7 +1244,7 @@ class baseDAO
      * @access public
      * @return void
      */
-    public function logError($checkType, $fieldName, $fieldLabel, $funcArgs = array())
+    public function logError($checkType, $fieldName, $fieldLabel, $funcArgs = array(), $val = 0)
     {
         global $lang;
         $error    = $lang->error->$checkType;
@@ -1259,6 +1283,8 @@ class baseDAO
                 }
             }
         }
+
+        $error = $error . " val:$val"; // oscar
         dao::$errors[$fieldName][] = $error;
     }
 
@@ -1771,7 +1797,7 @@ class baseSQL
         }
 
         if(!$this->inMark) $this->sql .= ' ' . DAO::WHERE ." $condition ";
-        if($this->inMark) $this->sql .= " $condition ";
+        if($this->inMark)  $this->sql .= " $condition ";
         return $this;
     } 
 
