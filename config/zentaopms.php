@@ -49,6 +49,12 @@ $config->charsets['en']['GBK']      = 'GBK';
 $config->ipWhiteList = '*';
 
 /* Define the tables. */
+// oscar[
+define('TABLE_PRODUCTMILESTONE',        'productmilestone');
+define('TABLE_PRODUCTMILESTONESTORY',   'productmilestonestory');
+define('TABLE_AUTOSTORY',                   'autostory');
+// oscar]
+
 define('TABLE_COMPANY',       '`' . $config->db->prefix . 'company`');
 define('TABLE_DEPT',          '`' . $config->db->prefix . 'dept`');
 define('TABLE_CONFIG',        '`' . $config->db->prefix . 'config`');
@@ -85,6 +91,7 @@ define('TABLE_TASKESTIMATE',  '`' . $config->db->prefix . 'taskestimate`');
 define('TABLE_EFFORT',        '`' . $config->db->prefix . 'effort`');
 define('TABLE_BURN',          '`' . $config->db->prefix . 'burn`');
 define('TABLE_BUILD',         '`' . $config->db->prefix . 'build`');
+define('TABLE_BUILDEX',         '`' . $config->db->prefix . 'buildex`');
 
 define('TABLE_DOCLIB',        '`' . $config->db->prefix . 'doclib`');
 define('TABLE_DOC',           '`' . $config->db->prefix . 'doc`');

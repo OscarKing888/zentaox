@@ -42,4 +42,13 @@ class miscModel extends model
         }
         return $tables;
     }
+
+    public function fixTeamProjectId(){
+        // $member = new stdClass();
+        // $member->project = 'root';
+        // $this->dao->update(TABLE_TEAM)
+        // ->data($member)
+        // ->where('project')->eq(0)
+        // ->exec();
+    }
 }

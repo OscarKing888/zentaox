@@ -113,7 +113,17 @@ class baseHTML
         if(empty($title)) $title = $href;
         $newline = $newline ? "\n" : '';
 
-        return "<a href='$href' $misc>$title</a>$newline";
+	    return "<a href='$href' $misc>$title</a>$newline";
+    }
+
+    static public function aQ2($href = '', $title = '', $misc = '', $newline = true)
+    {
+        global $config;
+
+        if(empty($title)) $title = $href;
+        $newline = $newline ? "\n" : '';
+
+        return "<a href=\"$href\" $misc>$title</a>$newline";
     }
 
     /**
@@ -245,6 +255,7 @@ class baseHTML
             if($isBlock) $string .= "<div class='radio'><label>";
             else $string .= "<label class='radio-inline'>";
             $string .= "<input type='radio' name='$name' value='$key' ";
+            //$string .= ($key == $checked) ? " checked ='checked'" : "";
             $string .= ($key == $checked) ? " checked ='checked'" : "";
             $string .= $attrib;
             $string .= " id='$name$key' /> ";
@@ -291,6 +302,39 @@ class baseHTML
             if($isBlock) $string .= '</label></div>';
             else $string .= '</label>';
         }
+        return $string;
+    }
+
+    static public function checkboxBool($name, $val, $attrib = "", $type= 'inline')
+    {
+        return html::checkboxBoolEx($name, $val, $attrib, $type, true) . html::checkboxBoolEx($name, $val, $attrib, $type);
+    }
+
+    static public function checkboxBoolEx($name, $val, $attrib = "", $type= 'inline', $hidden = false)
+    {
+        $string  = '';
+        if($hidden)
+        {
+            $string .= "<input type='hidden' name='{$name}' value='0'";
+        }
+        else
+        {
+            $string .= "<input type='checkbox' onchange='this.value = this.checked ? 1 : 0;' name='{$name}' value='$val' ";
+        }
+        $string .= $hidden ? "checked ='checked'" : ($val ? " checked ='checked'" : "");
+        $string .= $attrib;
+
+        $string .= " id='$name' /> ";
+        return $string;
+    }
+
+    static public function checkboxBoolDisplay($name, $val, $attrib = "", $type= 'inline')
+    {
+        $string  = '';
+        $string .= "<input type='checkbox' onclick=\"return false;\" name='{$name}' value='$val' ";
+        $string .= $val ? " checked ='checked'" : "";
+        $string .= $attrib;
+        $string .= " id='$name' /> ";
         return $string;
     }
 
@@ -917,6 +961,8 @@ EOT;
      */
     static public function locate($url, $target = "self")
     {
+        //error_log("OSCAR:locate:" . $url);
+
         /* If the url if empty, goto the home page. */
         if(!$url)
         {

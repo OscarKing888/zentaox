@@ -1,6 +1,8 @@
 <?php
 $config->story = new stdclass();
 
+$config->story->forceReview = false;
+
 $config->story->batchCreate      = 10;
 $config->story->affectedFixedNum = 7;
 $config->story->needReview = 1;
@@ -13,7 +15,7 @@ $config->story->edit   = new stdclass();
 $config->story->change = new stdclass();
 $config->story->close  = new stdclass();
 $config->story->review = new stdclass();
-$config->story->create->requiredFields = 'title';
+$config->story->create->requiredFields = 'title,module';
 $config->story->change->requiredFields = 'title';
 $config->story->close->requiredFields  = 'closedReason';
 $config->story->review->requiredFields = 'assignedTo,reviewedBy';
@@ -37,21 +39,26 @@ $config->story->list->exportFields      = '
     lastEditedBy, lastEditedDate,
     childStories, linkStories, duplicateStory, files';
 
-$config->story->list->customCreateFields      = 'source,verify,pri,estimate,mailto,keywords';
-$config->story->list->customBatchCreateFields = 'module,plan,spec,source,verify,pri,estimate,review,keywords';
-$config->story->list->customBatchEditFields   = 'branch,module,plan,estimate,pri,assignedTo,source,stage,closedBy,closedReason,keywords';
+//oscar:$config->story->list->customCreateFields      = 'source,verify,pri,estimate,mailto,keywords';
+$config->story->list->customCreateFields      = 'pri,files,assignedTo';
+//$config->story->list->customBatchCreateFields = 'assignedTo,plan,spec,source,verify,pri,estimate,review,keywords';
+$config->story->list->customBatchCreateFields = 'assignedTo,module,spec,pri';
+$config->story->list->customBatchEditFields   = 'branch,plan,estimate,pri,assignedTo,source,stage,closedBy,closedReason,keywords';
 
 $config->story->custom = new stdclass();
 $config->story->custom->createFields      = $config->story->list->customCreateFields;
-$config->story->custom->batchCreateFields = 'module,plan,spec,pri,estimate,review';
+//oscar:$config->story->custom->batchCreateFields = 'module,plan,spec,pri,estimate,review';
+$config->story->custom->batchCreateFields = 'module,spec,assignedTo,pri';
+
 $config->story->custom->batchEditFields   = 'branch,module,plan,estimate,pri,source,stage,closedBy,closedReason';
 
 $config->story->datatable = new stdclass();
+//$config->story->datatable->defaultField = array('id', 'pri', 'title', 'plan', 'openedBy', 'assignedTo', 'estimate', 'status', 'stage', 'taskCount', 'bugCount', 'caseCount', 'progress', 'actions');
 $config->story->datatable->defaultField = array('id', 'pri', 'title', 'plan', 'openedBy', 'assignedTo', 'estimate', 'status', 'stage', 'taskCount', 'bugCount', 'caseCount', 'actions');
 
 $config->story->datatable->fieldList['id']['title']    = 'idAB';
 $config->story->datatable->fieldList['id']['fixed']    = 'left';
-$config->story->datatable->fieldList['id']['width']    = '70';
+$config->story->datatable->fieldList['id']['width']    = '60';
 $config->story->datatable->fieldList['id']['required'] = 'yes';
 
 $config->story->datatable->fieldList['pri']['title']    = 'priAB';
@@ -195,3 +202,11 @@ $config->story->datatable->fieldList['actions']['title']    = 'actions';
 $config->story->datatable->fieldList['actions']['fixed']    = 'right';
 $config->story->datatable->fieldList['actions']['width']    = '140';
 $config->story->datatable->fieldList['actions']['required'] = 'yes';
+
+// oscar[
+//$config->story->datatable->fieldList['progress']['title']    = 'progress';
+//$config->story->datatable->fieldList['progress']['fixed']    = 'right';
+//$config->story->datatable->fieldList['progress']['width']    = '120';
+//$config->story->datatable->fieldList['progress']['required'] = 'yes';
+
+// oscar]

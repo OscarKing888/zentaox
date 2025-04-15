@@ -19,7 +19,7 @@ $lang->null      = '空';
 $lang->ellipsis  = '…';
 
 $lang->zentaoPMS      = '禅道';
-$lang->welcome        = "%s项目管理系统";
+$lang->welcome        = "%s研发管理系统&nbsp;&nbsp;&nbsp;(内部信息，禁止外传！)";
 $lang->logout         = '退出';
 $lang->login          = '登录';
 $lang->help           = '帮助';
@@ -217,24 +217,34 @@ $lang->project = new stdclass();
 $lang->project->menu = new stdclass();
 
 $lang->project->menu->list      = array('link' => '%s', 'fixed' => true);
+$lang->project->menu->productMilestone      = '里程碑|project|productMilestone|projectID=%s';
 $lang->project->menu->task      = array('link' => '任务|project|task|projectID=%s', 'subModule' => 'task,tree', 'alias' => 'grouptask,importtask,burn,importbug,kanban,printkanban,tree');
+//oscar $lang->project->menu->taskmilestone      = '标签|project|taskmilestone|projectID=%s';
+$lang->project->menu->projectBlueprint      = '项目蓝图|project|projectBlueprint|projectID=%s';
 $lang->project->menu->story     = array('link' => '需求|project|story|projectID=%s', 'subModule' => 'story', 'alias' => 'linkstory,storykanban');
-$lang->project->menu->bug       = 'Bug|project|bug|projectID=%s';
+//$lang->project->menu->module   = '模块|tree|browseTask|productID=%s&view=story';
+//oscar $lang->project->menu->bug       = 'Bug|project|bug|projectID=%s';
 $lang->project->menu->dynamic   = '动态|project|dynamic|projectID=%s';
 $lang->project->menu->build     = array('link' => '版本|project|build|projectID=%s', 'subModule' => 'build');
-$lang->project->menu->testtask  = array('link' => '测试单|project|testtask|projectID=%s');
+$lang->project->menu->buildex     = array('link' => '版本(新)|project|buildex|projectID=%s', 'subModule' => 'buildex');
+$lang->project->menu->burnex     = array('link' => '人力统计|project|burnex|projectID=%s', 'subModule' => 'burnex');
+//oscar $lang->project->menu->testtask  = array('link' => '测试单|project|testtask|projectID=%s');
 $lang->project->menu->team      = array('link' => '团队|project|team|projectID=%s', 'alias' => 'managemembers');
-$lang->project->menu->doc       = array('link' => '文档|doc|objectLibs|type=project&objectID=%s&from=project', 'subModule' => 'doc');
+//oscar $lang->project->menu->doc       = array('link' => '文档|doc|objectLibs|type=project&objectID=%s&from=project', 'subModule' => 'doc');
 $lang->project->menu->product   = $lang->productCommon . '|project|manageproducts|projectID=%s';
-$lang->project->menu->view      = array('link' => '概况|project|view|projectID=%s', 'alias' => 'edit,start,suspend,putoff,close');
+//oscar $lang->project->menu->view      = array('link' => '概况|project|view|projectID=%s', 'alias' => 'edit,start,suspend,putoff,close');
 $lang->project->menu->create    = array('link' => "<i class='icon-plus'></i>&nbsp;添加{$lang->projectCommon}|project|create", 'float' => 'right');
 $lang->project->menu->all       = array('link' => "<i class='icon-th-large'></i>&nbsp;所有{$lang->projectCommon}|project|all|status=undone&projectID=%s", 'float' => 'right');
 $lang->project->menu->index     = array('link' => "<i class='icon-home'></i>{$lang->projectCommon}主页|project|index|locate=no", 'float' => 'right');
 
 $lang->task  = new stdclass();
 $lang->build = new stdclass();
+$lang->buildex = new stdclass();
+$lang->burnex = new stdclass();
 $lang->task->menu  = $lang->project->menu;
 $lang->build->menu = $lang->project->menu;
+$lang->buildex->menu = $lang->project->menu;
+$lang->burnex->menu = $lang->project->menu;
 
 /* QA视图菜单设置。*/
 $lang->qa = new stdclass();
@@ -378,11 +388,14 @@ $lang->webhook->menu   = $lang->admin->menu;
 /* 菜单分组。*/
 $lang->menugroup = new stdclass();
 $lang->menugroup->release     = 'product';
-$lang->menugroup->story       = 'product';
+//$lang->menugroup->story       = 'product'; // oscar
+$lang->menugroup->story       = 'project';
+
 $lang->menugroup->branch      = 'product';
 $lang->menugroup->productplan = 'product';
 $lang->menugroup->task        = 'project';
 $lang->menugroup->build       = 'project';
+$lang->menugroup->buildex       = 'project';
 $lang->menugroup->convert     = 'admin';
 $lang->menugroup->upgrade     = 'admin';
 $lang->menugroup->user        = 'company';
@@ -458,7 +471,7 @@ $lang->pager->noRecord     = "暂时没有记录";
 $lang->pager->digest       = "共 <strong>%s</strong> 条记录，%s <strong>%s/%s</strong> &nbsp; ";
 $lang->pager->recPerPage   = "每页 <strong>%s</strong> 条";
 $lang->pager->first        = "<i class='icon-step-backward' title='首页'></i>";
-$lang->pager->pre          = "<i class='icon-play icon-rotate-180' title='上一页'></i>";
+$lang->pager->pre          = "<i class='icon-play icon-flip-horizontal' title='上一页'></i>";
 $lang->pager->next         = "<i class='icon-play' title='下一页'></i>";
 $lang->pager->last         = "<i class='icon-step-forward' title='末页'></i>";
 $lang->pager->locate       = "GO!";
@@ -585,6 +598,11 @@ $lang->icons['unlock']             = 'unlock-alt';
 $lang->icons['confirmStoryChange'] = 'search';
 $lang->icons['score']              = 'tint';
 
+// oscar[
+$lang->icons['checkByGD']              = 'review';
+$lang->icons['uncheckByGD']              = 'remove-sign';
+// oscar]
+
 include (dirname(__FILE__) . '/menuOrder.php');
 
 global $config;
@@ -640,6 +658,7 @@ if(isset($config->global->flow) and $config->global->flow == 'onlyTask')
     /* Adjust sub menu of project  module. */
     unset($lang->project->menu->story);
     unset($lang->project->menu->build);
+    unset($lang->project->menu->buildex);
     unset($lang->project->menu->bug);
     unset($lang->project->menu->testtask);
     unset($lang->project->menu->product);
@@ -799,13 +818,19 @@ if(isset($config->global->flow) and $config->global->flow == 'onlyTest')
     unset($lang->product->menu->index);
 
     $lang->product->menu->build = array('link' => '版本|product|build', 'subModule' => 'build');
+    $lang->product->menu->buildex = array('link' => '版本(新)|product|buildex', 'subModule' => 'buildex');
+    $lang->product->menu->burnex = array('link' => '人力统计|product|burnex', 'subModule' => 'burnex');
 
     $lang->product->menuOrder[5]  = 'build';
+    $lang->product->menuOrder[6]  = 'buildex';
     $lang->product->menuOrder[10] = 'view';
     $lang->product->menuOrder[15] = 'order';
 
     $lang->build->menu      = $lang->product->menu;
     $lang->build->menuOrder = $lang->product->menuOrder;
+
+    $lang->build->menu      = $lang->product->menu;
+    $lang->buildex->menuOrder = $lang->product->menuOrder;
     
     /* Adjust menu group. */
     $lang->menugroup->bug        = 'bug';
@@ -814,6 +839,7 @@ if(isset($config->global->flow) and $config->global->flow == 'onlyTest')
     $lang->menugroup->testsuite  = 'testsuite';
     $lang->menugroup->testreport = 'testtask';
     $lang->menugroup->build      = 'product';
+    $lang->menugroup->buildex      = 'product';
     
     /* Adjust search objects. */ 
     unset($lang->searchObjects['story']);

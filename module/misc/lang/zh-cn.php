@@ -12,6 +12,7 @@
 $lang->misc = new stdclass();
 $lang->misc->common = '杂项';
 $lang->misc->ping   = '防超时';
+$lang->misc->api    = 'http://api.zentao.net';
 
 $lang->misc->zentao = new stdclass();
 $lang->misc->zentao->version           = '版本%s';
@@ -30,25 +31,24 @@ $lang->misc->zentao->about['official']     = "官方网站";
 $lang->misc->zentao->about['changelog']    = "版本历史";
 $lang->misc->zentao->about['license']      = "授权协议";
 $lang->misc->zentao->about['extension']    = "插件平台";
+$lang->misc->zentao->about['follow']       = "关注我们";
 
 $lang->misc->zentao->support['vip']        = "商业技术支持";
 $lang->misc->zentao->support['manual']     = "用户手册";
 $lang->misc->zentao->support['faq']        = "常见问题";
 $lang->misc->zentao->support['ask']        = "官方问答";
+$lang->misc->zentao->support['video']      = "使用视频";
 $lang->misc->zentao->support['qqgroup']    = "官方QQ群";
 
 $lang->misc->zentao->cowin['donate']       = "捐助我们";
 $lang->misc->zentao->cowin['reportbug']    = "汇报Bug";
 $lang->misc->zentao->cowin['feedback']     = "反馈需求";
 $lang->misc->zentao->cowin['recommend']    = "推荐给朋友";
-$lang->misc->zentao->cowin['cowinmore']    = "更多方式...";
+
 
 $lang->misc->zentao->service['zentaotrain']= '禅道使用培训';
-$lang->misc->zentao->service['scrumtrain'] = '敏捷开发培训';
 $lang->misc->zentao->service['idc']        = '禅道在线托管';
 $lang->misc->zentao->service['custom']     = '禅道定制开发';
-$lang->misc->zentao->service['install']    = '禅道安装服务';
-$lang->misc->zentao->service['fixissue']   = '禅道问题解决';
 $lang->misc->zentao->service['servicemore']= '更多服务...';
 
 $lang->misc->mobile      = "手机访问";
@@ -68,7 +68,7 @@ $lang->misc->noticeRepair = "<h5>普通用户请联系管理员进行修复</h5>
     <ol>
     <li>文件内容为空。</li>
     <li>如果之前文件存在，删除之后重新创建。</li>
-    </ol>"; 
+    </ol>";
 
 $lang->misc->feature = new stdclass();
 $lang->misc->feature->lastest  = '最新版本';
@@ -99,3 +99,4 @@ $lang->misc->feature->all['7.1.stable'][] = array('title'=>'提供rpm和deb包',
 
 $lang->misc->feature->all['6.3.stable'][] = array('title'=>'增加数据表格功能', 'desc' => '<p>可配置数据表格中可显示的字段，按照配置字段显示想看的数据</p>');
 $lang->misc->feature->all['6.3.stable'][] = array('title'=>'继续完善细节', 'desc' => '');
+// $lang->misc->feature->all['9.0.fix'][] = array('title'=>'修复团队数据表的项目id', 'desc' => '');

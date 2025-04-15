@@ -11,11 +11,14 @@
  */
 $lang->task->index              = "任务一览";
 $lang->task->create             = "建任务";
-$lang->task->batchCreate        = "批量添加";
+$lang->task->batchCreate        = "批量建任务";
+$lang->task->batchCreateRoot    = "批量建主任务";
 $lang->task->batchEdit          = "批量编辑";
 $lang->task->batchChangeModule  = "批量修改模块";
 $lang->task->batchClose         = "批量关闭";
+$lang->task->batchSetWorkhour        = "批量设置工时";
 $lang->task->batchCancel        = "批量取消";
+
 $lang->task->edit               = "编辑";
 $lang->task->delete             = "删除";
 $lang->task->deleted            = "已删除";
@@ -35,7 +38,9 @@ $lang->task->reportChart        = "报表统计";
 $lang->task->fromBug            = '来源Bug';
 $lang->task->case               = '相关用例';
 $lang->task->confirmStoryChange = "确认需求变动";
-$lang->task->progress           = '进度';
+$lang->task->progress           = '任务进度';
+$lang->task->progressOfStory    = '验收进度';
+
 $lang->task->progressTips       = '已消耗/(已消耗+剩余)';
 $lang->task->copy               = '复制任务';
 
@@ -45,10 +50,13 @@ $lang->task->project          = '所属' . $lang->projectCommon;
 $lang->task->module           = '所属模块';
 $lang->task->moduleAB         = '模块';
 $lang->task->story            = '相关需求';
+$lang->task->storyAB          = '需求';
+$lang->task->storyIDAB          = '需求ID'; // oscar
 $lang->task->storySpec        = '需求描述';
 $lang->task->storyVerify      = '验收标准';
 $lang->task->name             = '任务名称';
 $lang->task->type             = '任务类型';
+$lang->task->dept             = '部门';
 $lang->task->pri              = '优先级';
 $lang->task->mailto           = '抄送给';
 $lang->task->estimate         = '最初预计';
@@ -71,6 +79,11 @@ $lang->task->desc             = '任务描述';
 $lang->task->assign           = '指派';
 $lang->task->assignTo         = $lang->task->assign;
 $lang->task->batchAssignTo    = '批量指派';
+$lang->task->assignedToDept   = '转部门';
+
+$lang->task->batchChangeVersion     = '标签';
+$lang->task->milestone     = '标签';
+
 $lang->task->assignedTo       = '指派给';
 $lang->task->assignedToAB     = '指派给';
 $lang->task->assignedDate     = '指派日期';
@@ -103,6 +116,7 @@ $lang->task->transferTo       = '转交给';
 $lang->task->children         = '子任务';
 $lang->task->childrenAB       = '子';
 $lang->task->parent           = '父任务';
+$lang->task->parentAB         = '父';
 $lang->task->lblPri           = 'P';
 $lang->task->lblHour          = '(h)';
 $lang->task->deniedNotice     = '此任务只允许由团队第一人开始。';
@@ -115,6 +129,43 @@ $lang->task->noAssigned    = '未指派';
 $lang->task->noFinished    = '未完成';
 $lang->task->noClosed      = '未关闭';
 
+// oscar[
+
+//error_log("====== deptList config<");
+//debug_print_backtrace();
+//error_log("====== deptList config>");
+$lang->task->deptList['']       = '';
+$lang->task->deptList['1']   = '高层管理';
+$lang->task->deptList['2']   = '项目管理';
+$lang->task->deptList['3']   = '策划';
+$lang->task->deptList['4']   = '程序-客户端';
+$lang->task->deptList['5']   = '程序-服务器';
+$lang->task->deptList['6']   = '美术';
+$lang->task->deptList['7']   = '测试';
+$lang->task->deptList['8']   = '产品运营';
+$lang->task->deptList['9']   = '产品总监';
+$lang->task->deptList['10']  = '产品经理';
+$lang->task->deptList['11']  = 'GS主管';
+$lang->task->deptList['12']  = '社区运营';
+$lang->task->deptList['13']  = '美术设计';
+$lang->task->deptList['14']  = '客服经理';
+$lang->task->deptList['15']  = '内宣支持';
+$lang->task->deptList['16']  = 'GS';
+$lang->task->deptList['17']  = 'CS';
+$lang->task->deptList['18']  = 'GM';
+
+
+$lang->task->importTaskFromMSProject = '从Microsoft Project格式导入';
+$lang->task->project = '所属工程';
+// oscar]
+
+
+
+$lang->task->batchChangePriority = '批量修改优先级';
+$lang->task->batchDelete = '批量删除';
+$lang->task->batchCreateRootTask = '批量创建主任务';
+
+
 $lang->task->statusList['']       = '';
 $lang->task->statusList['wait']   = '未开始';
 $lang->task->statusList['doing']  = '进行中';
@@ -122,6 +173,14 @@ $lang->task->statusList['done']   = '已完成';
 $lang->task->statusList['pause']  = '已暂停';
 $lang->task->statusList['cancel'] = '已取消';
 $lang->task->statusList['closed'] = '已关闭';
+$lang->task->statusList['checked'] = '已验收'; // oscar
+$lang->task->statusList['wait_check'] = '待验收'; // oscar
+$lang->task->statusList['wait_check-by-me'] = '待我验收'; // oscar
+$lang->task->statusList['fail'] = '未通过'; // oscar
+
+$lang->task->statuschecked[''] = ''; // oscar
+$lang->task->statuschecked['0'] = '待验收'; // oscar
+$lang->task->statuschecked['1'] = '已验收'; // oscar
 
 $lang->task->typeList['']        = '';
 $lang->task->typeList['design']  = '设计';
@@ -146,6 +205,8 @@ $lang->task->reasonList['cancel'] = '已取消';
 $lang->task->afterChoices['continueAdding'] = '继续为该需求添加任务';
 $lang->task->afterChoices['toTaskList']     = '返回任务列表';
 $lang->task->afterChoices['toStoryList']    = '返回需求列表';
+
+$lang->task->changeWorkHour = "设置工时";
 
 $lang->task->legendBasic  = '基本信息';
 $lang->task->legendEffort = '工时信息';
@@ -260,3 +321,14 @@ $lang->task->report->tasksPerClosedReason->graph->xAxisName = '关闭原因';
 
 $lang->task->report->finishedTasksPerDay->type             = 'bar';
 $lang->task->report->finishedTasksPerDay->graph->xAxisName = '日期';
+
+$lang->task->batchCreateChildTask = '🚅‍';
+
+// oscar[
+$lang->task->checkByGD        = "验收";
+$lang->task->checkBy        = "验收人";
+$lang->task->checkedStatus        = "验收状态";
+$lang->task->uncheckByGD = '取消验收';
+$lang->task->batchAssignToCheckByGD = '指定验收';
+$lang->task->batchSetEstStartFromRealStart = '修正开始时间为实际开始';
+// oscar]

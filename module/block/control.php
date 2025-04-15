@@ -589,7 +589,7 @@ class block extends control
         $this->session->set('buildList', $this->server->http_referer);
         $this->app->loadLang('build');
         $projects = $this->loadModel('project')->getPairs();
-        $this->view->builds = $this->dao->select('t1.*, t2.name as productName')->from(TABLE_BUILD)->alias('t1')
+        $this->view->builds = $this->dao->select('t1.*, t2.name as productName')->from(TABLE_BUILDEX)->alias('t1')
             ->leftJoin(TABLE_PRODUCT)->alias('t2')->on('t1.product=t2.id')
             ->where('t1.deleted')->eq('0')
             ->andWhere('t1.project')->in(array_keys($projects))

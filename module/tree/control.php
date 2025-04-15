@@ -28,6 +28,7 @@ class tree extends control
         if(strpos('story|bug|case|line', $viewType) !== false)
         {
             $product = $this->loadModel('product')->getById($rootID);
+            if(empty($product)) $this->locate($this->createLink('product', 'create'));
             if(!empty($product->type) && $product->type != 'normal')
             {
                 $branches = $this->loadModel('branch')->getPairs($product->id);
@@ -62,6 +63,10 @@ class tree extends control
             $this->product->setMenu($this->product->getPairs(), $rootID, $branch, 'story', '', 'story');
             $this->lang->tree->menu      = $this->lang->product->menu;
             $this->lang->tree->menuOrder = $this->lang->product->menuOrder;
+            // oscar[
+            //$this->lang->tree->menu      = $this->lang->project->menu;
+            //$this->lang->tree->menuOrder = $this->lang->project->menuOrder;
+            // oscar]
 
             $products = $this->product->getPairs();
             unset($products[$rootID]);
@@ -75,6 +80,35 @@ class tree extends control
             $position[] = html::a($this->createLink('product', 'browse', "product=$rootID"), $product->name);
             $position[] = $this->lang->tree->manageProduct;
         }
+        // oscar[
+        elseif($viewType == 'milestones')
+        {
+            $this->lang->set('menugroup.tree', 'product');
+            $this->product->setMenu($this->product->getPairs(), $rootID, $branch, 'story', '', 'story');
+
+            $this->project->setMenu($this->project->getPairs(), $rootID);
+
+            $this->lang->tree->menu      = $this->lang->product->menu;
+            $this->lang->tree->menuOrder = $this->lang->product->menuOrder;
+
+            // oscar[
+            //$this->lang->tree->menu      = $this->lang->project->menu;
+            //$this->lang->tree->menuOrder = $this->lang->project->menuOrder;
+            // oscar]
+
+            $products = $this->product->getPairs();
+            unset($products[$rootID]);
+            $currentProduct = key($products);
+
+            $this->view->allProduct     = $products;
+            $this->view->currentProduct = $currentProduct;
+            $this->view->productModules = $this->tree->getOptionMenu($currentProduct, 'milestones');
+
+            $title      = $product->name . $this->lang->colon . $this->lang->project->manageMilestones;
+            $position[] = html::a($this->createLink('product', 'browse', "product=$rootID"), $product->name);
+            $position[] = $this->lang->tree->manageProduct;
+        }
+        // oscar]
         elseif($viewType == 'bug')
         {
             $this->loadModel('bug')->setMenu($this->product->getPairs(), $rootID);
@@ -325,9 +359,11 @@ class tree extends control
      * AJAX: Get the option menu of modules.
      * 
      * @param  int    $rootID 
-     * @param  string $viewType 
-     * @param  int    $rootModuleID 
+     * @param  string $viewType
+     * @param  int    $branch
+     * @param  int    $rootModuleID
      * @param  string $returnType
+     * @param  string $fieldID
      * @param  bool   $needManage
      * @access public
      * @return string the html select string.

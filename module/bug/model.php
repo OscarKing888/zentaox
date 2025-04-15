@@ -70,8 +70,8 @@ class bugModel extends model
             ->setIF($this->post->story != false, 'storyVersion', $this->loadModel('story')->getVersion($this->post->story))
             ->stripTags($this->config->bug->editor->create['id'], $this->config->allowedTags)
             ->cleanInt('product, module, severity')
-            ->join('openedBuild', ',')
-            ->join('mailto', ',')
+            //->join('openedBuild', ',')
+            //->join('mailto', ',')
             ->remove('files, labels,uid,oldTaskID')
             ->get();
 
@@ -80,6 +80,9 @@ class bugModel extends model
         if($result['stop']) return array('status' => 'exists', 'id' => $result['duplicate']);
 
         $bug = $this->loadModel('file')->processImgURL($bug, $this->config->bug->editor->create['id'], $this->post->uid);
+        $bug->dept = $this->dao->select('dept')->from(TABLE_USER)->where('account')->eq($bug->assignedTo)->fetch('dept'); // oscar
+        //error_log("oscar: bug openedBuild:$bug->openedBuild");
+
         $this->dao->insert(TABLE_BUG)->data($bug)->autoCheck()->batchCheck($this->config->bug->create->requiredFields, 'notempty')->exec();
         if(!dao::isError())
         {
@@ -113,7 +116,11 @@ class bugModel extends model
 
         for($i = 0; $i < $batchNum; $i++)
         {
-            if(!empty($data->title[$i]) and empty($data->openedBuilds[$i])) die(js::alert(sprintf($this->lang->error->notempty, $this->lang->bug->openedBuild)));
+            if(!empty($data->title[$i]))
+            {
+                if(empty($data->modules[$i]))      die(js::alert(sprintf($this->lang->error->notempty, $this->lang->bug->module)));
+                if(empty($data->openedBuilds[$i])) die(js::alert(sprintf($this->lang->error->notempty, $this->lang->bug->openedBuild)));
+            }
         }
 
         /* Get pairs(moduleID => moduleOwner) for bug. */
@@ -127,6 +134,9 @@ class bugModel extends model
         $pri     = 0;
         $os      = '';
         $browser = '';
+        $openedBuild = '';
+        $asT = ''; // oscar
+
         for($i = 0; $i < $batchNum; $i++)
         {
             if($data->modules[$i]  != 'ditto') $module  = (int)$data->modules[$i];
@@ -135,6 +145,8 @@ class bugModel extends model
             if($data->pris[$i]     != 'ditto') $pri     = $data->pris[$i];
             if($data->oses[$i]     != 'ditto') $os      = $data->oses[$i];
             if($data->browsers[$i] != 'ditto') $browser = $data->browsers[$i];
+            if($data->openedBuilds[$i] != 'ditto') $openedBuild = $data->openedBuilds[$i];
+            if($data->assignedTos[$i] != 'ditto') $asT = $data->assignedTos[$i]; // oscar
 
             $data->modules[$i]  = (int)$module;
             $data->projects[$i] = (int)$project;
@@ -142,6 +154,8 @@ class bugModel extends model
             $data->pris[$i]     = $pri;
             $data->oses[$i]     = $os;
             $data->browsers[$i] = $browser;
+            $data->openedBuilds[$i] = $openedBuild;
+            $data->assignedTos[$i] = $asT; // oscar
         }
 
         if(isset($data->uploadImage)) $this->loadModel('file');
@@ -166,6 +180,8 @@ class bugModel extends model
             $bug->os          = $data->oses[$i];
             $bug->browser     = $data->browsers[$i];
             $bug->keywords    = $data->keywords[$i];
+            $bug->openedBuild    = $data->openedBuilds[$i];
+            $bug->assignedTo = $data->assignedTos[$i]; // oscar
 
             if(!empty($data->uploadImage[$i]))
             {
@@ -197,6 +213,15 @@ class bugModel extends model
                 $bug->assignedTo   = $moduleOwners[$bug->module];
                 $bug->assignedDate = $now;
             }
+
+            /*
+            foreach ($bug as $k => $v)
+            {
+                error_log("batchBug: $k -> $v");
+            }
+            //*/
+
+            $bug->dept = $this->dao->select('dept')->from(TABLE_USER)->where('account')->eq($bug->assignedTo)->fetch('dept'); // oscar
 
             $this->dao->insert(TABLE_BUG)->data($bug)->autoCheck()->batchCheck($this->config->bug->create->requiredFields, 'notempty')->exec();
             $bugID = $this->dao->lastInsertID();
@@ -247,6 +272,8 @@ class bugModel extends model
         /* Set modules and browse type. */
         $modules    = $moduleID ? $this->loadModel('tree')->getAllChildId($moduleID) : '0';
         $browseType = ($browseType == 'bymodule' and $this->session->bugBrowseType and $this->session->bugBrowseType != 'bysearch') ? $this->session->bugBrowseType : $browseType;
+
+        //error_log("getBugs:$browseType queryID:$queryID s:" . $this->session->bugBrowseType);
 
         /* Get bugs by browse type. */
         $bugs = array();
@@ -362,6 +389,8 @@ class bugModel extends model
             ->where('t1.id')->eq((int)$bugID)->fetch();
         if(!$bug) return false;
 
+
+
         $bug = $this->loadModel('file')->replaceImgURL($bug, 'steps');
         if($setImgSize) $bug->steps = $this->file->setImgSize($bug->steps);
         foreach($bug as $key => $value) if(strpos($key, 'Date') !== false and !(int)substr($value, 0, 4)) $bug->$key = '';
@@ -377,7 +406,6 @@ class bugModel extends model
         foreach($toCases as $toCase) $bug->toCases[$toCase->id] = $toCase->title;
 
         $bug->files = $this->loadModel('file')->getByObject('bug', $bugID);
-
         return $bug;
     }
 
@@ -507,6 +535,7 @@ class bugModel extends model
             ->setDefault('openedBuild', '')
             ->setDefault('plan', 0)
             ->setDefault('deadline', '0000-00-00')
+            ->setDefault('resolvedDate', '0000-00-00 00:00:00')
             ->setIF(strpos($this->config->bug->edit->requiredFields, 'deadline') !== false, 'deadline', $this->post->deadline)
             ->add('lastEditedBy',   $this->app->user->account)
             ->add('lastEditedDate', $now)
@@ -531,6 +560,9 @@ class bugModel extends model
             ->get();
 
         $bug = $this->loadModel('file')->processImgURL($bug, $this->config->bug->editor->edit['id'], $this->post->uid);
+
+        $bug->dept = $this->dao->select('dept')->from(TABLE_USER)->where('account')->eq($bug->assignedTo)->fetch('dept'); // oscar
+
         $this->dao->update(TABLE_BUG)->data($bug)
             ->autoCheck()
             ->batchCheck($this->config->bug->edit->requiredFields, 'notempty')
@@ -576,7 +608,9 @@ class bugModel extends model
                 if($data->resolvedBys[$bugID] == 'ditto') $data->resolvedBys[$bugID] = isset($prev['resolvedBy']) ? $prev['resolvedBy'] : ''; 
                 if($data->resolutions[$bugID] == 'ditto') $data->resolutions[$bugID] = isset($prev['resolution']) ? $prev['resolution'] : ''; 
                 if($data->os[$bugID]          == 'ditto') $data->os[$bugID]          = isset($prev['os'])         ? $prev['os'] : ''; 
-                if($data->browsers[$bugID]    == 'ditto') $data->browsers[$bugID]    = isset($prev['browser'])    ? $prev['browser'] : ''; 
+                if($data->browsers[$bugID]    == 'ditto') $data->browsers[$bugID]    = isset($prev['browser'])    ? $prev['browser'] : '';
+
+                if($data->openedBuilds[$bugID]    == 'ditto') $data->openedBuilds[$bugID]    = isset($prev['openedBuild'])    ? $prev['openedBuild'] : '';
 
                 $prev['type']       = $data->types[$bugID];
                 $prev['severity']   = $data->severities[$bugID];
@@ -588,6 +622,8 @@ class bugModel extends model
                 $prev['resolution'] = $data->resolutions[$bugID];
                 $prev['os']         = $data->os[$bugID];
                 $prev['browser']    = $data->browsers[$bugID];
+
+                $prev['openedBuild']    = $data->openedBuilds[$bugID];
             }
 
             /* Initialize bugs from the post data.*/
@@ -616,6 +652,8 @@ class bugModel extends model
                 $bug->resolution     = $data->resolutions[$bugID];
                 $bug->duplicateBug   = $data->duplicateBugs[$bugID] ? $data->duplicateBugs[$bugID] : $oldBug->duplicateBug;
 
+                $bug->openedBuild   = $data->openedBuilds[$bugID] ? $data->openedBuilds[$bugID] : $oldBug->openedBuild;
+
                 if($bug->assignedTo  != $oldBug->assignedTo)           $bug->assignedDate = $now;
                 if(($bug->resolvedBy != '' or $bug->resolution != '') and $oldBug->status != 'resolved') $bug->resolvedDate = $now;
                 if($bug->resolution  != '' and $bug->resolvedBy == '') $bug->resolvedBy   = $this->app->user->account;
@@ -638,6 +676,8 @@ class bugModel extends model
             foreach($bugs as $bugID => $bug)
             {
                 $oldBug = $oldBugs[$bugID];
+
+                $bug->dept = $this->dao->select('dept')->from(TABLE_USER)->where('account')->eq($bug->assignedTo)->fetch('dept'); // oscar
 
                 $this->dao->update(TABLE_BUG)->data($bug)
                     ->autoCheck()
@@ -673,10 +713,14 @@ class bugModel extends model
         $now  = helper::now();
         $data = fixer::input('post')->get();
 
+        //error_log("batchActive 1");
+
         $activateBugs = array();
         $bugIDList    = $data->bugIDList ? $data->bugIDList : array();
 
         if(empty($bugIDList)) return $activateBugs;
+
+        ///error_log("batchActive 2", var_export($bugIDList));
 
         foreach($bugIDList as $bugID)
         {
@@ -699,6 +743,9 @@ class bugModel extends model
             $activateBugs[$bugID]['toStory']        = 0;
             $activateBugs[$bugID]['lastEditedBy']   = $this->app->user->account;
             $activateBugs[$bugID]['lastEditedDate'] = $now;
+
+            $activateBugs[$bugID]['openedBuild']    = $data->openedBuildList[$bugID];
+            ///error_log("openedBuildList:" . $data->openedBuildList[$bugID]);
         }
 
         /* Update bugs. */
@@ -724,18 +771,68 @@ class bugModel extends model
     {
         $now = helper::now();
         $oldBug = $this->getById($bugID);
-        $bug = fixer::input('post')
+        $pst = $this->post;
+
+        /*fixer::input('post')
             ->setDefault('lastEditedBy', $this->app->user->account)
             ->setDefault('lastEditedDate', $now)
             ->setDefault('assignedDate', $now)
             ->remove('comment,showModule')
             ->join('mailto', ',')
             ->get();
+        */
+
+        $bug = new stdClass();
+        $bug->assignedTo = $pst->assignedTo;
+        $bug->lastEditedBy = $pst->lastEditedBy;
+        $bug->lastEditedDate = $pst->lastEditedDate;
+        $bug->assignedDate = $pst->assignedDate;
+
+        $bug->dept = $this->dao->select('dept')->from(TABLE_USER)
+            ->where('account')->eq($bug->assignedTo)
+            ->fetch('dept');
+
+        //error_log("bugModel batch assign dept:$bug->dept acc:$bug->assignedTo");
 
         $this->dao->update(TABLE_BUG)
             ->data($bug)
             ->autoCheck()
             ->where('id')->eq($bugID)->exec(); 
+
+        if(!dao::isError()) return common::createChanges($oldBug, $bug);
+    }
+
+    public function assignEx($bugID)
+    {
+        $now = helper::now();
+        $oldBug = $this->getById($bugID);
+        $pst = $this->post;
+
+        /*fixer::input('post')
+            ->setDefault('lastEditedBy', $this->app->user->account)
+            ->setDefault('lastEditedDate', $now)
+            ->setDefault('assignedDate', $now)
+            ->remove('comment,showModule')
+            ->join('mailto', ',')
+            ->get();
+        */
+
+        $bug = new stdClass();
+        $bug->assignedTo = $pst->assignedToEx;
+        $bug->lastEditedBy = $pst->lastEditedBy;
+        $bug->lastEditedDate = $pst->lastEditedDate;
+        $bug->assignedDate = $pst->assignedDate;
+
+        $bug->dept = $this->dao->select('dept')->from(TABLE_USER)
+            ->where('account')->eq($bug->assignedTo)
+            ->fetch('dept');
+
+        //error_log("bugModel batch assignEx dept:$bug->dept acc:$bug->assignedTo");
+
+        $this->dao->update(TABLE_BUG)
+            ->data($bug)
+            ->autoCheck()
+            ->where('id')->eq($bugID)->exec();
 
         if(!dao::isError()) return common::createChanges($oldBug, $bug);
     }
@@ -826,6 +923,7 @@ class bugModel extends model
             ->get();
 
         /* Can create build when resolve bug. */
+        /* oscar
         if(isset($bug->createBuild))
         {
             if(empty($bug->buildName)) dao::$errors['buildName'][] = sprintf($this->lang->error->notempty, $this->lang->bug->placeholder->newBuildName);
@@ -847,11 +945,13 @@ class bugModel extends model
             $this->loadModel('action')->create('build', $buildID, 'opened');
             $bug->resolvedBuild = $buildID;
         }
+        //*/
+
         unset($bug->buildName);
         unset($bug->createBuild);
         unset($bug->buildProject);
 
-        if($bug->resolvedBuild != 'trunk') $bug->testtask = (int) $this->dao->select('id')->from(TABLE_TESTTASK)->where('build')->eq($bug->resolvedBuild)->orderBy('id_desc')->limit(1)->fetch('id');
+        //oscar if($bug->resolvedBuild != 'trunk') $bug->testtask = (int) $this->dao->select('id')->from(TABLE_TESTTASK)->where('build')->eq($bug->resolvedBuild)->orderBy('id_desc')->limit(1)->fetch('id');
 
         $this->dao->update(TABLE_BUG)->data($bug)
             ->autoCheck()
@@ -862,7 +962,66 @@ class bugModel extends model
             ->exec();
         if(!dao::isError()) $this->loadModel('score')->create('bug', 'resolve', $oldBug);
         /* Link bug to build and release. */
-        $this->linkBugToBuild($bugID, $bug->resolvedBuild);
+        //oscar $this->linkBugToBuild($bugID, $bug->resolvedBuild);
+
+        $this->autoCreateBlog("解决", $bugID);
+    }
+
+    // oscar[
+    // todo auto create blog
+    public function autoCreateBlog($action, $bugID)
+    {
+        $bug = $this->dao->select()->from(TABLE_BUG)
+            ->where('id')->eq($bugID)
+            ->fetch();
+
+        //error_log("task autoCreateBlog sql:" . $this->dao->get() . " task:" . $task);
+
+        $this->loadModel('blog');
+        //$this->loadModel('product');
+
+        //$task->project = $this->dao->select('project')->from(TABLE_TASK)
+        //    ->where('id')->eq($task->id)
+        //    ->fetch('project');
+
+        $taskLink = helper::createLink('bug', 'view', "bugID=$bugID");
+        $blogContent = html::aQ2($taskLink, $bug->title, "class=\"auto-action-blog iframe\"") ;
+
+        $bugProduct = $bug->product;
+
+        //error_log("task autoCreateBlog select product:$taskProduct sql:" . $this->dao->get());
+
+        $this->blog->createOrUpdate($action . "BUG：$blogContent", $bugProduct);
+    }
+    // oscar]
+
+    /**
+     * Batch change branch.
+     * 
+     * @param  array  $bugIDList 
+     * @param  int    $branchID 
+     * @access public
+     * @return array
+     */
+    public function batchChangeBranch($bugIDList, $branchID)
+    {
+        $now        = helper::now();
+        $allChanges = array();
+        $oldBugs    = $this->getByList($bugIDList);
+        foreach($bugIDList as $bugID)
+        {
+            $oldBug = $oldBugs[$bugID];
+            if($branchID == $oldBug->branch) continue;
+
+            $bug = new stdclass();
+            $bug->lastEditedBy   = $this->app->user->account;
+            $bug->lastEditedDate = $now;
+            $bug->branch         = $branchID;
+
+            $this->dao->update(TABLE_BUG)->data($bug)->autoCheck()->where('id')->eq((int)$bugID)->exec();
+            if(!dao::isError()) $allChanges[$bugID] = common::createChanges($oldBug, $bug);
+        }
+        return $allChanges;
     }
 
     /**
@@ -991,11 +1150,14 @@ class bugModel extends model
             ->add('lastEditedBy',   $this->app->user->account)
             ->add('lastEditedDate', $now)
             ->add('activatedDate', $now)
-            ->join('openedBuild', ',')
+            //->join('openedBuild', ',')
             ->remove('comment,files,labels')
             ->get();
 
-        $this->dao->update(TABLE_BUG)->data($bug)->autoCheck()->where('id')->eq((int)$bugID)->exec();
+        $this->dao->update(TABLE_BUG)->data($bug)->autoCheck()->where('id')->eq((int)$bugID)
+            ->autoCheck()
+            ->batchCheck($this->config->bug->activate->requiredFields, 'notempty')
+            ->exec();
         $this->dao->update(TABLE_BUG)->set('activatedCount = activatedCount + 1')->where('id')->eq((int)$bugID)->exec();
     }
 
@@ -1128,7 +1290,7 @@ class bugModel extends model
         $this->config->bug->search['params']['module']['values']        = $this->loadModel('tree')->getOptionMenu($productID, $viewType = 'bug', $startModuleID = 0);
         $this->config->bug->search['params']['project']['values']       = $this->product->getProjectPairs($productID);
         $this->config->bug->search['params']['severity']['values']      = array(0 => '') + $this->lang->bug->severityList; //Fix bug #939.
-        $this->config->bug->search['params']['openedBuild']['values']   = $this->loadModel('build')->getProductBuildPairs($productID, 0, $params = '');
+        $this->config->bug->search['params']['openedBuild']['values']   = $this->loadModel('buildex')->getProductBuildPairs($productID, 0, $params = '');
         $this->config->bug->search['params']['resolvedBuild']['values'] = $this->config->bug->search['params']['openedBuild']['values'];
         if($this->session->currentProductType == 'normal')
         {
@@ -1155,7 +1317,7 @@ class bugModel extends model
     {
         $productIdList = array();
         foreach($bugs as $bug) $productIdList[$bug->id] = $bug->product;
-        $builds = $this->loadModel('build')->getProductBuildPairs(array_unique($productIdList), 0, $params = '');
+        $builds = $this->loadModel('buildex')->getProductBuildPairs(array_unique($productIdList), 0, $params = '');
 
         /* Process the openedBuild and resolvedBuild fields. */
         foreach($bugs as $key => $bug)
@@ -1282,15 +1444,19 @@ class bugModel extends model
     {
         if($type == 'bySearch')
         {
+            //error_log("== getProjectBugs bySearch");
+
             $queryID  = (int)$param;
             $products = $this->loadModel('project')->getProducts($projectID);
 
             if($this->session->projectBugQuery == false) $this->session->set('projectBugQuery', ' 1 = 1');
             if($queryID)
             {
+                //error_log("== getProjectBugs queryID:{$queryID}");
                 $query = $this->loadModel('search')->getQuery($queryID);
                 if($query)
                 {
+                    //error_log("== getProjectBugs $query");
                     $this->session->set('projectBugQuery', $query->sql);
                     $this->session->set('projectBugForm', $query->form);
                 }
@@ -1300,6 +1466,7 @@ class bugModel extends model
             $bugQuery   = $this->session->projectBugQuery;
             if(strpos($this->session->projectBugQuery, $allProduct) !== false)
             {
+                //error_log("== getProjectBugs bugQuery:{$bugQuery}");
                 $bugQuery = str_replace($allProduct, '1', $this->session->projectBugQuery);
             }
 
@@ -1307,22 +1474,107 @@ class bugModel extends model
                 ->where($bugQuery)
                 ->andWhere('project')->eq((int)$projectID)
                 ->andWhere('deleted')->eq(0)
+                //->andWhere('status')->eq('active')
                 ->orderBy($orderBy)
                 ->page($pager)
+                //->limit(100)
                 ->fetchAll('id');
         }
         else
         {
+            //error_log("== getProjectBugs not bySearch orderBy:{$orderBy}");
+
             $bugs = $this->dao->select('*')->from(TABLE_BUG)
                 ->where('deleted')->eq(0)
                 ->beginIF(empty($build))->andWhere('project')->eq($projectID)->fi()
                 ->beginIF($build)->andWhere("CONCAT(',', openedBuild, ',') like '%,$build,%'")->fi()
+                //->andWhere('status')->eq('active')
                 ->orderBy($orderBy)->page($pager)->fetchAll();
         }
 
         $this->loadModel('common')->saveQueryCondition($this->dao->get(), 'bug');
 
         return $bugs;
+    }
+
+    public function getBuildBugs($projectID, $build = 0, $type = '', $param = 0, $orderBy = 'id_desc', $pager = null)
+    {
+        /*
+        error_log("== getBuildBugs prj:{$projectID} build:{$build} orderBy:{$orderBy}");
+
+        $bugs = $this->dao->select('*')->from(TABLE_BUG)
+            ->where('deleted')->eq(0)
+            //->where('status')->eq('closed')
+            //->beginIF(empty($build))->andWhere('project')->eq($projectID)->fi()
+            //->beginIF($build)->andWhere("CONCAT(',', openedBuild, ',') like '%,$build,%'")->fi()
+            //->andWhere('status')->eq('active')
+            //->where('id')->eq('7371')
+            ->orderBy($orderBy)
+            //->page($pager)
+            ->limit(100)
+            ->fetchAll();
+
+        error_log("== getBuildBugs cnt:". count($bugs));
+        return $bugs;
+        //*/
+        //*
+        if($type == 'bySearch')
+        {
+            //error_log("== getProjectBugs bySearch");
+
+            $queryID  = (int)$param;
+            $products = $this->loadModel('project')->getProducts($projectID);
+
+            if($this->session->projectBugQuery == false) $this->session->set('projectBugQuery', ' 1 = 1');
+            if($queryID)
+            {
+                //error_log("== getProjectBugs queryID:{$queryID}");
+                $query = $this->loadModel('search')->getQuery($queryID);
+                if($query)
+                {
+                    //error_log("== getProjectBugs $query");
+                    $this->session->set('projectBugQuery', $query->sql);
+                    $this->session->set('projectBugForm', $query->form);
+                }
+            }
+
+            $allProduct = "`product` = 'all'";
+            $bugQuery   = $this->session->projectBugQuery;
+            if(strpos($this->session->projectBugQuery, $allProduct) !== false)
+            {
+                //error_log("== getProjectBugs bugQuery:{$bugQuery}");
+                $bugQuery = str_replace($allProduct, '1', $this->session->projectBugQuery);
+            }
+
+            $bugs = $this->dao->select('*')->from(TABLE_BUG)
+                ->where($bugQuery)
+                //->andWhere('project')->eq((int)$projectID)
+                ->andWhere('deleted')->eq(0)
+                //->andWhere('status')->eq('active')
+                ->orderBy($orderBy)
+                //->page($pager)
+                ->limit(100)
+                ->fetchAll('id');
+        }
+        else
+        {
+            //error_log("== getProjectBugs not bySearch orderBy:{$orderBy}");
+
+            $bugs = $this->dao->select('*')->from(TABLE_BUG)
+                ->where('deleted')->eq(0)
+                //->beginIF(empty($build))->andWhere('project')->eq($projectID)->fi()
+                //->beginIF($build)->andWhere("CONCAT(',', openedBuild, ',') like '%,$build,%'")->fi()
+                //->andWhere('status')->eq('active')
+                ->orderBy($orderBy)
+                //->page($pager)
+                ->limit(100)
+                ->fetchAll();
+        }
+
+        $this->loadModel('common')->saveQueryCondition($this->dao->get(), 'bug');
+
+        return $bugs;
+        //*/
     }
 
     /**
@@ -1459,9 +1711,12 @@ class bugModel extends model
             ->from(TABLE_BUG)
             ->where('story')->in($stories)
             ->andWhere('deleted')->eq(0)
-            ->beginIF($projectID)->andWhere('project')->eq($projectID)->fi()
+            //->beginIF($projectID)->andWhere('project')->eq($projectID)->fi()
             ->groupBy('story')
             ->fetchPairs();
+
+        //error_log("getStoryBugCounts" . $this->dao->get());
+
         foreach($stories as $storyID) if(!isset($bugCounts[$storyID])) $bugCounts[$storyID] = 0;
         return $bugCounts;
     }
@@ -1549,8 +1804,88 @@ class bugModel extends model
         if(!$datas) return array();
         $projects = $this->loadModel('project')->getPairs();
         foreach($datas as $projectID => $data) $data->name = isset($projects[$projectID]) ? $projects[$projectID] : $this->lang->report->undefined;
+
+        //var_dump($datas);
+
         return $datas;
     }
+
+    // oscar
+
+    function sortByValue($a, $b)
+    {
+        return $a->value > $b->value;
+    }
+
+    public function getDataOfBugsPerDept()
+    {
+        //baseDAO::$debug_log_sql = true;
+        $userDatas = $this->dao->select('assignedTo AS name, COUNT(*) AS value')
+            ->from(TABLE_BUG)->alias('t1')
+            //->leftJoin(TABLE_USER)->alias('t2')->on('t1.assignedTo = t2.account')
+            ->where($this->reportCondition())
+            ->groupBy('name')
+            ->orderBy('value DESC')->fetchAll('name');
+
+        if(!$userDatas) return array();
+
+        $this->loadModel('dept');
+
+        $datas = array();
+
+        // get account => dept
+        $userDepts = $this->dept->getUsersDept();
+        $userDepts['closed'] = 'closed';
+
+
+        // get dept id => name
+        $depts = $this->dept->getPairs();
+        $depts['closed'] = '已关闭';
+        $depts[''] = "其它部门";
+        $depts['0'] = "/";
+
+
+        foreach($userDatas as $account => $data)
+        {
+            $userDept = $userDepts[$account];
+            $deptName = $depts[$userDept];
+
+            if(!isset($deptName))
+            {
+                $deptName = $userDept;
+                error_log("user:$account dept:$userDept");
+            }
+
+            //error_log("getDataOfBugsPerDept acc:$account dept:$userDept deptName:$deptName v:$data->value");
+
+            if(!isset($datas[$userDept]))
+            {
+                $datas[$userDept] = new stdClass();
+                $datas[$userDept]->value = $data->value;
+                $datas[$userDept]->name = $deptName;
+            }
+            else
+            {
+                $datas[$userDept]->value += $data->value;
+            }
+        }
+
+        usort($datas, sortByValue);
+
+        //var_dump($datas);
+//
+//
+//        if(!isset($this->users)) $this->users = $this->loadModel('user')->getPairs('noletter');
+//        foreach($datas as $account => $data)
+//        {
+//            if(isset($this->users[$account]))
+//            {
+//                $data->name = $this->users[$account];
+//            }
+//        }
+        return $datas;
+    }
+    // oscar
 
     /**
      * Get report data of bugs per build.
@@ -1562,7 +1897,7 @@ class bugModel extends model
     {
         $datas = $this->dao->select('openedBuild as name, count(openedBuild) as value')->from(TABLE_BUG)->where($this->reportCondition())->groupBy('openedBuild')->orderBy('value DESC')->fetchAll('name');
         if(!$datas) return array();
-        $builds = $this->loadModel('build')->getProductBuildPairs($this->session->product, $branch = 0, $params = '');
+        $builds = $this->loadModel('buildex')->getProductBuildPairs($this->session->product, $branch = 0, $params = '');
 
         /* Deal with the situation that a bug maybe associate more than one openedBuild. */
         foreach($datas as $buildIDList => $data) 
@@ -2199,9 +2534,48 @@ class bugModel extends model
         $allBranch = "`branch` = 'all'";
         if($branch and strpos($bugQuery, '`branch` =') === false) $bugQuery .= " AND `branch` in('0','$branch')";
         if(strpos($bugQuery, $allBranch) !== false) $bugQuery = str_replace($allBranch, '1', $bugQuery);
-        $bugs = $this->dao->select('*')->from(TABLE_BUG)->where($bugQuery)
-            ->andWhere('deleted')->eq(0)
-            ->orderBy($orderBy)->page($pager)->fetchAll();
+
+        // oscar[
+        $deptTag = '`dept` = \'';
+        $deptPos = strpos($bugQuery, $deptTag);
+        $deptTagLen = strlen($deptTag);
+        if(false && $deptPos !== false){
+            $startOffset = $deptPos + $deptTagLen;
+            $endQuot = strpos($bugQuery, "'",  $startOffset);
+            $deptNumb = substr($bugQuery, $startOffset, $endQuot - $startOffset);
+
+            /*
+            error_log("bug getBySearch P:$deptPos L:$deptTagLen E:$endQuot N:$deptNumb QID:$queryID bugQuery:$bugQuery" . " sq:" . $this->session->bugQuery);
+            foreach ($this->session as $k => $v)
+            {
+                error_log("session $k = $v");
+            }
+            //*/
+
+            $bugQuery1 = substr($bugQuery, 0, $deptPos);
+            $bugQuery2 = substr($bugQuery, $endQuot + 1, strlen($bugQuery) - $endQuot);
+
+            $bugQuery = $bugQuery1 . " 1" . $bugQuery2;
+
+            //error_log("bq:$bugQuery b1:$bugQuery1 b2:$bugQuery2");
+
+            //baseDAO::$debug_log_sql = true;
+
+            $bugs = $this->dao->select('t1.*, t2.dept, t2.account')
+                ->from(TABLE_BUG)->alias('t1')
+                ->leftJoin(TABLE_USER)->alias('t2')->on('t1.assignedTo = t2.account')
+                ->where('t2.dept')->eq($deptNumb)
+                ->andWhere($bugQuery)
+                ->andWhere('t1.deleted')->eq(0)
+                ->orderBy($orderBy)->page($pager)->fetchAll();
+        }
+        else{
+            $bugs = $this->dao->select('*')->from(TABLE_BUG)->where($bugQuery)
+                ->andWhere('deleted')->eq(0)
+                ->orderBy($orderBy)->page($pager)->fetchAll();
+        }
+        // oscar]
+
         return $bugs;
     }
 
@@ -2364,14 +2738,23 @@ class bugModel extends model
                 echo "</span>";
                 break;
             case 'title':
+                // oscar
+                $depts = array('' => '') + $this->loadModel('dept')->getOptionMenu();
+                $deptNames = explode('/', $depts[$bug->dept]);
+                $deptName = " - <span class='bug-dept'>" . $deptNames[count($deptNames) - 1] . "</span>";
+                // oscar
+
                 $class = 'confirm' . $bug->confirmed;
                 echo "<span class='$class'>[{$this->lang->bug->confirmedList[$bug->confirmed]}]</span> ";
-                if($bug->branch)echo "<span class='label label-info label-badge'>{$branches[$bug->branch]}</span> ";
-                if($modulePairs and $bug->module)echo "<span class='label label-info label-badge'>{$modulePairs[$bug->module]}</span> ";
-                echo $canView ? html::a($bugLink, $bug->title, null, "style='color: $bug->color'") : "<span style='color: $bug->color'>{$bug->title}</span>";
+                if($bug->branch and isset($branches[$bug->branch]))    echo "<span class='label label-info label-badge'>{$branches[$bug->branch]}</span> ";
+                if($bug->module and isset($modulePairs[$bug->module])) echo "<span class='label label-info label-badge'>{$modulePairs[$bug->module]}</span> ";
+                $bugTitle =  $bug->title . $deptName;
+                echo $canView ? html::a($bugLink, $bugTitle, null, "style='color: $bug->color'") : "<span style='color: $bug->color'>{$bugTitle}</span>";
+
+
                 break;
             case 'branch':
-                echo $branches[$bug->branch];
+                echo zget($branches, $bug->branch, '');
                 break;
             case 'project':
                 echo zget($projects, $bug->project, '');
@@ -2380,10 +2763,18 @@ class bugModel extends model
                 echo zget($plans, $bug->plan, '');
                 break;
             case 'story':
-                echo zget($stories, $bug->story, '');
+                if(isset($stories[$bug->story]))
+                {
+                    $story = $stories[$bug->story];
+                    echo common::hasPriv('story', 'view') ? html::a(helper::createLink('story', 'view', "storyID=$story->id", 'html', true), $story->title, '', "class='iframe'") : $story->title;
+                }
                 break;
             case 'task':
-                echo zget($tasks, $bug->task, '');
+                if(isset($tasks[$bug->task]))
+                {
+                    $task = $tasks[$bug->task];
+                    echo common::hasPriv('task', 'view') ? html::a(helper::createLink('task', 'view', "taskID=$task->id", 'html', true), $task->name, '', "class='iframe'") : $task->name;
+                }
                 break;
             case 'type':
                 echo zget($this->lang->bug->typeList, $bug->type);
@@ -2425,7 +2816,23 @@ class bugModel extends model
                 echo substr($bug->openedDate, 5, 11);
                 break;
             case 'openedBuild':
-                foreach(explode(',', $bug->openedBuild) as $build) echo zget($builds, $build) . ' ';
+                $builds = array_flip($builds);
+                foreach(explode(',', $bug->openedBuild) as $build)
+                {
+                    $buildID = zget($builds, $build, '');
+                    if($buildID == 'trunk')
+                    {
+                        echo $build;
+                    }
+                    elseif($buildID and common::hasPriv('build', 'view'))
+                    {
+                        echo html::a(helper::createLink('build', 'view', "buildID=$buildID"), $build, '', "title='$bug->openedBuild'");
+                    }
+                    else
+                    {
+                        echo $build;
+                    }
+                }
                 break;
             case 'assignedTo':
                 echo zget($users, $bug->assignedTo, $bug->assignedTo);
@@ -2485,9 +2892,8 @@ class bugModel extends model
     public function sendmail($bugID, $actionID)
     {
         $this->loadModel('mail');
-        $bug         = $this->getByID($bugID);
-        $productName = $this->loadModel('product')->getById($bug->product)->name;
-        $users       = $this->loadModel('user')->getPairs('noletter');
+        $bug   = $this->getByID($bugID);
+        $users = $this->loadModel('user')->getPairs('noletter');
 
         /* Get action info. */
         $action             = $this->loadModel('action')->getById($actionID);
@@ -2522,12 +2928,44 @@ class bugModel extends model
         ob_end_clean();
         chdir($oldcwd);
 
+        $sendUsers = $this->getToAndCcList($bug);
+        if(!$sendUsers) return;
+        list($toList, $ccList) = $sendUsers;
+        $subject = $this->getSubject($bug);
+
+        /* Send it. */
+        $this->mail->send($toList, $subject, $mailContent, $ccList);
+        if($this->mail->isError()) trigger_error(join("\n", $this->mail->getError()));
+    }
+
+    /**
+     * Get subject.
+     * 
+     * @param  object    $bug 
+     * @access public
+     * @return string
+     */
+    public function getSubject($bug)
+    {
+        $productName = $this->loadModel('product')->getById($bug->product)->name;
+        return 'BUG #'. $bug->id . ' ' . $bug->title . ' - ' . $productName;
+    }
+
+    /**
+     * Get toList and ccList.
+     * 
+     * @param  object    $bug 
+     * @access public
+     * @return bool|array
+     */
+    public function getToAndCcList($bug)
+    {
         /* Set toList and ccList. */
         $toList = $bug->assignedTo;
         $ccList = trim($bug->mailto, ',');
         if(empty($toList))
         {
-            if(empty($ccList)) return;
+            if(empty($ccList)) return false;
             if(strpos($ccList, ',') === false)
             {
                 $toList = $ccList;
@@ -2545,8 +2983,50 @@ class bugModel extends model
             $toList = $bug->resolvedBy;
         }
 
-        /* Send it. */
-        $this->mail->send($toList, 'BUG #'. $bug->id . ' ' . $bug->title . ' - ' . $productName, $mailContent, $ccList);
-        if($this->mail->isError()) trigger_error(join("\n", $this->mail->getError()));
+        return array($toList, $ccList);
+    }
+
+
+    public function batchChangePriority($bugIDList, $priority)
+    {
+        $now        = helper::now();
+        $allChanges = array();
+        $oldBugs    = $this->getByList($bugIDList);
+        foreach($bugIDList as $bugID)
+        {
+            $oldBug = $oldBugs[$bugID];
+            if($priority == $oldBug->pri) continue;
+
+            $bug = new stdclass();
+            $bug->lastEditedBy   = $this->app->user->account;
+            $bug->lastEditedDate = $now;
+            $bug->pri         = $priority;
+
+            $this->dao->update(TABLE_BUG)->data($bug)->autoCheck()->where('id')->eq((int)$bugID)->exec();
+            if(!dao::isError()) $allChanges[$bugID] = common::createChanges($oldBug, $bug);
+        }
+        return $allChanges;
+    }
+
+
+    public function batchChangeSeverity($bugIDList, $severity)
+    {
+        $now        = helper::now();
+        $allChanges = array();
+        $oldBugs    = $this->getByList($bugIDList);
+        foreach($bugIDList as $bugID)
+        {
+            $oldBug = $oldBugs[$bugID];
+            if($severity == $oldBug->severity) continue;
+
+            $bug = new stdclass();
+            $bug->lastEditedBy   = $this->app->user->account;
+            $bug->lastEditedDate = $now;
+            $bug->severity         = $severity;
+
+            $this->dao->update(TABLE_BUG)->data($bug)->autoCheck()->where('id')->eq((int)$bugID)->exec();
+            if(!dao::isError()) $allChanges[$bugID] = common::createChanges($oldBug, $bug);
+        }
+        return $allChanges;
     }
 }

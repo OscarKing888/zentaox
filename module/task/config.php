@@ -8,7 +8,8 @@ $config->task->start    = new stdclass();
 $config->task->finish   = new stdclass();
 $config->task->activate = new stdclass();
 
-$config->task->create->requiredFields      = 'name,type';
+$config->task->create->requiredFields      = 'name,deadline,dept';
+$config->task->batchCreate->requiredFields      = 'name,assignedTo';
 $config->task->edit->requiredFields        = $config->task->create->requiredFields;
 $config->task->finish->requiredFields      = 'consumed';
 $config->task->activate->requiredFields    = 'left';
@@ -26,26 +27,39 @@ $config->task->editor->activate = array('id' => 'comment', 'tools' => 'simpleToo
 $config->task->editor->cancel   = array('id' => 'comment', 'tools' => 'simpleTools');
 $config->task->editor->pause    = array('id' => 'comment', 'tools' => 'simpleTools');
 
-$config->task->exportFields = '
-    id, project, module, progress, story,
+$config->task->exportFieldsOld = '
+    id, project, module, story,dept,
     name, desc,
     type, pri,estStarted, realStarted, deadline, status,estimate, consumed, left,
-    mailto,
+    mailto, progress,
     openedBy, openedDate, assignedTo, assignedDate, 
     finishedBy, finishedDate, canceledBy, canceledDate,
     closedBy, closedDate, closedReason,
     lastEditedBy, lastEditedDate,files
     ';
+
+$config->task->exportFields = '
+    id, project, module, story,dept,
+    name, pri, estimate, estStarted, deadline,     
+    assignedTo, checkBy, status
+    ';
+
+$config->task->importFields = 'id,project,module,story,dept,name,pri,estimate,estStarted,deadline,assignedTo';
+
 if($config->global->flow == 'onlyTask') $config->task->exportFields = str_replace(array(' story,'), '', $config->task->exportFields);
 
-$config->task->customCreateFields      = 'story,estStarted,deadline,mailto,pri,estimate'; 
-$config->task->customBatchCreateFields = 'module,story,assignedTo,estimate,estStarted,deadline,desc,pri'; 
+//oscar: $config->task->customCreateFields      = 'story,estStarted,deadline,mailto,pri,estimate';
+$config->task->customCreateFields      = 'story,pri,files,deadline';
+//oscar: $config->task->customBatchCreateFields = 'module,story,assignedTo,estimate,estStarted,deadline,desc,pri';
+$config->task->customBatchCreateFields = 'module,story,dept,estimate,pri,deadline';
 $config->task->customBatchEditFields   = 'module,assignedTo,status,pri,estimate,record,left,estStarted,deadline,finishedBy,canceledBy,closedBy,closedReason';
 
 $config->task->custom = new stdclass();
 $config->task->custom->createFields      = $config->task->customCreateFields;
-$config->task->custom->batchCreateFields = 'module,story,assignedTo,estimate,desc,pri';
+//oscar:$config->task->custom->batchCreateFields = 'module,story,assignedTo,estimate,desc,pri';
+$config->task->custom->batchCreateFields = 'module,story,dept,estimate,pri,deadline';
 $config->task->custom->batchEditFields   = 'module,assignedTo,status,pri,estimate,record,left,finishedBy,closedBy,closedReason';
+
 
 if($config->global->flow == 'onlyTask')
 {
@@ -55,12 +69,19 @@ if($config->global->flow == 'onlyTask')
 }
 
 $config->task->datatable = new stdclass();
-$config->task->datatable->defaultField = array('id', 'pri', 'name', 'status', 'deadline', 'openedDate', 'assignedTo', 'finishedBy', 'estimate', 'consumed', 'left', 'actions');
+//$config->task->datatable->defaultField = array('id', 'pri', 'name', 'dept', 'status', 'deadline', 'openedDate', 'openedBy', 'assignedTo', 'finishedBy', 'estimate', 'consumed', 'left', 'actions');
+// oscar todo modify this to change project-task view table header
+$config->task->datatable->defaultField = array('id', 'pri', 'name', 'status', 'deadline', 'openedDate', 'openedBy', 'assignedTo', 'finishedBy', 'estimate', 'checkBy', 'actions');
 
 $config->task->datatable->fieldList['id']['title']    = 'idAB';
 $config->task->datatable->fieldList['id']['fixed']    = 'left';
 $config->task->datatable->fieldList['id']['width']    = '70';
 $config->task->datatable->fieldList['id']['required'] = 'yes';
+
+$config->task->datatable->fieldList['project']['title']    = 'project';
+$config->task->datatable->fieldList['project']['fixed']    = 'left';
+$config->task->datatable->fieldList['project']['width']    = 'auto';
+$config->task->datatable->fieldList['project']['required'] = 'yes';
 
 $config->task->datatable->fieldList['pri']['title']    = 'priAB';
 $config->task->datatable->fieldList['pri']['fixed']    = 'left';
@@ -69,13 +90,23 @@ $config->task->datatable->fieldList['pri']['required'] = 'no';
 
 $config->task->datatable->fieldList['name']['title']    = 'name';
 $config->task->datatable->fieldList['name']['fixed']    = 'left';
-$config->task->datatable->fieldList['name']['width']    = 'auto';
+$config->task->datatable->fieldList['name']['width']    = '350';
 $config->task->datatable->fieldList['name']['required'] = 'yes';
 
 $config->task->datatable->fieldList['type']['title']    = 'type';
 $config->task->datatable->fieldList['type']['fixed']    = 'no';
 $config->task->datatable->fieldList['type']['width']    = '80';
 $config->task->datatable->fieldList['type']['required'] = 'no';
+
+$config->task->datatable->fieldList['dept']['title']    = 'dept';
+$config->task->datatable->fieldList['dept']['fixed']    = 'no';
+$config->task->datatable->fieldList['dept']['width']    = 'auto';
+$config->task->datatable->fieldList['dept']['required'] = 'no';
+
+$config->task->datatable->fieldList['milestone']['title']    = 'milestone';
+$config->task->datatable->fieldList['milestone']['fixed']    = 'no';
+$config->task->datatable->fieldList['milestone']['width']    = 'auto';
+$config->task->datatable->fieldList['milestone']['required'] = 'yes';
 
 $config->task->datatable->fieldList['status']['title']    = 'statusAB';
 $config->task->datatable->fieldList['status']['fixed']    = 'no';
@@ -106,12 +137,12 @@ $config->task->datatable->fieldList['progress']['sort']     = 'no';
 $config->task->datatable->fieldList['deadline']['title']    = 'deadlineAB';
 $config->task->datatable->fieldList['deadline']['fixed']    = 'no';
 $config->task->datatable->fieldList['deadline']['width']    = '70';
-$config->task->datatable->fieldList['deadline']['required'] = 'no';
+$config->task->datatable->fieldList['deadline']['required'] = 'yes';
 
 $config->task->datatable->fieldList['openedBy']['title']    = 'openedByAB';
 $config->task->datatable->fieldList['openedBy']['fixed']    = 'no';
 $config->task->datatable->fieldList['openedBy']['width']    = '70';
-$config->task->datatable->fieldList['openedBy']['required'] = 'no';
+$config->task->datatable->fieldList['openedBy']['required'] = 'yes';
 
 $config->task->datatable->fieldList['openedDate']['title']    = 'openedDate';
 $config->task->datatable->fieldList['openedDate']['fixed']    = 'no';
@@ -173,10 +204,12 @@ $config->task->datatable->fieldList['closedReason']['fixed']    = 'no';
 $config->task->datatable->fieldList['closedReason']['width']    = '80';
 $config->task->datatable->fieldList['closedReason']['required'] = 'no';
 
-$config->task->datatable->fieldList['story']['title']    = 'story';
+global $lang;
+$config->task->datatable->fieldList['story']['title']    = "storyAB";
 $config->task->datatable->fieldList['story']['fixed']    = 'no';
-$config->task->datatable->fieldList['story']['width']    = '80';
+$config->task->datatable->fieldList['story']['width']    = '40';
 $config->task->datatable->fieldList['story']['required'] = 'no';
+$config->task->datatable->fieldList['story']['name']     = $lang->task->story;
 
 $config->task->datatable->fieldList['mailto']['title']    = 'mailto';
 $config->task->datatable->fieldList['mailto']['fixed']    = 'no';
@@ -195,5 +228,10 @@ $config->task->datatable->fieldList['lastEditedDate']['required'] = 'no';
 
 $config->task->datatable->fieldList['actions']['title']    = 'actions';
 $config->task->datatable->fieldList['actions']['fixed']    = 'right';
-$config->task->datatable->fieldList['actions']['width']    = '180';
+$config->task->datatable->fieldList['actions']['width']    = '180'; // oscar:180
 $config->task->datatable->fieldList['actions']['required'] = 'yes';
+
+$config->task->datatable->fieldList['checkBy']['title']    = 'checkBy';
+$config->task->datatable->fieldList['checkBy']['fixed']    = 'right';
+$config->task->datatable->fieldList['checkBy']['width']    = '90';
+$config->task->datatable->fieldList['checkBy']['required'] = 'yes';

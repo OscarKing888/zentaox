@@ -5,6 +5,9 @@
     <small class='text-muted'> <?php echo $lang->story->cases;?></small>
   </div>
 </div>
+<?php
+include 'info_story.html.php';
+?>
 <div class='casesList'>
   <form class='form-condensed' target='hiddenwin'>
     <table class='table table-fixed'>

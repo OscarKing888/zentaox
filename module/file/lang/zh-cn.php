@@ -30,6 +30,14 @@ $lang->file->addFile       = '添加文件';
 $lang->file->beginUpload   = '开始上传';
 $lang->file->uploadSuccess = '上传成功';
 
+//oscar:
+$lang->file->downloadthumb   = '下载缩略图';
+$lang->file->downloadToDisk  = '下载到本机';
+$lang->file->buildFormsingle = '上传单个文件';
+$lang->file->readthumb       = '查看缩略图';
+
+//oscar:
+
 $lang->file->pathname  = '路径';
 $lang->file->title     = '标题';
 $lang->file->extension = '扩展名';

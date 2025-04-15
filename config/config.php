@@ -16,7 +16,7 @@ if(!class_exists('config')){class config{}}
 if(!function_exists('getWebRoot')){function getWebRoot(){}}
 
 /* 基本设置。Basic settings. */
-$config->version    = '9.6.3';                // ZenTaoPHP的版本。 The version of ZenTaoPHP. Don't change it.
+$config->version    = '9.7';                // ZenTaoPHP的版本。 The version of ZenTaoPHP. Don't change it.
 $config->charset    = 'UTF-8';              // ZenTaoPHP的编码。 The encoding of ZenTaoPHP.
 $config->cookieLife = time() + 2592000;     // Cookie的生存时间。The cookie life time.
 $config->timezone   = 'Asia/Shanghai';      // 时区设置。        The time zone setting, for more see http://www.php.net/manual/en/timezones.php.
@@ -34,17 +34,17 @@ $config->views       = ',html,json,mhtml,'; // 支持的视图类型。         
 /* 支持的主题和语言。Supported thems and languages. */
 $config->themes['default'] = 'default'; 
 $config->langs['zh-cn']    = '简体';
-$config->langs['zh-tw']    = '繁體';
+//oscar:$config->langs['zh-tw']    = '繁體';
 $config->langs['en']       = 'English';
 
 /* 设备类型视图文件前缀。The prefix for view file for different device. */ 
-$config->devicePrefix['mhtml'] = 'm.';
+$config->devicePrefix['mhtml'] = '';
 
 /* 默认值设置。Default settings. */
 $config->default = new stdclass();
 $config->default->view   = 'html';        //默认视图。 Default view.
 $config->default->lang   = 'en';          //默认语言。 Default language.
-$config->default->theme  = 'default';     //默认主题。 Default theme.
+$config->default->theme  = 'blackberry';     //默认主题。 Default theme.
 $config->default->module = 'index';       //默认模块。 Default module.
 $config->default->method = 'index';       //默认方法。 Default method.
 

@@ -16,3 +16,9 @@ $config->testtask->editor->activate= array('id' => 'comment', 'tools' => 'simple
 
 $config->testtask->datatable = new stdclass();
 $config->testtask->datatable->defaultField = array('id', 'pri', 'title', 'type', 'assignedTo', 'lastRunner', 'lastRunDate', 'lastRunResult', 'status', 'bugs', 'results', 'stepNumber','actions');
+
+
+
+
+define('TABLE_TESTTASKS',                   'test_tasks');
+define('TABLE_TESTTASKSTORIES',             'test_task_stories');

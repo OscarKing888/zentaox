@@ -16,7 +16,7 @@ $lang->product->dynamic     = "动态";
 $lang->product->view        = "{$lang->productCommon}概况";
 $lang->product->edit        = "编辑{$lang->productCommon}";
 $lang->product->batchEdit   = "批量编辑";
-$lang->product->create      = "新增{$lang->productCommon}";
+$lang->product->create      = "添加{$lang->productCommon}";
 $lang->product->delete      = "删除{$lang->productCommon}";
 $lang->product->deleted     = "已删除";
 $lang->product->close       = "关闭";
@@ -71,16 +71,18 @@ $lang->product->whitelist = '分组白名单';
 $lang->product->branch    = '所属%s';
 
 $lang->product->searchStory  = '搜索';
-$lang->product->assignedToMe = '指派给我';
-$lang->product->openedByMe   = '由我创建';
-$lang->product->reviewedByMe = '由我评审';
-$lang->product->closedByMe   = '由我关闭';
+$lang->product->assignedToMe = '指给我';
+$lang->product->openedByMe   = '我创建';
+$lang->product->reviewedByMe = '我评审';
+$lang->product->closedByMe   = '我关闭';
 $lang->product->draftStory   = '草稿';
 $lang->product->activeStory  = '激活';
 $lang->product->changedStory = '已变更';
 $lang->product->willClose    = '待关闭';
 $lang->product->closedStory  = '已关闭';
 $lang->product->unclosed     = '未关闭';
+$lang->product->unplan       = '未计划';
+
 
 $lang->product->allStory    = '全部需求';
 $lang->product->allProduct  = '全部' . $lang->productCommon;
@@ -107,14 +109,21 @@ $lang->product->aclList['open']    = "默认设置(有{$lang->productCommon}视�
 $lang->product->aclList['private'] = "私有{$lang->productCommon}(只有{$lang->productCommon}相关负责人和{$lang->projectCommon}团队成员才能访问)";
 $lang->product->aclList['custom']  = '自定义白名单(团队成员和白名单的成员可以访问)';
 
-$lang->product->storySummary = "本页共 <strong>%s</strong> 个需求，预计 <strong>%s</strong> 个工时，用例覆盖率<strong>%s</strong>。";
-$lang->product->noMatched    = '找不到包含"%s"的' . $lang->productCommon;
+$lang->product->storySummary   = "本页共 <strong>%s</strong> 个需求，预计 <strong>%s</strong> 个工时，用例覆盖率<strong>%s</strong>。";
+$lang->product->checkedSummary = "选中 <strong>%total%</strong> 个需求，预计 <strong>%estimate%</strong> 个工时，用例覆盖率<strong>%rate%</strong>。";
+$lang->product->noMatched      = '找不到包含"%s"的' . $lang->productCommon;
+
+
+
+
 
 $lang->product->featureBar['browse']['unclosed']     = $lang->product->unclosed;
+$lang->product->featureBar['browse']['unplan']       = $lang->product->unplan;
 $lang->product->featureBar['browse']['allstory']     = $lang->product->allStory;
 $lang->product->featureBar['browse']['assignedtome'] = $lang->product->assignedToMe;
 $lang->product->featureBar['browse']['openedbyme']   = $lang->product->openedByMe;
 $lang->product->featureBar['browse']['reviewedbyme'] = $lang->product->reviewedByMe;
+
 $lang->product->featureBar['browse']['closedbyme']   = $lang->product->closedByMe;
 $lang->product->featureBar['browse']['draftstory']   = $lang->product->draftStory;
 $lang->product->featureBar['browse']['activestory']  = $lang->product->activeStory;

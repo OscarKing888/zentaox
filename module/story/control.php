@@ -25,6 +25,7 @@ class story extends control
         $this->loadModel('tree');
         $this->loadModel('user');
         $this->loadModel('action');
+        $this->loadModel('dept'); // oscar
     }
 
     /**
@@ -102,6 +103,7 @@ class story extends control
 
         $users = $this->user->getPairs('pdfirst|noclosed|nodeleted');
         $moduleOptionMenu = $this->tree->getOptionMenu($productID, $viewType = 'story', 0, $branch);
+        if(empty($moduleOptionMenu)) die(js::locate(helper::createLink('tree', 'browse', "productID=$productID&view=story")));
 
         /* Set menu. */
         $this->product->setMenu($products, $product->id, $branch);
@@ -187,6 +189,11 @@ class story extends control
         $this->view->mailto           = $mailto;
         $this->view->needReview       = ($this->app->user->account == $product->PO || $projectID > 0 || $this->config->story->needReview == 0) ? "checked='checked'" : "";
 
+        //oscar:
+        $this->loadModel('dept');
+        $this->dept->setupDeptUsers($this->view, $this->app->user->account, $this->app->user->dept);
+        //oscar:
+
         $this->display();
     }
 
@@ -194,29 +201,39 @@ class story extends control
      * Create a batch stories.
      * 
      * @param  int    $productID 
+     * @param  int    $branch 
      * @param  int    $moduleID 
      * @param  int    $storyID
+     * @param  int    $project 
+     * @param  int    $plan 
      * @access public
      * @return void
      */
-    public function batchCreate($productID = 0, $branch = 0, $moduleID = 0, $storyID = 0)
+    public function batchCreate($productID = 0, $branch = 0, $moduleID = 0, $storyID = 0, $project = 0, $plan = 0)
     {
         if(!empty($_POST))
         {
             $mails = $this->story->batchCreate($productID, $branch);
             if(dao::isError()) die(js::error(dao::getError()));
 
+            $stories = array();
             foreach($mails as $mail)
             {
+                $stories[] = $mail->storyID;
                 if($mail->actionID) $this->story->sendmail($mail->storyID, $mail->actionID);
             }
+
+            //if($project) $this->loadModel('project')->linkStory($project, $stories); // oscar move to model batch create
 
             /* If storyID not equal zero, subdivide this story to child stories and close it. */
             if($storyID)
             {
+                if(empty($mails)) die(js::closeModal('parent.parent', 'this'));
                 $actionID = $this->story->subdivide($storyID, $mails);
+
                 if(dao::isError()) die(js::error(dao::getError()));
                 $this->story->sendmail($storyID, $actionID);
+
                 if(isonlybody()) die(js::closeModal('parent.parent', 'this'));
                 die(js::locate(inlink('view', "storyID=$storyID"), 'parent'));
             }
@@ -233,11 +250,11 @@ class story extends control
         $this->product->setMenu($products, $product->id, $branch);
 
         /* Init vars. */
-        $planID     = 0;
-        $pri        = 0;
-        $estimate   = '';
-        $title      = '';
-        $spec       = '';
+        $planID   = $plan;
+        $pri      = 0;
+        $estimate = '';
+        $title    = '';
+        $spec     = '';
 
         /* Process upload images. */
         if($this->session->storyImagesFile)
@@ -299,6 +316,11 @@ class story extends control
         $this->view->branches         = $this->loadModel('branch')->getPairs($productID);
         $this->view->needReview       = ($this->app->user->account == $product->PO || $this->config->story->needReview == 0) ? 0 : 1;
 
+        //oscar:
+        $this->loadModel('dept');
+        $this->dept->setupDeptUsers($this->view, $this->app->user->account, $this->app->user->dept);
+        //oscar:
+
         $this->display();
     }
 
@@ -344,10 +366,26 @@ class story extends control
         {
             $changes = $this->story->update($storyID);
             if(dao::isError()) die(js::error(dao::getError()));
+
+            /*
             if($this->post->comment != '' or !empty($changes))
             {
                 $action   = !empty($changes) ? 'Edited' : 'Commented';
                 $actionID = $this->action->create('story', $storyID, $action, $this->post->comment);
+                $this->action->logHistory($actionID, $changes);
+                $this->story->sendmail($storyID, $actionID);
+            }
+            //*/
+
+            $version = $this->dao->findById($storyID)->from(TABLE_STORY)->fetch('version');
+            $files = $this->loadModel('file')->saveUpload('story', $storyID, $version);
+            if($this->post->comment != '' or !empty($changes) or !empty($files))
+            {
+                //$action = (!empty($changes) or !empty($files)) ? 'Changed' : 'Commented';
+                $action = 'Edit';
+                $fileAction = '';
+                if(!empty($files)) $fileAction = $this->lang->addFiles . join(',', $files) . "\n" ;
+                $actionID = $this->action->create('story', $storyID, $action, $fileAction . $this->post->comment);
                 $this->action->logHistory($actionID, $changes);
                 $this->story->sendmail($storyID, $actionID);
             }
@@ -365,6 +403,7 @@ class story extends control
         $this->view->users      = $this->user->getPairs('pofirst|nodeleted', "$story->assignedTo,$story->openedBy,$story->closedBy");
         $this->view->product    = $product;
         $this->view->branches   = $product->type == 'normal' ? array() : $this->loadModel('branch')->getPairs($story->product);
+        $story->files = $this->loadModel('file')->getByObject('story', $storyID); // oscar:
         $this->display();
     }
 
@@ -627,9 +666,15 @@ class story extends control
         $this->view->actions    = $this->action->getList('story', $storyID);
         $this->view->modulePath = $modulePath;
         $this->view->version    = $version == 0 ? $story->version : $version;
-        $this->view->preAndNext = $this->loadModel('common')->getPreAndNextObject('story', $storyID);
+        //oscar export bug $this->view->preAndNext = $this->loadModel('common')->getPreAndNextObject('story', $storyID);
         $this->view->from       = $from;
         $this->view->param      = $param;
+
+        //oscar:
+        $this->loadModel('dept');
+        $this->dept->setupDeptUsers($this->view, $this->app->user->account, $this->app->user->dept);
+        //oscar:
+
         $this->display();
     }
 
@@ -669,7 +714,7 @@ class story extends control
             $this->story->review($storyID);
             if(dao::isError()) die(js::error(dao::getError()));
             $result = $this->post->result;
-            if($this->post->closedReason != '' and strpos('done,postponed,subdivided', $this->post->closedReason) === false) $result = 'pass';
+            if($this->post->closedReason != '' and strpos('done,postponed,subdivided,willnotdo', $this->post->closedReason) === false) $result = 'pass';
             $actionID = $this->action->create('story', $storyID, 'Reviewed', $this->post->comment, ucfirst($result));
             $this->story->sendmail($storyID, $actionID);
             if($this->post->result == 'reject')
@@ -973,6 +1018,25 @@ class story extends control
         die(js::locate($this->session->storyList, 'parent'));
     }
 
+    public function batchChangePriority()
+    {
+        if(!empty($_POST) && isset($_POST['storyIDList']))
+        {
+            $allChanges  = $this->story->batchChangePriority();
+            if(dao::isError()) die(js::error(dao::getError()));
+            foreach($allChanges as $storyID => $changes)
+            {
+                $actionID = $this->action->create('story', $storyID, 'Edited');
+                $this->action->logHistory($actionID, $changes);
+                $this->story->sendmail($storyID, $actionID);
+            }
+        }
+        if(!dao::isError()) $this->loadModel('score')->create('ajax', 'batchOther');
+        die(js::locate($this->session->storyList, 'parent'));
+    }
+
+
+
     /**
      * Tasks of a story.
      * 
@@ -984,8 +1048,12 @@ class story extends control
     public function tasks($storyID, $projectID = 0)
     {
         $this->loadModel('task');
-        $this->view->tasks = $this->task->getStoryTasks($storyID, $projectID);
-        $this->view->users = $this->user->getPairs('noletter');
+        $tasks = $this->task->getStoryTasks($storyID, $projectID);
+        $this->view->story = $this->story->getByID($storyID); // oscar
+        $this->view->tasks   = $tasks;
+        $this->view->users   = $this->user->getPairs('noletter');
+        $this->view->summary = $this->loadModel('project')->summary($tasks);
+        $this->view->depts = $this->dept->getOptionMenu(); //oscar:
         $this->display();
     }
 
@@ -999,6 +1067,7 @@ class story extends control
     public function bugs($storyID)
     {
         $this->loadModel('bug');
+        $this->view->story = $this->story->getByID($storyID); // oscar
         $this->view->bugs  = $this->bug->getStoryBugs($storyID);
         $this->view->users = $this->user->getPairs('noletter');
         $this->display();
@@ -1014,6 +1083,7 @@ class story extends control
     public function cases($storyID)
     {
         $this->loadModel('testcase');
+        $this->view->story = $this->story->getByID($storyID); // oscar
         $this->view->cases      = $this->testcase->getStoryCases($storyID);
         $this->view->users      = $this->user->getPairs('noletter');
         $this->view->resultList = array('' => '') + $this->lang->testcase->resultList;
@@ -1204,7 +1274,7 @@ class story extends control
         }
 
         $stories = $this->story->getProductStoryPairs($productID, $branch ? "0,$branch" : $branch, $moduleID, $storyStatus, 'id_desc', $limit);
-        $select  = html::select('story', empty($stories) ? array('' => '') : $stories, $storyID, "class='form-control'");
+        $select  = html::select('story', empty($stories) ? array('' => '') : $stories, $storyID, "class='form-control' onchange='setStoryRelated()'");
 
         /* If only need options, remove select wrap. */
         if($onlyOption == 'true') die(substr($select, strpos($select, '>') + 1, -10));
@@ -1343,7 +1413,9 @@ class story extends control
      * @return void
      */
     public function export($productID, $orderBy)
-    { 
+    {
+        //error_log("XXXXXXX: story.control.export product:$productID order:$orderBy");
+
         /* format the fields of every story in order to export data. */
         if($_POST)
         {
@@ -1365,17 +1437,21 @@ class story extends control
             $stories = array();
             if($this->session->storyOnlyCondition)
             {
-                $stories = $this->dao->select('*')->from(TABLE_STORY)->where($this->session->storyQueryCondition)
+                //$stories = $this->dao->select('*')->from(TABLE_STORY)->where($this->session->storyQueryCondition)
+                $stories = $this->dao->select('*')->from(TABLE_STORY)->where('1')
                     ->beginIF($this->post->exportType == 'selected')->andWhere('id')->in($this->cookie->checkedItem)->fi()
                     ->orderBy($orderBy)->fetchAll('id');
             }
             else
             {
-                $stmt = $this->dbh->query($this->session->storyQueryCondition . ($this->post->exportType == 'selected' ? " AND t2.id IN({$this->cookie->checkedItem})" : '') . " ORDER BY " . strtr($orderBy, '_', ' '));
+                $sql = $this->session->storyQueryCondition . ($this->post->exportType == 'selected' ? " AND id IN({$this->cookie->checkedItem})" : '') . " ORDER BY " . strtr($orderBy, '_', ' ');
+                //$sql = str_replace('`zt_task`','`zt_story`', $sql);
+                error_log("story export: $sql");
+                $stmt = $this->dbh->query($sql);
                 while($row = $stmt->fetch()) $stories[$row->id] = $row;
-            }
+        }
 
-            /* Get users, products and projects. */
+        /* Get users, products and projects. */
             $users    = $this->loadModel('user')->getPairs('noletter');
             $products = $this->loadModel('product')->getPairs('nocode');
 
@@ -1562,4 +1638,6 @@ class story extends control
         if($id) die(html::select("storys[$id]", $storys, '', 'class="form-control"'));
         die(html::select('story', $storys, '', 'class=form-control'));
     }
+
+
 }

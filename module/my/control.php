@@ -13,7 +13,7 @@ class my extends control
 {
     /**
      * Construct function.
-     * 
+     *
      * @access public
      * @return void
      */
@@ -27,7 +27,7 @@ class my extends control
 
     /**
      * Index page, goto todo.
-     * 
+     *
      * @access public
      * @return void
      */
@@ -63,14 +63,14 @@ class my extends control
     }
 
     /**
-     * My todos. 
-     * 
-     * @param  string $type 
-     * @param  string $account 
-     * @param  string $status 
-     * @param  int    $recTotal 
-     * @param  int    $recPerPage 
-     * @param  int    $pageID 
+     * My todos.
+     *
+     * @param  string $type
+     * @param  string $account
+     * @param  string $status
+     * @param  int    $recTotal
+     * @param  int    $recPerPage
+     * @param  int    $pageID
      * @access public
      * @return void
      */
@@ -108,18 +108,21 @@ class my extends control
         $this->view->account      = $this->app->user->account;
         $this->view->orderBy      = $orderBy == 'date_desc,status,begin,id_desc' ? '' : $orderBy;
         $this->view->pager        = $pager;
+        $this->view->times        = date::buildTimeList($this->config->todo->times->begin, $this->config->todo->times->end, $this->config->todo->times->delta);
+        $this->view->time         = date::now();
+        $this->view->members      = $this->loadModel('user')->getPairs();
         $this->view->importFuture = ($type != 'today');
 
         $this->display();
     }
 
     /**
-     * My stories 
-      
-     * @param  string $type 
-     * @param  int    $recTotal 
-     * @param  int    $recPerPage 
-     * @param  int    $pageID 
+     * My stories
+
+     * @param  string $type
+     * @param  int    $recTotal
+     * @param  int    $recPerPage
+     * @param  int    $pageID
      * @access public
      * @return void
      */
@@ -153,11 +156,11 @@ class my extends control
 
     /**
      * My tasks
-     * 
-     * @param  string $type 
-     * @param  int    $recTotal 
-     * @param  int    $recPerPage 
-     * @param  int    $pageID 
+     *
+     * @param  string $type
+     * @param  int    $recTotal
+     * @param  int    $recPerPage
+     * @param  int    $pageID
      * @access public
      * @return void
      */
@@ -195,12 +198,12 @@ class my extends control
 
     /**
      * My bugs.
-     * 
-     * @param  string $type 
-     * @param  string $orderBy 
-     * @param  int    $recTotal 
-     * @param  int    $recPerPage 
-     * @param  int    $pageID 
+     *
+     * @param  string $type
+     * @param  string $orderBy
+     * @param  int    $recTotal
+     * @param  int    $recPerPage
+     * @param  int    $pageID
      * @access public
      * @return void
      */
@@ -209,7 +212,7 @@ class my extends control
         /* Save session. load Lang. */
         if($this->app->viewType != 'json') $this->session->set('bugList', $this->app->getURI(true));
         $this->app->loadLang('bug');
- 
+
         /* Load pager. */
         $this->app->loadClass('pager', $static = true);
         if($this->app->getViewType() == 'mhtml') $recPerPage = 10;
@@ -239,7 +242,7 @@ class my extends control
 
     /**
      * My test task.
-     * 
+     *
      * @access public
      * @return void
      */
@@ -260,7 +263,7 @@ class my extends control
         $this->view->title      = $this->lang->my->common . $this->lang->colon . $this->lang->my->testTask;
         $this->view->position[] = $this->lang->my->testTask;
         $this->view->tasks      = $this->loadModel('testtask')->getByUser($this->app->user->account, $pager, $sort, $type);
-        
+
         $this->view->recTotal   = $recTotal;
         $this->view->recPerPage = $recPerPage;
         $this->view->pageID     = $pageID;
@@ -327,7 +330,7 @@ class my extends control
 
     /**
      * My projects.
-     * 
+     *
      * @access public
      * @return void
      */
@@ -344,8 +347,8 @@ class my extends control
     }
 
     /**
-     * Edit profile 
-     * 
+     * Edit profile
+     *
      * @access public
      * @return void
      */
@@ -369,8 +372,8 @@ class my extends control
     }
 
     /**
-     * Change password 
-     * 
+     * Change password
+     *
      * @access public
      * @return void
      */
@@ -406,18 +409,35 @@ class my extends control
             if($this->post->mode == 'new')
             {
                 $listID = $this->user->createContactList($this->post->newList, $this->post->users);
+                $this->user->setGlobalContacts($listID, isset($_POST['share']));
                 if(isonlybody()) die(js::closeModal('parent.parent', '', 'function(){parent.parent.ajaxGetContacts(\'#mailtoGroup\')}'));
                 die(js::locate(inlink('manageContacts', "listID=$listID"), 'parent'));
             }
             elseif($this->post->mode == 'edit')
             {
                 $this->user->updateContactList($this->post->listID, $this->post->listName, $this->post->users);
+                $this->user->setGlobalContacts($this->post->listID, isset($_POST['share']));
                 die(js::locate(inlink('manageContacts', "listID={$this->post->listID}"), 'parent'));
             }
         }
 
-        $mode   = empty($mode) ? 'edit' : $mode;
-        $lists  = $this->user->getContactLists($this->app->user->account);
+        $mode  = empty($mode) ? 'edit' : $mode;
+        $lists = $this->user->getContactLists($this->app->user->account);
+
+        $globalContacts = isset($this->config->my->global->globalContacts) ? $this->config->my->global->globalContacts : '';
+        $globalContacts = !empty($globalContacts) ? explode(',', $globalContacts) : array();
+
+        $myContacts = $this->user->getListByAccount($this->app->user->account);
+        $disabled   = $globalContacts;
+
+        if(!empty($myContacts) && !empty($globalContacts))
+        {
+            foreach($globalContacts as $id)
+            {
+                if(in_array($id, array_keys($myContacts))) unset($disabled[array_search($id, $disabled)]);
+            }
+        }
+
         $listID = $listID ? $listID : key($lists);
         if(!$listID) $mode = 'new';
 
@@ -434,10 +454,12 @@ class my extends control
             $this->view->list       = $this->user->getContactListByID($listID);
         }
 
-        $this->view->mode   = $mode;
-        $this->view->lists  = $lists;
-        $this->view->listID = $listID;
-        $this->view->users  = $this->user->getPairs('noletter|noempty|noclosed|noclosed');
+        $this->view->mode           = $mode;
+        $this->view->lists          = $lists;
+        $this->view->listID         = $listID;
+        $this->view->users          = $this->user->getPairs('noletter|noempty|noclosed|noclosed');
+        $this->view->disabled       = $disabled;
+        $this->view->globalContacts = $globalContacts;
         $this->display();
     }
 
@@ -476,7 +498,7 @@ class my extends control
 
     /**
      * View my profile.
-     * 
+     *
      * @access public
      * @return void
      */
@@ -490,18 +512,18 @@ class my extends control
         $this->view->position[] = $this->lang->my->profile;
         $this->view->user       = $user;
         $this->view->groups     = $this->loadModel('group')->getByAccount($this->app->user->account);
-        $this->view->deptPath   = $this->dept->getParents($user->dept); 
+        $this->view->deptPath   = $this->dept->getParents($user->dept);
         $this->display();
     }
 
     /**
      * My dynamic.
-     * 
-     * @param  string $type 
-     * @param  string $orderBy 
-     * @param  int    $recTotal 
-     * @param  int    $recPerPage 
-     * @param  int    $pageID 
+     *
+     * @param  string $type
+     * @param  string $orderBy
+     * @param  int    $recTotal
+     * @param  int    $recPerPage
+     * @param  int    $pageID
      * @access public
      * @return void
      */
@@ -543,9 +565,9 @@ class my extends control
     }
 
     /**
-     * Unbind ranzhi 
-     * 
-     * @param  string $confirm 
+     * Unbind ranzhi
+     *
+     * @param  string $confirm
      * @access public
      * @return void
      */

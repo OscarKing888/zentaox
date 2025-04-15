@@ -204,6 +204,12 @@ class product extends control
         $this->view->storyCases    = $storyCases;
         $this->view->param         = $param;
         $this->view->products      = $this->products;
+
+        //oscar:
+        $this->loadModel('dept');
+        $this->dept->setupDeptUsers($this->view, $this->app->user->account, $this->app->user->dept);
+        //oscar:
+
         $this->display();
     }
 

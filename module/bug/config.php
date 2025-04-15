@@ -6,9 +6,10 @@ $config->bug->longlife    = 7;
 $config->bug->create  = new stdclass();
 $config->bug->edit    = new stdclass();
 $config->bug->resolve = new stdclass();
-$config->bug->create->requiredFields  = 'title,openedBuild';
+$config->bug->create->requiredFields  = 'title,openedBuild,module,assignedTo';
 $config->bug->edit->requiredFields    = $config->bug->create->requiredFields;
-$config->bug->resolve->requiredFields = 'resolution';
+$config->bug->resolve->requiredFields = 'resolution,resolvedBuild';
+$config->bug->activate->requiredFields = 'openedBuild';
 
 $config->bug->list = new stdclass();
 $config->bug->list->allFields = 'id, module, project, story, task, 
@@ -23,7 +24,7 @@ $config->bug->list->allFields = 'id, module, project, story, task,
     lastEditedBy,
     lastEditedDate';
 
-$config->bug->list->defaultFields = 'id,severity,pri,title,openedBy,assignedTo,resolvedBy,resolution';
+$config->bug->list->defaultFields = 'id,severity,story,pri,title,openedBy,assignedTo,resolvedBy,resolution';
 
 $config->bug->list->exportFields = 'id, product, branch, module, project, story, task, 
     title, keywords, severity, pri, type, os, browser,
@@ -38,13 +39,14 @@ $config->bug->list->exportFields = 'id, product, branch, module, project, story,
     lastEditedDate, files';
 
 $config->bug->list->customCreateFields      = 'project,story,task,pri,severity,os,browser,deadline,mailto,keywords';
-$config->bug->list->customBatchCreateFields = 'module,project,steps,type,pri,severity,os,browser,keywords';
-$config->bug->list->customBatchEditFields   = 'type,severity,pri,productplan,assignedTo,deadline,status,resolvedBy,resolution,os,browser,keywords';
+$config->bug->list->customBatchCreateFields = 'module,project,story,task,steps,type,pri,severity,os,browser,keywords,assignedTo';
+$config->bug->list->customBatchEditFields   = 'story,type,severity,pri,productplan,assignedTo,deadline,status,resolvedBy,resolution,os,browser,keywords';
 
 $config->bug->custom = new stdclass();
 $config->bug->custom->createFields      = $config->bug->list->customCreateFields;
-$config->bug->custom->batchCreateFields = 'module,project,steps,type,severity,os,browser';
-$config->bug->custom->batchEditFields   = 'type,severity,pri,branch,assignedTo,deadline,status,resolvedBy,resolution';
+//$config->bug->custom->batchCreateFields = 'module,project,steps,type,severity,os,browser';
+$config->bug->custom->batchCreateFields = 'module,story,task,steps,type,severity,assignedTo,os,browser';
+$config->bug->custom->batchEditFields   = 'type,story,task,severity,pri,branch,assignedTo,deadline,status,resolvedBy,resolution';
 
 if($config->global->flow == 'onlyTest')
 {
@@ -68,13 +70,17 @@ $config->bug->editor->close      = array('id' => 'comment', 'tools' => 'bugTools
 $config->bug->editor->activate   = array('id' => 'comment', 'tools' => 'bugTools');
 
 global $lang;
+
 $config->bug->search['module']                   = 'bug';
+$config->bug->search['fields']['dept']           = $lang->bug->dept; // oscar
 $config->bug->search['fields']['title']          = $lang->bug->title;
 $config->bug->search['fields']['id']             = $lang->bug->id;
 $config->bug->search['fields']['keywords']       = $lang->bug->keywords;
 $config->bug->search['fields']['steps']          = $lang->bug->steps;
 $config->bug->search['fields']['assignedTo']     = $lang->bug->assignedTo;
 $config->bug->search['fields']['resolvedBy']     = $lang->bug->resolvedBy;
+
+
 
 $config->bug->search['fields']['status']         = $lang->bug->status;
 $config->bug->search['fields']['confirmed']      = $lang->bug->confirmed;
@@ -121,6 +127,7 @@ if($config->global->flow == 'onlyTest')
     unset($config->bug->search['fields']['toStory']);
 }
 
+$config->bug->search['params']['dept']           = array('operator' => '=', 'control' => 'select',  'values' => $lang->bug->deptList); // oscar
 $config->bug->search['params']['title']         = array('operator' => 'include', 'control' => 'input',  'values' => '');
 $config->bug->search['params']['keywords']      = array('operator' => 'include', 'control' => 'input',  'values' => '');
 $config->bug->search['params']['steps']         = array('operator' => 'include', 'control' => 'input',  'values' => '');
@@ -165,7 +172,7 @@ $config->bug->search['params']['lastEditedDate']= array('operator' => '=',      
 $config->bug->search['params']['deadline']      = array('operator' => '=',      'control' => 'input',  'values' => '', 'class' => 'date');
 
 $config->bug->datatable = new stdclass();
-$config->bug->datatable->defaultField = array('id', 'severity', 'pri', 'title', 'status', 'openedBy', 'openedDate', 'assignedTo', 'resolvedBy', 'resolution', 'actions');
+$config->bug->datatable->defaultField = array('id',  'severity', 'pri', 'title', 'story','status', 'openedBy', 'openedDate', 'assignedTo', 'resolvedBy', 'resolution', 'actions');
 
 $config->bug->datatable->fieldList['id']['title']    = 'idAB';
 $config->bug->datatable->fieldList['id']['fixed']    = 'left';
@@ -225,7 +232,7 @@ $config->bug->datatable->fieldList['activatedDate']['required'] = 'no';
 $config->bug->datatable->fieldList['story']['title']    = 'story';
 $config->bug->datatable->fieldList['story']['fixed']    = 'no';
 $config->bug->datatable->fieldList['story']['width']    = '120';
-$config->bug->datatable->fieldList['story']['required'] = 'no';
+$config->bug->datatable->fieldList['story']['required'] = 'yes';
 
 $config->bug->datatable->fieldList['task']['title']    = 'task';
 $config->bug->datatable->fieldList['task']['fixed']    = 'no';
@@ -267,7 +274,7 @@ $config->bug->datatable->fieldList['openedBuild']['fixed']    = 'no';
 $config->bug->datatable->fieldList['openedBuild']['width']    = '120';
 $config->bug->datatable->fieldList['openedBuild']['required'] = 'no';
 
-$config->bug->datatable->fieldList['assignedTo']['title']    = 'assignedTo';
+$config->bug->datatable->fieldList['assignedTo']['title']    = 'assignedToAB';
 $config->bug->datatable->fieldList['assignedTo']['fixed']    = 'no';
 $config->bug->datatable->fieldList['assignedTo']['width']    = '80';
 $config->bug->datatable->fieldList['assignedTo']['required'] = 'no';

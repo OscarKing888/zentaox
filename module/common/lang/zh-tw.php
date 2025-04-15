@@ -19,7 +19,7 @@ $lang->null      = '空';
 $lang->ellipsis  = '…';
 
 $lang->zentaoPMS      = '禪道';
-$lang->welcome        = "%s項目管理系統";
+$lang->welcome        = "%s日报系統&nbsp;&nbsp;&nbsp;(内部信息，禁止外传！)";
 $lang->logout         = '退出';
 $lang->login          = '登錄';
 $lang->help           = '幫助';
@@ -219,6 +219,7 @@ $lang->project->menu = new stdclass();
 $lang->project->menu->list      = array('link' => '%s', 'fixed' => true);
 $lang->project->menu->task      = array('link' => '任務|project|task|projectID=%s', 'subModule' => 'task,tree', 'alias' => 'grouptask,importtask,burn,importbug,kanban,printkanban,tree');
 $lang->project->menu->story     = array('link' => '需求|project|story|projectID=%s', 'subModule' => 'story', 'alias' => 'linkstory,storykanban');
+$lang->project->menu->productMilestone      = '里程碑|project|productMilestone|projectID=%s';
 $lang->project->menu->bug       = 'Bug|project|bug|projectID=%s';
 $lang->project->menu->dynamic   = '動態|project|dynamic|projectID=%s';
 $lang->project->menu->build     = array('link' => '版本|project|build|projectID=%s', 'subModule' => 'build');
@@ -458,7 +459,7 @@ $lang->pager->noRecord     = "暫時沒有記錄";
 $lang->pager->digest       = "共 <strong>%s</strong> 條記錄，%s <strong>%s/%s</strong> &nbsp; ";
 $lang->pager->recPerPage   = "每頁 <strong>%s</strong> 條";
 $lang->pager->first        = "<i class='icon-step-backward' title='首頁'></i>";
-$lang->pager->pre          = "<i class='icon-play icon-rotate-180' title='上一頁'></i>";
+$lang->pager->pre          = "<i class='icon-play icon-flip-horizontal' title='上一頁'></i>";
 $lang->pager->next         = "<i class='icon-play' title='下一頁'></i>";
 $lang->pager->last         = "<i class='icon-step-forward' title='末頁'></i>";
 $lang->pager->locate       = "GO!";
@@ -584,6 +585,10 @@ $lang->icons['manage']             = 'cog';
 $lang->icons['unlock']             = 'unlock-alt';
 $lang->icons['confirmStoryChange'] = 'search';
 $lang->icons['score']              = 'tint';
+
+// oscar[
+$lang->icons['checkByGD']              = 'review';
+// oscar]
 
 include (dirname(__FILE__) . '/menuOrder.php');
 

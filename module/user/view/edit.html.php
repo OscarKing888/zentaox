@@ -39,10 +39,8 @@
         <td colspan='3'><?php echo html::select('groups[]', $groups, $userGroups, 'size=3 multiple=multiple class="form-control chosen"');?></td>
       </tr>
       <tr>
-        <th><?php echo $lang->user->join;?></th>
-        <td><?php echo html::input('join', $user->join, "class='form-control form-date'");?></td>
         <th><?php echo $lang->user->gender;?></th>
-        <td><?php echo html::radio('gender', (array)$lang->user->genderList, $user->gender);?></td>
+        <td colspan="3"><?php echo html::radio('gender', (array)$lang->user->genderList, $user->gender);?></td>
       </tr>
     </table>
     <table align='center' class='table table-form'>
@@ -98,7 +96,7 @@
         <td><?php echo html::input('phone', $user->phone, "class='form-control' autocomplete='off'");?></td>
         <th><?php echo $lang->user->address;?></th>
         <td><?php echo html::input('address', $user->address, "class='form-control' autocomplete='off'");?></td>
-      </tr>  
+      </tr>
       <tr>
         <th><?php echo $lang->user->zipcode;?></th>
         <td><?php echo html::input('zipcode', $user->zipcode, "class='form-control' autocomplete='off'");?></td>

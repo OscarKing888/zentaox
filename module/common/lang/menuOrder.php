@@ -1,6 +1,17 @@
 <?php
 /* Sort of main menu. */
-$lang->menuOrder[5]  = 'my';
+
+$lang->menuOrder[-1]  = 'pmshelp';
+$lang->menuOrder[1]  = 'my';
+$lang->menuOrder[2]  = 'blog';
+$lang->menuOrder[3]  = 'meeting';
+$lang->menuOrder[4]  = 'artstation';
+$lang->menuOrder[5]  = 'pipeline';
+$lang->menuOrder[6]  = 'timeline';
+$lang->menuOrder[7]  = 'books';
+$lang->menuOrder[8]  = 'gametaskinternal';
+
+
 $lang->menuOrder[10] = 'product';
 $lang->menuOrder[15] = 'project';
 $lang->menuOrder[20] = 'qa';
@@ -51,10 +62,16 @@ $lang->branch->menuOrder      = $lang->product->menuOrder;
 /* project menu order. */
 $lang->project->menuOrder[5]  = 'list';
 $lang->project->menuOrder[10] = 'index';
-$lang->project->menuOrder[15] = 'task';
-$lang->project->menuOrder[20] = 'story';
+$lang->project->menuOrder[12] = 'module';
+$lang->project->menuOrder[14] = 'story';
+$lang->project->menuOrder[16] = 'productMilestone';
+$lang->project->menuOrder[20] = 'task';
+//$lang->project->menuOrder[23] = 'taskmilestone'; // oscar
+$lang->project->menuOrder[24] = 'projectBlueprint'; // oscar
 $lang->project->menuOrder[25] = 'bug';
 $lang->project->menuOrder[30] = 'build';
+$lang->project->menuOrder[31] = 'buildex';
+$lang->project->menuOrder[32] = 'burn';
 $lang->project->menuOrder[35] = 'testtask';
 $lang->project->menuOrder[40] = 'team';
 $lang->project->menuOrder[45] = 'dynamic';

@@ -48,6 +48,8 @@ function setBranchRelated(branchID, productID, num)
  */
 function setOpenedBuilds(link, index)
 {
+    // oscar
+    /*
     $.get(link, function(builds)
     {
         var row = $('#buildBox' + index).closest('tbody').find('tr').size()
@@ -67,6 +69,7 @@ function setOpenedBuilds(link, index)
             if($('#projects' + index).val() != 'ditto') break;
         }while(index < row)
     });
+    //*/
 }
 
 /**
@@ -136,3 +139,27 @@ if(navigator.userAgent.indexOf("Firefox") < 0)
         this.style.height = (this.scrollHeight + 2) + "px"; 
     });
 }
+
+$(document).keydown(function(event)
+{
+    if(event.ctrlKey && event.keyCode == 38)
+    {
+        event.stopPropagation();
+        event.preventDefault();
+        selectFocusJump('up');
+    }
+    else if(event.ctrlKey && event.keyCode == 40)
+    {
+        event.stopPropagation();
+        event.preventDefault();
+        selectFocusJump('down');
+    }
+    else if(event.keyCode == 38)
+    {
+        inputFocusJump('up');
+    }
+    else if(event.keyCode == 40)
+    {
+        inputFocusJump('down');
+    }
+});

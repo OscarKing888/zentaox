@@ -1,3 +1,25 @@
 .linkbox{height:180px; overflow-y:auto}
 .tab-pane .table-borderless {border: 1px solid #ddd!important}
 .tab-pane .table-data.table-borderless {border: none!important}
+
+.red {color:red}
+.confirmedtext {color: #00b7ff}
+.confirmed {border: 4px solid #6ea400}
+.designnormal {border: 2px solid #c9c9cb}
+
+
+.progressCompleted{background-color: rgba(0, 255, 14, 0.18)}
+.progressInCompleted{background-color: rgba(0, 255, 14, 0)}
+
+.task-finished { color: #229f24 }
+.task-wait_check { color: #0056a2}
+.task-wait_check-by-me { color: #ff00e6}
+.task-checked { color: #229f24 }
+.task-dept { color: deepskyblue}
+
+.red {color:red}
+.confirmedtext {color: #00b7ff}
+.confirmed {border: 4px solid #6ea400}
+.designnormal {border: 2px solid #c9c9cb}
+.taskIDColor{color:#6ea400}
+.taskUserNameColor {color:#d10054}

@@ -121,21 +121,21 @@ js::set('oldResolvedBuild'       , $bug->resolvedBuild);
               if($bug->type != 'designchange') unset($lang->bug->typeList['designchange']);
               if($bug->type != 'newfeature')   unset($lang->bug->typeList['newfeature']);
               if($bug->type != 'trackthings')  unset($lang->bug->typeList['trackthings']);
-              echo html::select('type', $lang->bug->typeList, $bug->type, "class='form-control'");
+              echo html::select('type', $lang->bug->typeList, $bug->type, "class='form-control chosen'");
               ?>
             </td>
           </tr>
           <tr>
             <th><?php echo $lang->bug->severity;?></th>
-            <td><?php echo html::select('severity', $lang->bug->severityList, $bug->severity, "class='form-control'");?></td>
+            <td><?php echo html::select('severity', $lang->bug->severityList, $bug->severity, "class='form-control chosen'");?></td>
           </tr>
           <tr>
             <th><?php echo $lang->bug->pri;?></th>
-            <td><?php echo html::select('pri', $lang->bug->priList, $bug->pri, "class='form-control'");?></td>
+            <td><?php echo html::select('pri', $lang->bug->priList, $bug->pri, "class='form-control chosen'");?></td>
           </tr>
           <tr>
             <th><?php echo $lang->bug->status;?></th>
-            <td><?php echo html::select('status', $lang->bug->statusList, $bug->status, "class='form-control'");?></td>
+            <td><?php echo html::select('status', $lang->bug->statusList, $bug->status, "class='form-control chosen'");?></td>
           </tr>
           <tr>
             <th><?php echo $lang->bug->confirmed;?></th>
@@ -151,11 +151,11 @@ js::set('oldResolvedBuild'       , $bug->resolvedBuild);
           </tr>
           <tr>
             <th><?php echo $lang->bug->os;?></th>
-            <td><?php echo html::select('os', $lang->bug->osList, $bug->os, "class='form-control'");?></td>
+            <td><?php echo html::select('os', $lang->bug->osList, $bug->os, "class='form-control chosen'");?></td>
           </tr>
           <tr>
             <th><?php echo $lang->bug->browser;?></th>
-            <td><?php echo html::select('browser', $lang->bug->browserList, $bug->browser, "class='form-control'");?></td>
+            <td><?php echo html::select('browser', $lang->bug->browserList, $bug->browser, "class='form-control chosen'");?></td>
           </tr>
           <tr>
             <th><?php echo $lang->bug->keywords;?></th>
@@ -163,7 +163,10 @@ js::set('oldResolvedBuild'       , $bug->resolvedBuild);
           </tr>
           <tr>
             <th><?php echo $lang->bug->mailto;?></th>
-            <td><?php echo html::select('mailto[]', $users, str_replace(' ', '', $bug->mailto), 'class="form-control chosen" multiple');?></td>
+            <td>
+              <?php echo html::select('mailto[]', $users, str_replace(' ', '', $bug->mailto), 'class="form-control chosen" multiple');?>
+              <?php echo $this->fetch('my', 'buildContactLists');?>
+            </td>
           </tr>
         </table>
       </fieldset>
@@ -198,12 +201,12 @@ js::set('oldResolvedBuild'       , $bug->resolvedBuild);
           </tr>
           <tr>
             <th><?php echo $lang->bug->openedBuild;?></th>
-            <td>
-              <div class='input-group'>
-                <span id='openedBuildBox'><?php echo html::select('openedBuild[]', $openedBuilds, $bug->openedBuild, 'size=4 multiple=multiple class="chosen form-control"');?></span>
-                <span class='input-group-btn'><?php echo html::commonButton($lang->bug->allBuilds, "class='btn btn-default' onclick='loadAllBuilds(this)'")?></span>
-              </div>
-            </td>
+              <td>
+                  <div class='input-group'>
+                      <span id='openedBuildBox'><?php echo html::select('openedBuild[]', $openedBuilds, $bug->openedBuild, 'size=4 multiple=multiple class="chosen form-control"');?></span>
+                      <span class='input-group-btn'><?php echo html::commonButton($lang->bug->allBuilds, "class='btn btn-default' onclick='loadAllBuilds(this)'")?></span>
+                  </div>
+              </td>
           </tr>
           <tr>
             <th><?php echo $lang->bug->resolvedBy;?></th>
@@ -211,16 +214,16 @@ js::set('oldResolvedBuild'       , $bug->resolvedBuild);
           </tr>
           <tr>
             <th><?php echo $lang->bug->resolvedDate;?></th>
-            <td><?php echo html::input('resolvedDate', $bug->resolvedDate, 'class=form-control');?></td>
+            <td><?php echo html::input('resolvedDate', $bug->resolvedDate, "class='form-control form-datetime'");?></td>
           </tr>
           <tr>
             <th><?php echo $lang->bug->resolvedBuild;?></th>
-            <td>
-              <div class='input-group'>
-                <span id='resolvedBuildBox'><?php echo html::select('resolvedBuild', $resolvedBuilds, $bug->resolvedBuild, "class='form-control chosen'");?></span>
-                <span class='input-group-btn'><?php echo html::commonButton($lang->bug->allBuilds, "class='btn btn-default' onclick='loadAllBuilds(this)'")?></span>
-              </div>
-            </td>
+              <td>
+                  <div class='input-group'>
+                      <span id='resolvedBuildBox'><?php echo html::select('resolvedBuild', $resolvedBuilds, $bug->resolvedBuild, "class='form-control chosen'");?></span>
+                      <span class='input-group-btn'><?php echo html::commonButton($lang->bug->allBuilds, "class='btn btn-default' onclick='loadAllBuilds(this)'")?></span>
+                  </div>
+              </td>
           </tr>
           <tr>
             <th><?php echo $lang->bug->resolution;?></th>
@@ -236,7 +239,7 @@ js::set('oldResolvedBuild'       , $bug->resolvedBuild);
           </tr>
           <tr>
             <th><?php echo $lang->bug->closedDate;?></th>
-            <td><?php echo html::input('closedDate', $bug->closedDate, 'class=form-control');?></td>
+            <td><?php echo html::input('closedDate', $bug->closedDate, "class='form-control form-datetime'");?></td>
           </tr>
         </table>
       </fieldset>

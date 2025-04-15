@@ -30,10 +30,12 @@
     <tbody class='text-left'>
       <?php foreach($bugs as $bug):?>
       <tr>
-        <td class='text-center'><?php echo $bug->id . html::hidden("bugIDList[$bug->id]", $bug->id);?></td>
+        <td class='text-center'><?php echo $bug->id . html::input("bugIDList[$bug->id]", $bug->id);?></td>
         <td><?php echo $bug->title . html::hidden("statusList[$bug->id]", $bug->status);?></td>
         <td style='overflow:visible'><?php echo html::select("assignedToList[$bug->id]", $users, $bug->resolvedBy, "class='form-control chosen'");?></td>
-        <td style='overflow:visible'><?php echo html::select("openedBuildList[$bug->id]", $builds, $bug->openedBuild, 'size=4 multiple=multiple class="form-control chosen"');?></td>
+        <td style='overflow:visible'>
+            <?php echo html::input("openedBuildList[$bug->id]", $bug->openedBuild, "class='form-control'");?>
+        </td>
         <td><?php echo html::input("commentList[$bug->id]", '', "class='form-control'");?></td>
       </tr>
       <?php endforeach;?>
